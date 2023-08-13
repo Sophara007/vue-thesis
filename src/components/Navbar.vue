@@ -4,7 +4,6 @@
       <router-link to="/" class="navbar-brand">Blue-Tech</router-link>
       <ul class="navbar-links">
         <li><router-link to="/login">Login</router-link></li>
-        <li><router-link to="/signup">Signup</router-link></li>
       </ul>
     </div>
   </nav>

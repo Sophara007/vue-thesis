@@ -1,100 +1,186 @@
 <template>
-  <div>
-    <h1>Service Company Management</h1>
-    
-    <button @click="createServiceCompany">Create New</button>
-
-    <ul v-if="serviceCompanies.length">
-    <li v-for="company in serviceCompanies" :key="company.id">
-      {{ company.name }} - 
-      <button @click="editServiceCompany(company)">Edit</button>
-      <button @click="viewServiceCompany(company.id)">View</button>
-      <button @click="deleteServiceCompany(company.id)">Delete</button>
-      {{ console.log(company) }} <!-- Add this line -->
-    </li>
-  </ul>
-    <div v-else>
-      <p>No service companies available.</p>
+  <div class="slider-page container-fluid">
+    <h1>Service page</h1>
+    <div class="wrapper-create m-5">
+      <button
+        class="btn btn-success custom-btn"
+        data-bs-toggle="modal"
+        data-bs-target="#createModal"
+      >
+        Create
+      </button>
     </div>
-    
-    <div v-if="showCreateForm">
-      <h2>Create New Service Company</h2>
-      <form @submit.prevent="submitCreateForm">
-        <label for="title">Title:</label>
-        <input type="text" v-model="newCompany.title" required>
-        
-        <label for="description">Description:</label>
-        <textarea v-model="newCompany.description" required></textarea>
-        
-        <button type="submit">Create</button>
-      </form>
+    <div class="wrapper-table">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">N0</th>
+            <th scope="col">Title</th>
+            <th scope="col">Image</th>
+            <th scope="col">Description</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="service in sliders" :key="service.index">
+            <th>1</th>
+            <td>{{ service.title }}</td>
+            <td>
+              <img
+                :src="service?.image?.url"
+                class="slider-img img-fluid"
+                alt="slider"
+              />
+            </td>
+            <td>{{ service.description }}</td>
+            <td>
+              <div class="wrapper-action">
+                <button class="btn btn-danger" @click="deleteSlider(slider)">
+                  Delete
+                </button>
+                <button class="btn btn-warning ml-2">Edit</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div
+    class="modal fade wrapper-modal"
+    id="createModal"
+    tabindex="-1"
+    aria-labelledby="exampleModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Create Slider</h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <div class="wrapper-form-input">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Title"
+              v-model="form.title"
+            />
+            <div class="input-group mt-3">
+              <input
+                type="file"
+                class="form-control"
+                v-on:change="onImageChange"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success" @click="createSlider">
+            Create
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
+
+
 <script>
+import axios from "axios";
+import Swal from "sweetalert2";
+
 export default {
-  computed: {
-    serviceCompanies() {
-      return this.$store.state.serviceCompanies;
-    },
-  },
   data() {
     return {
-      showCreateForm: true,
-      newCompany: {
-        title: '',
-        description: '',
+      sliders: [],
+      file: "",
+      form: {
+        title: "",
+        image: "",
+        description: ""
       },
     };
   },
   methods: {
-    async fetchServiceCompanies() {
-      console.log('Fetching service companies...');
-      try {
-        await this.$store.dispatch('fetchServiceCompanies');
-        console.log('Service companies fetched:', this.serviceCompanies);
-      } catch (error) {
-        console.error('Error fetching service companies:', error);
+    async getService() {
+      const services = await axios.get("/service-company").then((res) => res.data);
+      this.services = services;
+    },
+    async deleteSlider(slider) {
+      console.log("slider", slider._id);
+      const deleteResult = await axios.delete(`/slider/${slider._id}`);
+      if (deleteResult.status == 200) {
+        location.reload();
       }
+      console.log(deleteResult);
     },
-    async createServiceCompany() {
-      console.log('Creating new service company...');
-      this.showCreateForm = true;
+    async onImageChange(e) {
+      const fileData = e.target.files[0];
+      const config = {
+        headers: { "content-type": "multipart/form-data" },
+      };
+
+      let formData = new FormData();
+      formData.append("file", fileData);
+      const upload = await axios
+        .post("/files/upload", formData, config)
+        .then((res) => res.data);
+      this.form.image = upload?._id;
     },
-    async submitCreateForm() {
-      console.log('Submitting create form...');
-      try {
-        await this.$store.dispatch('createServiceCompany', this.newCompany);
-        console.log('Service company created:', this.newCompany);
-        this.showCreateForm = false;
-        this.newCompany.title = '';
-        this.newCompany.description = '';
-      } catch (error) {
-        console.error('Error creating service company:', error);
-      }
-    },
-    editServiceCompany(company) {
-      const id = company.id; // Use the correct property here
-      console.log('Editing service company:', id);
-      this.$router.push(`/edit-service/${id}`);
-    },
-    viewServiceCompany(id) {
-      console.log('Viewing service company:', id);
-      this.$router.push(`/view-service/${id}`);
-    },
-    async deleteServiceCompany(id) {
-      console.log('Deleting service company:', id);
-      try {
-        await this.$store.dispatch('deleteServiceCompany', id);
-      } catch (error) {
-        console.error('Error deleting service company:', error);
-      }
+    async createSlider() {
+      console.log(this.form);
+      const create = await axios.post("/service-company", this.form)
+
+      if (create.status == 201) {
+        location.reload();  
+      } 
     },
   },
-  created() {
-    console.log('Component created.');
-    this.fetchServiceCompanies();
+  async mounted() {
+    await this.getService();
   },
 };
 </script>
+
+<style lang="scss" scoped>
+.slider-page {
+  h1 {
+    font-size: 24px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  .wrapper-create {
+    display: flex;
+    justify-content: end;
+    .custom-btn {
+    }
+    .wrapper-table {
+    }
+  }
+}
+.slider-img {
+  width: 300px;
+  height: 150px;
+  object-fit: contain;
+}
+.wrapper-modal {
+  .modal-footer {
+    .btn {
+      color: green;
+      &:hover {
+        color: white;
+      }
+    }
+  }
+}
+</style>
