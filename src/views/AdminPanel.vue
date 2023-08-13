@@ -98,7 +98,7 @@
         </div>
       </div>
       <div class="h-[calc(100vh-50px)] bg-gray-50 p-[20px] overflow-auto">
-        <div class="border border-gray-300 rounded-md p-[20px]">
+        <div class="">
           <router-view></router-view>
         </div>
       </div>
