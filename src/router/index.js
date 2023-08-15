@@ -13,6 +13,7 @@ import Partner from '../admin-views/Partner.vue';
 import Product from '../admin-views/Product.vue';
 import Setting from '../admin-views/Setting.vue';
 import HomePage from '../admin-views/Home.vue';
+import Admin from '../admin-views/Admin.vue';
 import store from '../store';
 import Inquiry from '../admin-views/Inquiry.vue'
 
@@ -82,6 +83,10 @@ const routes = [
         path: '/admin/inquiry',
         component: Inquiry,
         meta: { requiresAuth: true },
+      },
+      {
+        path: '/admin/setting',
+        component: Admin
       },
     ],
   },
