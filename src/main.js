@@ -12,6 +12,7 @@ const app = createApp(App);
 // Import Bootstrap JavaScript
 import "bootstrap";
 axios.defaults.baseURL = 'https://seahorse-app-ih22h.ondigitalocean.app/blue-tech-api2'; // Replace with your actual API base URL
+// axios.defaults.baseURL = 'http://localhost:4000'; // Replace with your actual API base URL
 
 const token = localStorage.getItem('token');
 if (token) {

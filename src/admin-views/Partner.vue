@@ -1,6 +1,6 @@
 <template>
   <div class="slider-page container-fluid">
-    <h1>slider page</h1>
+    <h1>partner page</h1>
     <div class="wrapper-create m-5">
       <button class="btn btn-success custom-btn" data-bs-toggle="modal" data-bs-target="#createModal">
         Create
@@ -17,27 +17,22 @@
           </tr>
         </thead>
         <tbody>
-  <tr v-for="(slider, index) in sliders" :key="slider._id">
-    <th>{{ index + 1 }}</th>
-    <td>{{ slider.title }}</td>
-    <td>
-      <img
-        :src="slider?.image?.url"
-        class="slider-img img-fluid"
-        alt="slider"
-      />
-    </td>
-    <td>
-      <div class="wrapper-action">
-        <button class="btn btn-danger" @click="deleteSlider(slider)">
-          Delete
-        </button>
-        <button class="btn btn-warning ml-2">Edit</button>
-      </div>
-    </td>
-  </tr>
-</tbody>
-
+          <tr v-for="slider in sliders" :key="slider.index">
+            <th>1</th>
+            <td>{{ slider.title }}</td>
+            <td>
+              <img :src="slider?.image?.url" class="slider-img img-fluid" alt="slider" />
+            </td>
+            <td>
+              <div class="wrapper-action">
+                <button class="btn btn-danger" @click="deleteSlider(slider)">
+                  Delete
+                </button>
+                <button class="btn btn-warning ml-2">Edit</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
       </table>
     </div>
   </div>
@@ -49,7 +44,6 @@
       <div class="modal-content">
         <div class="modal-header">
           <h1 class="modal-title fs-5" id="exampleModalLabel">Create Slider</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <div class="wrapper-form-input">
@@ -68,11 +62,12 @@
     </div>
   </div>
 </template>
-
-
-
+  
+  
+  
 <script>
 import axios from "axios";
+import Swal from "sweetalert2";
 
 export default {
   data() {
@@ -87,12 +82,13 @@ export default {
   },
   methods: {
     async getSlider() {
-      const sliders = await axios.get("/slider").then((res) => res.data);
+      const sliders = await axios.get("/slider/partner").then((res) => res.data);
       this.sliders = sliders;
+      console.log(this.sliders = sliders);
     },
     async deleteSlider(slider) {
       console.log("slider", slider._id);
-      const deleteResult = await axios.delete(`/slider/${slider._id}`);
+      const deleteResult = await axios.delete(`/slider/partner${slider._id}`);
       if (deleteResult.status == 200) {
         location.reload();
       }
@@ -110,11 +106,10 @@ export default {
         .post("/files/upload", formData, config)
         .then((res) => res.data);
       this.form.image = upload?._id;
-      console.log("Uploaded image data:", upload);
     },
     async createSlider() {
       console.log(this.form);
-      const create = await axios.post("/slider", this.form)
+      const create = await axios.post("/slider/partner", this.form)
 
       if (create.status == 201) {
         location.reload();
@@ -126,7 +121,7 @@ export default {
   },
 };
 </script>
-
+  
 <style lang="scss" scoped>
 .slider-page {
   h1 {
@@ -138,7 +133,6 @@ export default {
   .wrapper-create {
     display: flex;
     justify-content: end;
- 
 
     .custom-btn {}
 
@@ -164,3 +158,4 @@ export default {
   }
 }
 </style>
+  
