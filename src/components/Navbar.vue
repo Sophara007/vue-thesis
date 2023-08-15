@@ -3,7 +3,7 @@
     <div class="container">
       <router-link to="/" class="navbar-brand">Blue-Tech</router-link>
       <ul class="navbar-links">
-        <!-- <li><router-link to="/login">Login</router-link></li> -->
+
       </ul>
     </div>
   </nav>
