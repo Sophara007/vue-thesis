@@ -22,7 +22,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="service in sliders" :key="service.index">
+          <tr v-for="service in services" :key="service.index">
             <th>1</th>
             <td>{{ service.title }}</td>
             <td>
@@ -58,7 +58,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">Create Slider</h1>
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Create Service</h1>
           <button
             type="button"
             class="btn-close"
@@ -73,6 +73,12 @@
               class="form-control"
               placeholder="Title"
               v-model="form.title"
+            />
+            <input
+              type="text"
+              class="form-control mt-3"
+              placeholder="Description"
+              v-model="form.description"
             />
             <div class="input-group mt-3">
               <input
@@ -91,18 +97,18 @@
       </div>
     </div>
   </div>
+  {{ services }}
 </template>
 
 
 
 <script>
 import axios from "axios";
-import Swal from "sweetalert2";
 
 export default {
   data() {
     return {
-      sliders: [],
+      services: [],
       file: "",
       form: {
         title: "",
@@ -113,10 +119,10 @@ export default {
   },
   methods: {
     async getService() {
-      const services = await axios.get("/service-company").then((res) => res.data);
+      const services = await axios.get("/service-company").then((res) => res.data.data.items);
       this.services = services;
     },
-    async deleteSlider(slider) {
+    async deleteService(service) {
       console.log("slider", slider._id);
       const deleteResult = await axios.delete(`/slider/${slider._id}`);
       if (deleteResult.status == 200) {
