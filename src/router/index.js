@@ -9,6 +9,8 @@ import Home from '../views/Home.vue';
 import Industry from '../admin-views/Industry.vue';
 import Service from '../admin-views/Service.vue';
 import Slider from '../admin-views/Slider.vue';
+import Partner from '../admin-views/Partner.vue';
+import Product from '../admin-views/Product.vue';
 import store from '../store';
 import Inquiry from '../admin-views/Inquiry.vue'
 
@@ -51,6 +53,16 @@ const routes = [
         name: 'Industry',
         path: '/industry',
         component: Industry,
+      },
+      {
+        name: 'Partner',
+        path: '/partner',
+        component: Partner,
+      },
+      {
+        name: 'Product',
+        path: '/product',
+        component: Product,
       },
       {
         path: '/admin/users',

@@ -1,6 +1,6 @@
 <template>
-  <div class="slider-page container-fluid">
-    <h1>slider page</h1>
+  <div class="product-page container-fluid">
+    <h1>product page</h1>
     <div class="wrapper-create m-5">
       <button class="btn btn-success custom-btn" data-bs-toggle="modal" data-bs-target="#createModal">
         Create
@@ -13,19 +13,21 @@
             <th scope="col">N0</th>
             <th scope="col">Title</th>
             <th scope="col">Image</th>
+            <th scope="col">Description</th>
             <th scope="col">Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="slider in sliders" :key="slider.index">
+          <tr v-for="product in products" :key="product.index">
             <th>1</th>
-            <td>{{ slider.title }}</td>
+            <td>{{ product.title }}</td>
             <td>
-              <img :src="slider?.image?.url" class="slider-img img-fluid" alt="slider" />
+              <img :src="product?.logo?.url" class="product-img img-fluid" alt="product" />
             </td>
+            <td>{{ product.description }}</td>
             <td>
               <div class="wrapper-action">
-                <button class="btn btn-danger" @click="deleteSlider(slider)">
+                <button class="btn btn-danger" @click="deleteProduct(product)">
                   Delete
                 </button>
                 <button class="btn btn-warning ml-2">Edit</button>
@@ -43,19 +45,22 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">Create Slider</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <h1 class="modal-title fs-5" id="exampleModalLabel">
+            Create Product
+          </h1>
         </div>
         <div class="modal-body">
           <div class="wrapper-form-input">
-            <input type="text" class="form-control" placeholder="Title" v-model="form.title" />
+            <input type="text" class="form-control" placeholder="Title" v-model="form.title" /> <br>
+            <input type="text" class="form-control" placeholder="description" v-model="form.description" /> <br>
+            
             <div class="input-group mt-3">
               <input type="file" class="form-control" v-on:change="onImageChange" />
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-success" @click="createSlider">
+          <button type="button" class="btn btn-success" @click="createProduct">
             Create
           </button>
         </div>
@@ -63,31 +68,34 @@
     </div>
   </div>
 </template>
-
-
-
+  
+  
+  
 <script>
 import axios from "axios";
+import Swal from "sweetalert2";
 
 export default {
   data() {
     return {
-      sliders: [],
+      products: [],
       file: "",
       form: {
         title: "",
-        image: "",
+        description: "",
+        logo: "",
       },
     };
   },
   methods: {
-    async getSlider() {
-      const sliders = await axios.get("/slider").then((res) => res.data);
-      this.sliders = sliders;
+    async getProduct() {
+      const products = await axios.get("/product").then((res) => res.data.data.items);
+      this.products = products;
+      console.log((this.products = products));
     },
-    async deleteSlider(slider) {
-      console.log("slider", slider._id);
-      const deleteResult = await axios.delete(`/slider/${slider._id}`);
+    async deleteProduct(product) {
+      console.log("product", product._id);
+      const deleteResult = await axios.delete(`/product/${product._id}`);
       if (deleteResult.status == 200) {
         location.reload();
       }
@@ -104,11 +112,11 @@ export default {
       const upload = await axios
         .post("/files/upload", formData, config)
         .then((res) => res.data);
-      this.form.image = upload?._id;
+      this.form.logo = upload?._id;
     },
-    async createSlider() {
+    async createProduct() {
       console.log(this.form);
-      const create = await axios.post("/slider", this.form)
+      const create = await axios.post("/product/create", this.form);
 
       if (create.status == 201) {
         location.reload();
@@ -116,13 +124,13 @@ export default {
     },
   },
   async mounted() {
-    await this.getSlider();
+    await this.getProduct();
   },
 };
 </script>
-
+  
 <style lang="scss" scoped>
-.slider-page {
+.product-page {
   h1 {
     font-size: 24px;
     font-weight: bold;
@@ -139,7 +147,7 @@ export default {
   }
 }
 
-.slider-img {
+.product-img {
   width: 300px;
   height: 150px;
   object-fit: contain;
@@ -157,3 +165,4 @@ export default {
   }
 }
 </style>
+  

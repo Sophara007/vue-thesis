@@ -16,11 +16,12 @@
               <i class="fas fa-home mr-5"></i>
               Home
             </router-link>
-            <router-link to="/slider"
-              class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md border-gray-200 hover:bg-gray-300  hover:text-gray-800 transition duration-400 ease-in-out">
-              <i class="fas fa-sliders-h mr-6"></i>
-              Slider
+
+            <router-link to="/slider" class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md border-gray-200 hover:bg-gray-300  hover:text-gray-800 transition duration-400 ease-in-out">
+              <i class="fas fa-sliders-h mr-6"></i>              
+              Home Slider
             </router-link>
+
             <router-link to="/service"
               class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md border-gray-200 hover:bg-gray-300  hover:text-gray-800 transition duration-400 ease-in-out">
               <i class="fas fa-handshake align-middle mr-5"></i>
@@ -32,8 +33,16 @@
               <i class="fas fa-industry mr-5"></i>
               Industy
             </router-link>
-            <router-link to="/admin/users"
-              class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md rounded-b-lg hover:bg-gray-300  hover:text-gray-800 transition duration-400 ease-in-out">
+
+            <router-link to="/partner" class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md rounded-b-lg hover:bg-gray-300  hover:text-gray-800 transition duration-400 ease-in-out">
+              <i class="fa-regular fa-window-restore mr-5"></i>
+              Partner Slider
+            </router-link>
+            <router-link to="/product" class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md rounded-b-lg hover:bg-gray-300  hover:text-gray-800 transition duration-400 ease-in-out">
+              <i class="fa-brands fa-product-hunt mr-5"></i>
+              Product Model
+            </router-link>
+            <router-link to="/admin/users" class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md rounded-b-lg hover:bg-gray-300  hover:text-gray-800 transition duration-400 ease-in-out">
               <i class="fas fa-users mr-5"></i>
               Users
             </router-link>

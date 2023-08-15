@@ -1,6 +1,6 @@
 <template>
   <div class="slider-page container-fluid">
-    <h1>slider page</h1>
+    <h1>partner page</h1>
     <div class="wrapper-create m-5">
       <button class="btn btn-success custom-btn" data-bs-toggle="modal" data-bs-target="#createModal">
         Create
@@ -44,7 +44,6 @@
       <div class="modal-content">
         <div class="modal-header">
           <h1 class="modal-title fs-5" id="exampleModalLabel">Create Slider</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <div class="wrapper-form-input">
@@ -63,11 +62,12 @@
     </div>
   </div>
 </template>
-
-
-
+  
+  
+  
 <script>
 import axios from "axios";
+import Swal from "sweetalert2";
 
 export default {
   data() {
@@ -82,12 +82,13 @@ export default {
   },
   methods: {
     async getSlider() {
-      const sliders = await axios.get("/slider").then((res) => res.data);
+      const sliders = await axios.get("/slider/partner").then((res) => res.data);
       this.sliders = sliders;
+      console.log(this.sliders = sliders);
     },
     async deleteSlider(slider) {
       console.log("slider", slider._id);
-      const deleteResult = await axios.delete(`/slider/${slider._id}`);
+      const deleteResult = await axios.delete(`/slider/partner${slider._id}`);
       if (deleteResult.status == 200) {
         location.reload();
       }
@@ -108,7 +109,7 @@ export default {
     },
     async createSlider() {
       console.log(this.form);
-      const create = await axios.post("/slider", this.form)
+      const create = await axios.post("/slider/partner", this.form)
 
       if (create.status == 201) {
         location.reload();
@@ -120,7 +121,7 @@ export default {
   },
 };
 </script>
-
+  
 <style lang="scss" scoped>
 .slider-page {
   h1 {
@@ -157,3 +158,4 @@ export default {
   }
 }
 </style>
+  
