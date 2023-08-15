@@ -12,6 +12,7 @@ import Slider from '../admin-views/Slider.vue';
 import Partner from '../admin-views/Partner.vue';
 import Product from '../admin-views/Product.vue';
 import Setting from '../admin-views/Setting.vue';
+import HomePage from '../admin-views/Home.vue';
 import store from '../store';
 import Inquiry from '../admin-views/Inquiry.vue'
 
@@ -37,6 +38,11 @@ const routes = [
       hideNavbar: true, 
     },
     children: [
+      {
+        name: 'HomePage',
+        path: '/home',
+        component: HomePage,
+      },
       {
         name: 'Slider',
         path: '/slider',
