@@ -9,28 +9,10 @@ const store = createStore({
     loading: false,
     error: null,
     isAuthenticated: false,
-    serviceCompanies: [], // Initialize as an empty array
+  
   },
   mutations: {
-    setServiceCompanies(state, companies) {
-      state.serviceCompanies = companies;
-    },
-    addServiceCompany(state, company) {
-      // Make sure state.serviceCompanies is an array
-      if (!Array.isArray(state.serviceCompanies)) {
-        state.serviceCompanies = [];
-      }
-      state.serviceCompanies.push(company);
-    },
-    updateServiceCompany(state, updatedCompany) {
-      const index = state.serviceCompanies.findIndex(company => company.id === updatedCompany.id);
-      if (index !== -1) {
-        state.serviceCompanies[index] = updatedCompany;
-      }
-    },
-    deleteServiceCompany(state, companyId) {
-      state.serviceCompanies = state.serviceCompanies.filter(company => company.id !== companyId);
-    },
+ 
     setUsers(state, users) {
       state.users = users;
     },
@@ -48,8 +30,7 @@ const store = createStore({
     clearError(state) {
       state.error = null;
     },
-    logout(state) {
-      state.user = null;
+    clearToken(state) {
       state.token = null;
       state.isAuthenticated = false;
       localStorage.removeItem('token');
@@ -58,42 +39,9 @@ const store = createStore({
   },
   actions: {
 
-    async fetchServiceCompanies({ commit }) {
-      try {
-        console.log('Fetching service companies...');
-        const response = await axios.get('/service-company?limit=2');
-        console.log('Service companies fetched:', response.data);
-        commit('setServiceCompanies', response.data);
-      } catch (error) {
-        console.error('Error fetching service companies:', error);
-      }
-    },
-    async createServiceCompany({ commit }) {
-      try {
-        console.log('Creating new service company...');
-        const response = await axios.post('/service-company/create', {});
-        console.log('Service company created:', response.data);
-        commit('addServiceCompany', response.data);
-      } catch (error) {
-        console.error('Error creating service company:', error);
-      }
-    },
-    async updateServiceCompany({ commit }, updatedCompany) {
-      try {
-        await axios.put(`/service-company/update/${updatedCompany.id}`, updatedCompany);
-        commit('updateServiceCompany', updatedCompany);
-      } catch (error) {
-        // Handle error
-      }
-    },
-    async deleteServiceCompany({ commit }, companyId) {
-      try {
-        await axios.delete(`/service-company/${companyId}`);
-        commit('deleteServiceCompany', companyId);
-      } catch (error) {
-        // Handle error
-      }
-    },
+    
+   
+   
     // ... other actions ...
     async login({ commit, dispatch }, { email, password }) {
       commit('setLoading', true);
@@ -116,7 +64,12 @@ const store = createStore({
         commit('setLoading', false);
       }
     },
-
+    async logout({ commit }) {
+      // You can include any necessary logout-related logic here
+      
+      // Call the clearToken mutation to remove the token from the store
+      commit('clearToken');
+    },
   },
   getters: {
     // ... other getters as needed ...
@@ -126,9 +79,7 @@ const store = createStore({
     currentUser(state) {
       return state.user;
     },
-    getServiceCompanyById: state => id => {
-      return state.serviceCompanies.find(company => company.id === id);
-    },
+   
 
   },
 });

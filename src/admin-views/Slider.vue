@@ -21,26 +21,27 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="slider in sliders" :key="slider.index">
-            <th>1</th>
-            <td>{{ slider.title }}</td>
-            <td>
-              <img
-                :src="slider?.image?.url"
-                class="slider-img img-fluid"
-                alt="slider"
-              />
-            </td>
-            <td>
-              <div class="wrapper-action">
-                <button class="btn btn-danger" @click="deleteSlider(slider)">
-                  Delete
-                </button>
-                <button class="btn btn-warning ml-2">Edit</button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
+  <tr v-for="(slider, index) in sliders" :key="slider._id">
+    <th>{{ index + 1 }}</th>
+    <td>{{ slider.title }}</td>
+    <td>
+      <img
+        :src="slider?.image?.url"
+        class="slider-img img-fluid"
+        alt="slider"
+      />
+    </td>
+    <td>
+      <div class="wrapper-action">
+        <button class="btn btn-danger" @click="deleteSlider(slider)">
+          Delete
+        </button>
+        <button class="btn btn-warning ml-2">Edit</button>
+      </div>
+    </td>
+  </tr>
+</tbody>
+
       </table>
     </div>
   </div>
@@ -133,6 +134,7 @@ export default {
         .post("/files/upload", formData, config)
         .then((res) => res.data);
       this.form.image = upload?._id;
+      console.log("Uploaded image data:", upload);
     },
     async createSlider() {
       console.log(this.form);
@@ -159,10 +161,7 @@ export default {
   .wrapper-create {
     display: flex;
     justify-content: end;
-    .custom-btn {
-    }
-    .wrapper-table {
-    }
+ 
   }
 }
 .slider-img {

@@ -1,6 +1,6 @@
 <template>
-  <div class="slider-page container-fluid">
-    <h1>Service page</h1>
+  <div class="service-page container-fluid">
+    <h1>Service Page</h1>
     <div class="wrapper-create m-5">
       <button
         class="btn btn-success custom-btn"
@@ -14,34 +14,36 @@
       <table class="table">
         <thead>
           <tr>
-            <th scope="col">N0</th>
+            <th scope="col">No</th>
             <th scope="col">Title</th>
-            <th scope="col">Image</th>
             <th scope="col">Description</th>
+            <th scope="col">Image</th>
             <th scope="col">Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="service in sliders" :key="service.index">
-            <th>1</th>
-            <td>{{ service.title }}</td>
-            <td>
-              <img
-                :src="service?.image?.url"
-                class="slider-img img-fluid"
-                alt="slider"
-              />
-            </td>
-            <td>{{ service.description }}</td>
-            <td>
-              <div class="wrapper-action">
-                <button class="btn btn-danger" @click="deleteSlider(slider)">
-                  Delete
-                </button>
-                <button class="btn btn-warning ml-2">Edit</button>
-              </div>
-            </td>
-          </tr>
+          <tr v-for="(service, index) in services" :key="service._id">
+  <th>{{ index + 1 }}</th>
+  <td>{{ service.title }}</td>
+  <td>{{ service.description }}</td>
+  <td>
+    <img
+      :src="service?.image?.url"
+      class="service-img img-fluid"
+      :alt="service?.image?.alt || 'service'"
+      :title="service?.image?.title || service.title"
+    />
+    <p>{{ service?.image?.description || '' }}</p>
+  </td>
+  <td>
+    <div class="wrapper-action">
+      <button class="btn btn-danger" @click="deleteService(service)">
+        Delete
+      </button>
+      <button class="btn btn-warning ml-2">Edit</button>
+    </div>
+  </td>
+</tr>
         </tbody>
       </table>
     </div>
@@ -58,7 +60,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">Create Slider</h1>
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Create Service</h1>
           <button
             type="button"
             class="btn-close"
@@ -74,6 +76,12 @@
               placeholder="Title"
               v-model="form.title"
             />
+            <textarea
+              class="form-control mt-3"
+              rows="4"
+              placeholder="Description"
+              v-model="form.description"
+            ></textarea>
             <div class="input-group mt-3">
               <input
                 type="file"
@@ -84,7 +92,7 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-success" @click="createSlider">
+          <button type="button" class="btn btn-success" @click="createService">
             Create
           </button>
         </div>
@@ -93,36 +101,45 @@
   </div>
 </template>
 
-
-
 <script>
 import axios from "axios";
-import Swal from "sweetalert2";
 
 export default {
   data() {
     return {
-      sliders: [],
-      file: "",
+      services: [],
+      file:"",
       form: {
         title: "",
+        description: "",
         image: "",
-        description: ""
       },
     };
   },
   methods: {
-    async getService() {
-      const services = await axios.get("/service-company").then((res) => res.data);
-      this.services = services;
-    },
-    async deleteSlider(slider) {
-      console.log("slider", slider._id);
-      const deleteResult = await axios.delete(`/slider/${slider._id}`);
-      if (deleteResult.status == 200) {
-        location.reload();
+    async getServices() {
+      try {
+        const response = await axios.get("/service-company");
+        if (
+          response.data &&
+          response.data.data &&
+          Array.isArray(response.data.data.items)
+        ) {
+          this.services = response.data.data.items;
+        } else {
+          console.error("Invalid API response format:", response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching services:", error);
       }
-      console.log(deleteResult);
+    },
+    async deleteService(service) {
+      const deleteResult = await axios.delete(`/service-company/${service._id}`);
+      if (deleteResult.status === 200) {
+        this.services = this.services.filter(
+          (item) => item._id !== service._id
+        );
+      }
     },
     async onImageChange(e) {
       const fileData = e.target.files[0];
@@ -137,23 +154,28 @@ export default {
         .then((res) => res.data);
       this.form.image = upload?._id;
     },
-    async createSlider() {
-      console.log(this.form);
-      const create = await axios.post("/service-company", this.form)
-
-      if (create.status == 201) {
-        location.reload();  
-      } 
+    async createService() {
+      try {
+        const createResponse = await axios.post("/service-company/create", this.form);
+        if (createResponse.status === 201) {
+          this.getServices();
+          this.form.title = "";
+          this.form.description = "";
+          this.form.image = "";
+        }
+      } catch (error) {
+        console.error("Error creating service:", error);
+      }
     },
   },
   async mounted() {
-    await this.getService();
+    await this.getServices();
   },
 };
 </script>
 
 <style lang="scss" scoped>
-.slider-page {
+.service-page {
   h1 {
     font-size: 24px;
     font-weight: bold;
@@ -162,13 +184,9 @@ export default {
   .wrapper-create {
     display: flex;
     justify-content: end;
-    .custom-btn {
-    }
-    .wrapper-table {
-    }
   }
 }
-.slider-img {
+.service-img {
   width: 300px;
   height: 150px;
   object-fit: contain;

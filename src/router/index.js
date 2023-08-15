@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Login from '@/views/Login.vue';
+
 import Signup from '@/views/Signup.vue';
 import AdminPanel from '@/views/AdminPanel.vue';
 import testRegister from '@/views/testRegister.vue';
@@ -20,10 +20,7 @@ const routes = [
     path: '/logout',
     component: Logout,
   },
-  {
-    path: '/login',
-    component: Login,
-  },
+
   {
     path: '/signup',
     component: Signup,
@@ -86,7 +83,7 @@ router.beforeEach((to, from, next) => {
 
   if (requiresAuth) {
     if (!store.getters.isAuthenticated) {
-      next('/login');
+      next('/');
     } else {
       next();
     }

@@ -125,11 +125,10 @@ export default {
 
     },
     logout() {
-      
       // Call the logout action in the Vuex store
-      this.$store.dispatch('logout');
+      this.$store.dispatch('logout'); // Dispatch the logout action
       // Redirect to the login page after logout
-      this.$router.push('/login');
+      this.$router.push('/');
     },
   },
 };
