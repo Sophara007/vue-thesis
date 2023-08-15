@@ -12,6 +12,7 @@ import Slider from '../admin-views/Slider.vue';
 import Partner from '../admin-views/Partner.vue';
 import Product from '../admin-views/Product.vue';
 import store from '../store';
+import Inquiry from '../admin-views/Inquiry.vue'
 
 const routes = [
   {
@@ -68,6 +69,11 @@ const routes = [
         component: User,
         meta: { requiresAuth: true },
       },
+      {
+        path: '/admin/inquiry',
+        component: Inquiry,
+        meta: { requiresAuth: true },
+      },
     ],
   },
   {
@@ -98,7 +104,7 @@ router.beforeEach((to, from, next) => {
 
   if (requiresAuth) {
     if (!store.getters.isAuthenticated) {
-      next('/login');
+      next('/');
     } else {
       next();
     }
