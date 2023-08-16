@@ -84,17 +84,23 @@
             ></textarea>
             <div class="input-group mt-3">
               <input
-                type="file"
-                class="form-control"
-                v-on:change="onImageChange"
-              />
+  ref="fileInput"
+  type="file"
+  class="form-control"
+  v-on:change="onImageChange"
+/>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-success" @click="createService">
-            Create
-          </button>
+          <button
+    type="button"
+    class="btn btn-success"
+    @click="createServiceAndClearModal"
+    data-bs-dismiss="modal"
+  >
+    Create
+  </button>
         </div>
       </div>
     </div>
@@ -167,6 +173,14 @@ export default {
         console.error("Error creating service:", error);
       }
     },
+    clearFileInput() {
+    this.$refs.fileInput.value = ''; // Clear the file input value
+  },
+
+  async createServiceAndClearModal() {
+    this.createService();
+    this.clearFileInput(); // Clear the file input after creating a service
+  },
   },
   async mounted() {
     await this.getServices();

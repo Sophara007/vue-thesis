@@ -82,6 +82,7 @@
           ></textarea>
           <div class="input-group mt-3">
             <input
+            ref="fileInput"
               type="file"
               class="form-control"
               v-on:change="onImageChange"
@@ -90,9 +91,14 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-success" @click="createIndustry">
-          Create
-        </button>
+        <button
+    type="button"
+    class="btn btn-success"
+    @click="createIndustryAndClearModal"
+    data-bs-dismiss="modal"
+  >
+    Create
+  </button>
       </div>
     </div>
   </div>
@@ -167,6 +173,14 @@ export default {
         console.error("Error creating industry:", error);
       }
     },
+    clearFileInput() {
+    this.$refs.fileInput.value = ''; // Clear the file input value
+  },
+
+  async createIndustryAndClearModal() {
+    this.createIndustry();
+    this.clearFileInput(); // Clear the file input after creating a service
+  },
   },
   async mounted() {
     console.log("Component mounted. Fetching industries..."); // Add this log
