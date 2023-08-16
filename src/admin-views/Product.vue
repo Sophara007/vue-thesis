@@ -18,8 +18,8 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="product in products" :key="product.index">
-            <th>1</th>
+          <tr v-for="(product, index) in products" :key="product.index">
+            <th>{{index + 1 }}</th>
             <td>{{ product.title }}</td>
             <td>
               <img :src="product?.logo?.url" class="product-img img-fluid" alt="product" />
@@ -141,9 +141,7 @@ export default {
     display: flex;
     justify-content: end;
 
-    .custom-btn {}
-
-    .wrapper-table {}
+   
   }
 }
 

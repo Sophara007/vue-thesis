@@ -17,8 +17,8 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="slider in sliders" :key="slider.index">
-            <th>1</th>
+          <tr v-for="(slider, index) in sliders" :key="slider.index">
+            <th>{{index + 1 }}</th>
             <td>{{ slider.title }}</td>
             <td>
               <img :src="slider?.image?.url" class="slider-img img-fluid" alt="slider" />
@@ -134,9 +134,7 @@ export default {
     display: flex;
     justify-content: end;
 
-    .custom-btn {}
-
-    .wrapper-table {}
+    
   }
 }
 

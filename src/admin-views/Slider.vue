@@ -140,9 +140,7 @@ export default {
     justify-content: end;
  
 
-    .custom-btn {}
-
-    .wrapper-table {}
+    
   }
 }
 

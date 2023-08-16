@@ -16,8 +16,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="inquiry in inquiries" :key="inquiry.index">
-                        <th>1</th>
+                    <tr v-for="(inquiry, index) in inquiries" :key="inquiry.index">
+                        <th>{{ index + 1 }}</th> <!-- Change this line -->
                         <td>{{ inquiry.fullName }}</td>
                         <td>
                             {{ inquiry.email }}
