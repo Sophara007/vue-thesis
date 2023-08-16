@@ -11,6 +11,8 @@ import Service from '../admin-views/Service.vue';
 import Slider from '../admin-views/Slider.vue';
 import Partner from '../admin-views/Partner.vue';
 import Product from '../admin-views/Product.vue';
+import Setting from '../admin-views/Setting.vue';
+import HomePage from '../admin-views/Home.vue';
 import store from '../store';
 import Inquiry from '../admin-views/Inquiry.vue'
 
@@ -37,6 +39,11 @@ const routes = [
     },
     children: [
       {
+        name: 'HomePage',
+        path: '/home',
+        component: HomePage,
+      },
+      {
         name: 'Slider',
         path: '/slider',
         component: Slider,
@@ -60,6 +67,11 @@ const routes = [
         name: 'Product',
         path: '/product',
         component: Product,
+      },
+      {
+        name: 'Setting',
+        path: '/setting',
+        component: Setting,
       },
       {
         path: '/admin/users',
