@@ -4,8 +4,8 @@
 
     <div class="w-[250px] h-full bg-gray-200 text-white" overflow-y-auto flex v-show="showSide">
       <div class="h-[50px] bg-gray-900 flex justify-start  items-center ">
-        <div class="px-[20px]">
-          <h3 class="font-bold text-xl">Admin Dashboard</h3>
+        <div class="px-[50px]">
+          <img src="https://static.wixstatic.com/media/74d6b3_b17a2b221c7246edb6bd50376a7a7ee4~mv2.gif" alt="logo-blue.gif" style="width:80px;height:50px">
         </div>
       </div>
       <div class="h-[calc(100vh-50px)] bg-gray-800 py-[20px]">
@@ -107,7 +107,7 @@
               <img class="w-10 h-10 rounded-full border-2 border-gray-500"
                 src="https://cdn.icon-icons.com/icons2/2248/PNG/512/account_icon_138984.png" style="cursor: pointer;">
               <div class="font-semibold dark:text-gray text-left">
-                <div style="cursor: pointer;">Ronaldo</div>
+                <div style="cursor: pointer;">admin@drtech.com</div>
                 <div class="text-xs text-gray-500 dark:text-gray-400">Admin</div>
               </div>
             </div>
