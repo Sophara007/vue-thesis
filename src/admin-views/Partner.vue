@@ -88,7 +88,7 @@ export default {
     },
     async deleteSlider(slider) {
       console.log("slider", slider._id);
-      const deleteResult = await axios.delete(`/slider/partner${slider._id}`);
+      const deleteResult = await axios.delete(`/slider/partner/${slider._id}`);
       if (deleteResult.status == 200) {
         location.reload();
       }
