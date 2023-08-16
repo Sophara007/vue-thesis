@@ -141,9 +141,7 @@ export default {
     display: flex;
     justify-content: end;
 
-    .custom-btn {}
-
-    .wrapper-table {}
+   
   }
 }
 
