@@ -40,9 +40,9 @@
       <button class="btn btn-danger" @click="deleteService(service)">
         Delete
       </button>
-      <button class="btn btn-warning ml-2">Edit</button>
-    </div>
-  </td>
+      <button class="btn btn-warning ml-2" @click="openEditModal(service)">Edit</button>
+  </div>
+</td>
 </tr>
         </tbody>
       </table>
@@ -105,6 +105,34 @@
       </div>
     </div>
   </div>
+  <!-- Edit Modal -->
+<div class="modal fade wrapper-modal" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="editModalLabel">Edit Service</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="wrapper-form-input">
+          <input type="text" class="form-control" placeholder="Title" v-model="editForm.title" />
+          <textarea class="form-control mt-3" rows="4" placeholder="Description" v-model="editForm.description"></textarea>
+        </div>
+        <div class="input-group mt-3">
+  <input ref="editFileInput" type="file" class="form-control" @change="onEditImageChange" />
+</div>
+      </div>
+      <!-- Inside the Edit Modal -->
+
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" @click="updateServiceAndClearModal" data-bs-dismiss="modal">
+          Update
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 </template>
 
 <script>
@@ -114,11 +142,15 @@ export default {
   data() {
     return {
       services: [],
-      file:"",
       form: {
         title: "",
         description: "",
         image: "",
+      },
+      editForm: {
+        id: "",
+        title: "",
+        description: "",
       },
     };
   },
@@ -126,11 +158,7 @@ export default {
     async getServices() {
       try {
         const response = await axios.get("/service-company");
-        if (
-          response.data &&
-          response.data.data &&
-          Array.isArray(response.data.data.items)
-        ) {
+        if (response.data && response.data.data && Array.isArray(response.data.data.items)) {
           this.services = response.data.data.items;
         } else {
           console.error("Invalid API response format:", response.data);
@@ -142,9 +170,7 @@ export default {
     async deleteService(service) {
       const deleteResult = await axios.delete(`/service-company/${service._id}`);
       if (deleteResult.status === 200) {
-        this.services = this.services.filter(
-          (item) => item._id !== service._id
-        );
+        this.services = this.services.filter((item) => item._id !== service._id);
       }
     },
     async onImageChange(e) {
@@ -155,9 +181,7 @@ export default {
 
       let formData = new FormData();
       formData.append("file", fileData);
-      const upload = await axios
-        .post("/files/upload", formData, config)
-        .then((res) => res.data);
+      const upload = await axios.post("/files/upload", formData, config).then((res) => res.data);
       this.form.image = upload?._id;
     },
     async createService() {
@@ -174,19 +198,62 @@ export default {
       }
     },
     clearFileInput() {
-    this.$refs.fileInput.value = ''; // Clear the file input value
-  },
+      this.$refs.fileInput.value = ""; // Clear the file input value
+    },
+    async createServiceAndClearModal() {
+      this.createService();
+      this.clearFileInput(); // Clear the file input after creating a service
+    },
+    async openEditModal(service) {
+      this.editForm.id = service._id;
+      this.editForm.title = service.title;
+      this.editForm.description = service.description;
+      $("#editModal").modal("show");
+    },
+    async updateServiceAndClearModal() {
+  try {
+    const updateData = {
+      title: this.editForm.title,
+      description: this.editForm.description,
+    };
 
-  async createServiceAndClearModal() {
-    this.createService();
-    this.clearFileInput(); // Clear the file input after creating a service
-  },
+    if (this.editForm.image) {
+      updateData.image = this.editForm.image; // Include image if it's updated
+    }
+
+    const updateResponse = await axios.put(`/service-company/update/${this.editForm.id}`, updateData);
+    if (updateResponse.status === 200) {
+      this.getServices();
+      this.editForm.id = "";
+      this.editForm.title = "";
+      this.editForm.description = "";
+      this.editForm.image = ""; // Reset the image field
+      $("#editModal").modal("hide");
+    }
+  } catch (error) {
+    console.error("Error updating service:", error);
+  }
+},
+
+    async onEditImageChange(e) {
+  const fileData = e.target.files[0];
+  const config = {
+    headers: { "content-type": "multipart/form-data" },
+  };
+
+  let formData = new FormData();
+  formData.append("file", fileData);
+  const upload = await axios.post("/files/upload", formData, config).then((res) => res.data);
+  this.editForm.image = upload?._id;
+},
+
   },
   async mounted() {
     await this.getServices();
   },
 };
 </script>
+
 
 <style lang="scss" scoped>
 .service-page {
