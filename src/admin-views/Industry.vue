@@ -38,7 +38,7 @@
                 <button class="btn btn-danger" @click="deleteIndustry(industry)">
                   Delete
                 </button>
-                <button class="btn btn-warning ml-2">Edit</button>
+                <button class="btn btn-warning ml-2" @click="openEditModal(industry)">Edit</button>
               </div>
             </td>
           </tr>
@@ -103,6 +103,34 @@
     </div>
   </div>
 </div>
+<!-- Edit Modal -->
+<div class="modal fade wrapper-modal" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="editModalLabel">Edit Industry</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="wrapper-form-input">
+          <input type="text" class="form-control" placeholder="Title" v-model="editForm.title" />
+          <textarea class="form-control mt-3" rows="4" placeholder="Description" v-model="editForm.description"></textarea>
+        </div>
+        <div class="input-group mt-3">
+  <input ref="editFileInput" type="file" class="form-control" @change="onEditImageChange" />
+</div>
+      </div>
+      <!-- Inside the Edit Modal -->
+
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" @click="updateIndustryAndClearModal" data-bs-dismiss="modal">
+          Update
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 </template>
 
 <script>
@@ -119,9 +147,67 @@ export default {
         description: "", // Add description field
         image: "",
       },
+      editForm: {
+        id: "", // Store the ID of the industry being edited
+        title: "",
+        description: "",
+      },
     };
   },
   methods: {
+    async onEditImageChange(e) {
+  const fileData = e.target.files[0];
+  const config = {
+    headers: { "content-type": "multipart/form-data" },
+  };
+
+  let formData = new FormData();
+  formData.append("file", fileData);
+  const upload = await axios.post("/files/upload", formData, config).then((res) => res.data);
+  this.editForm.image = upload?._id;
+},
+
+    openEditModal(industry) {
+      this.editForm.id = industry._id;
+      this.editForm.title = industry.title;
+      this.editForm.description = industry.description;
+      $("#editModal").modal("show"); // Use jQuery to open the modal
+    },
+    async updateIndustryAndClearModal() {
+      try {
+        const updateData = {
+          title: this.editForm.title,
+          description: this.editForm.description,
+        };
+
+        if (this.editForm.image) {
+          updateData.image = this.editForm.image;
+        }
+
+        const updateResponse = await axios.put(`/industry/${this.editForm.id}`, updateData);
+        if (updateResponse.status === 200) {
+          this.getIndustries();
+          this.editForm.id = "";
+          this.editForm.title = "";
+          this.editForm.description = "";
+          this.editForm.image = "";
+          $("#editModal").modal("hide");
+          Swal.fire({
+            icon: "success",
+            title: "Industry Updated!",
+            text: "The industry has been successfully updated.",
+          });
+        }
+      } catch (error) {
+        console.error("Error updating industry:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Update Failed",
+          text: "Failed to update the industry. Please try again.",
+        });
+      }
+    },
+
     async getIndustries() {
   console.log("Fetching industries...");
   try {
@@ -139,12 +225,38 @@ export default {
     console.error("Error fetching industries:", error);
   }
 },
-    async deleteIndustry(industry) {
+async deleteIndustry(industry) {
+  try {
+    const result = await Swal.fire({
+      title: "Confirm Deletion",
+      text: "Are you sure you want to delete this industry?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Delete",
+      cancelButtonText: "Cancel",
+    });
+
+    if (result.isConfirmed) {
       const deleteResult = await axios.delete(`/industry/${industry._id}`);
       if (deleteResult.status === 200) {
         this.industries = this.industries.filter(item => item._id !== industry._id);
+        Swal.fire({
+          icon: "success",
+          title: "Industry Deleted!",
+          text: "The industry has been successfully deleted.",
+        });
       }
-    },
+    }
+  } catch (error) {
+    console.error("Error deleting industry:", error);
+    Swal.fire({
+      icon: "error",
+      title: "Delete Failed",
+      text: "Failed to delete the industry. Please try again.",
+    });
+  }
+},
+
     async onImageChange(e) {
       const fileData = e.target.files[0];
       const config = {
@@ -174,13 +286,28 @@ export default {
       }
     },
     clearFileInput() {
-    this.$refs.fileInput.value = ''; // Clear the file input value
-  },
+  this.$refs.fileInput.value = '';
+  this.$refs.editFileInput.value = ''; // Clear the edit file input value
+},
 
-  async createIndustryAndClearModal() {
-    this.createIndustry();
-    this.clearFileInput(); // Clear the file input after creating a service
-  },
+async createIndustryAndClearModal() {
+      try {
+        await this.createIndustry();
+        this.clearFileInput();
+        Swal.fire({
+          icon: "success",
+          title: "Industry Created!",
+          text: "The industry has been successfully created.",
+        });
+      } catch (error) {
+        console.error("Error creating industry:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Create Failed",
+          text: "Failed to create the industry. Please try again.",
+        });
+      }
+    },
   },
   async mounted() {
     console.log("Component mounted. Fetching industries..."); // Add this log
