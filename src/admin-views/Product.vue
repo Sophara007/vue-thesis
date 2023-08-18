@@ -67,6 +67,7 @@
       </div>
     </div>
   </div>
+
   <!-- Edit Modal -->
   <div class="modal fade wrapper-modal" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -86,6 +87,7 @@
           </div>
         </div>
         <!-- Inside the Edit Modal -->
+
         <div class="modal-footer">
           <button type="button" class="btn btn-success" @click="updateProductAndClearModal" data-bs-dismiss="modal">
             Update
@@ -98,6 +100,7 @@
 
 <script>
 import axios from "axios";
+import Swal from "sweetalert2";
 export default {
   data() {
     return {
@@ -114,7 +117,6 @@ export default {
       },
     };
   },
-
   methods: {
     async getProducts() {
       try {
@@ -130,9 +132,34 @@ export default {
     },
 
     async deleteProduct(product) {
-      const deleteResult = await axios.delete(`/product/${product._id}`);
-      if (deleteResult.status === 200) {
-        this.products = this.products.filter((item) => item._id !== product._id);
+      try {
+        const result = await Swal.fire({
+          title: "Confirm Deletion",
+          text: "Are you sure you want to delete this product?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Delete",
+          cancelButtonText: "Cancel",
+        });
+
+        if (result.isConfirmed) {
+          const deleteResult = await axios.delete(`/product/${product._id}`);
+          if (deleteResult.status === 200) {
+            this.products = this.products.filter((item) => item._id !== product._id);
+            Swal.fire({
+              icon: "success",
+              title: "Product Deleted!",
+              text: "The product has been successfully deleted.",
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error deleting product:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Delete Failed",
+          text: "Failed to delete the product. Please try again.",
+        });
       }
     },
 
@@ -163,12 +190,26 @@ export default {
     },
 
     clearFileInput() {
-      this.$refs.fileInput.value = ""; // Clear the file input value
+      this.$refs.fileInput.value = "";
     },
 
     async createProductAndClearModal() {
-      this.createProduct();
-      this.clearFileInput();
+      try {
+        await this.createProduct();
+        this.clearFileInput();
+        Swal.fire({
+          icon: "success",
+          title: "Product Created!",
+          text: "The product has been successfully created.",
+        });
+      } catch (error) {
+        console.error("Error creating product:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Create Failed",
+          text: "Failed to create the product. Please try again.",
+        });
+      }
     },
 
     async openEditModal(product) {
@@ -197,9 +238,20 @@ export default {
           this.editForm.description = "";
           this.editForm.logo = "";
           $("#editModal").modal("hide");
+
+          Swal.fire({
+            icon: "success",
+            title: "Product Updated!",
+            text: "The product has been successfully updated.",
+          });
         }
       } catch (error) {
         console.error("Error updating product:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Update Failed",
+          text: "Failed to update the product. Please try again.",
+        });
       }
     },
 
@@ -208,19 +260,19 @@ export default {
       const config = {
         headers: { "content-type": "multipart/form-data" },
       };
-
       let formData = new FormData();
       formData.append("file", fileData);
       const upload = await axios.post("/files/upload", formData, config).then((res) => res.data);
       this.editForm.logo = upload?._id;
     },
+
   },
+
   async mounted() {
     await this.getProducts();
   },
 };
 </script>
-
 
 <style lang="scss" scoped>
 .product-page {
@@ -254,3 +306,4 @@ export default {
   }
 }
 </style>
+
