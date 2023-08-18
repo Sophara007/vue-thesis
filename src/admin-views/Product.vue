@@ -9,22 +9,22 @@
     <div class="wrapper-table">
       <table class="table">
         <thead>
-          <tr>
-            <th scope="col">No</th>
-            <th scope="col">Title</th>
-            <th scope="col">Description</th>
-            <th scope="col">Image</th>
-            <th scope="col">Actions</th>
+          <tr style="text-align: center;">
+            <th scope="col" style="width: 5%;">No</th>
+            <th scope="col" style="width: 20%;">Title</th>
+            <th scope="col" style="width: 20%;">Description</th>
+            <th scope="col" style="width: 20%;">Image</th>
+            <th scope="col" style="width: 20%;">Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(product, index) in products" :key="product._id">
+          <tr v-for="(product, index) in products" :key="product._id" style="text-align: center;">
             <th>{{ index + 1 }}</th>
-            <td>{{ product.title }}</td>
-            <td>{{ product.description }}</td>
+            <td><span class="description">{{ product.title }}</span></td>
+            <td><span class="description">{{ product.description }}</span></td>
             <td>
               <img :src="product?.logo?.url" class="product-img img-fluid" :alt="product?.logo?.alt || 'product'"
-                :title="product?.logo?.title || product.title" />
+                :title="product?.logo?.title || product.title" style="margin: auto;"/>
               <p>{{ product?.logo?.description || '' }}</p>
             </td>
             <td>
@@ -275,6 +275,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.description {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 .product-page {
   h1 {
     font-size: 24px;
@@ -289,8 +295,8 @@ export default {
 }
 
 .product-img {
-  width: 300px;
-  height: 150px;
+  width: 200px;
+  height: 100px;
   object-fit: contain;
 }
 

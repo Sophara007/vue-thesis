@@ -9,7 +9,7 @@
     <div class="wrapper-table">
       <table class="table">
         <thead>
-          <tr>
+          <tr style="text-align: center;">
             <th scope="col">N0</th>
             <th scope="col">Title</th>
             <th scope="col">Image</th>
@@ -17,11 +17,11 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(slider, index) in sliders" :key="slider.index">
+          <tr v-for="(slider, index) in sliders" :key="slider.index" style="text-align: center;">
             <th>{{ index + 1 }}</th>
             <td>{{ slider.title }}</td>
             <td>
-              <img :src="slider?.image?.url" class="slider-img img-fluid" alt="slider" />
+              <img :src="slider?.image?.url" class="slider-img img-fluid" alt="slider" style="margin: auto;" />
             </td>
             <td>
               <div class="wrapper-action">
@@ -155,7 +155,7 @@ export default {
       this.$refs.fileInput.value = "";
     },
 
-  //create
+    //create
     async createSliderAndClearModal() {
       try {
         await this.createSlider();
@@ -182,6 +182,13 @@ export default {
 </script>
   
 <style lang="scss" scoped>
+td {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .slider-page {
   h1 {
     font-size: 24px;
@@ -196,8 +203,8 @@ export default {
 }
 
 .slider-img {
-  width: 300px;
-  height: 150px;
+  width: 200px;
+  height: 100px;
   object-fit: contain;
 }
 

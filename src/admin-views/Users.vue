@@ -1,8 +1,6 @@
 <template>
   <div class="users-page container-fluid">
     <h1>Customer</h1>
-
-
     <div class="wrapper-table mt-5">
       <table class="table">
         <thead>
@@ -33,7 +31,6 @@
     </div>
   </div>
 </template>
-
 
 <script>
 import axios from "axios";
