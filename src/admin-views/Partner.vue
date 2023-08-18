@@ -18,7 +18,7 @@
         </thead>
         <tbody>
           <tr v-for="(slider, index) in sliders" :key="slider.index">
-            <th>{{index + 1 }}</th>
+            <th>{{ index + 1 }}</th>
             <td>{{ slider.title }}</td>
             <td>
               <img :src="slider?.image?.url" class="slider-img img-fluid" alt="slider" />
@@ -43,18 +43,18 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">Create Slider</h1>
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Create Partner</h1>
         </div>
         <div class="modal-body">
           <div class="wrapper-form-input">
             <input type="text" class="form-control" placeholder="Title" v-model="form.title" />
             <div class="input-group mt-3">
-              <input type="file" class="form-control" v-on:change="onImageChange" />
+              <input ref="fileInput" type="file" class="form-control" v-on:change="onImageChange" />
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-success" @click="createSlider">
+          <button type="button" class="btn btn-success" @click="createSliderAndClearModal" data-bs-dismiss="modal">
             Create
           </button>
         </div>
@@ -62,8 +62,6 @@
     </div>
   </div>
 </template>
-  
-  
   
 <script>
 import axios from "axios";
@@ -82,18 +80,50 @@ export default {
   },
   methods: {
     async getSlider() {
-      const sliders = await axios.get("/slider/partner").then((res) => res.data);
+      const sliders = await axios
+        .get("/slider/partner")
+        .then((res) => res.data);
       this.sliders = sliders;
-      console.log(this.sliders = sliders);
+      console.log((this.sliders = sliders));
     },
+
+    // delete
     async deleteSlider(slider) {
-      console.log("slider", slider._id);
-      const deleteResult = await axios.delete(`/slider/partner/${slider._id}`);
-      if (deleteResult.status == 200) {
-        location.reload();
+      try {
+        const result = await Swal.fire({
+          title: "Confirm Deletion",
+          text: "Are you sure you want to delete this slider?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Delete",
+          cancelButtonText: "Cancel",
+        });
+
+        if (result.isConfirmed) {
+          const deleteResult = await axios.delete(
+            `/slider/partner/${slider._id}`
+          );
+          if (deleteResult.status === 200) {
+            this.sliders = this.sliders.filter(
+              (item) => item._id !== slider._id
+            );
+            Swal.fire({
+              icon: "success",
+              title: "Slider Deleted!",
+              text: "The slider has been successfully deleted.",
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error deleting slider:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Delete Failed",
+          text: "Failed to delete the slider. Please try again.",
+        });
       }
-      console.log(deleteResult);
     },
+
     async onImageChange(e) {
       const fileData = e.target.files[0];
       const config = {
@@ -107,12 +137,41 @@ export default {
         .then((res) => res.data);
       this.form.image = upload?._id;
     },
-    async createSlider() {
-      console.log(this.form);
-      const create = await axios.post("/slider/partner", this.form)
 
-      if (create.status == 201) {
-        location.reload();
+    async createSlider() {
+      try {
+        const createResponse = await axios.post("/slider/partner", this.form);
+        if (createResponse.status === 201) {
+          this.getSlider();
+          this.form.title = "";
+          this.form.image = "";
+        }
+      } catch (error) {
+        console.error("Error creating partner slider:", error);
+      }
+    },
+
+    clearFileInput() {
+      this.$refs.fileInput.value = "";
+    },
+
+  //create
+    async createSliderAndClearModal() {
+      try {
+        await this.createSlider();
+        this.clearFileInput();
+        Swal.fire({
+          icon: "success",
+          title: "Slider Created!",
+          text: "The slider has been successfully created.",
+        });
+      } catch (error) {
+        console.error("Error creating slider:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Create Failed",
+          text: "Failed to create the slider. Please try again.",
+        });
       }
     },
   },
@@ -133,8 +192,6 @@ export default {
   .wrapper-create {
     display: flex;
     justify-content: end;
-
-    
   }
 }
 
