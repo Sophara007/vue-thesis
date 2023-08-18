@@ -137,7 +137,7 @@
 
 <script>
 import axios from "axios";
-
+import Swal from "sweetalert2"; // Import SweetAlert
 export default {
   data() {
     return {
@@ -168,9 +168,34 @@ export default {
       }
     },
     async deleteService(service) {
-      const deleteResult = await axios.delete(`/service-company/${service._id}`);
-      if (deleteResult.status === 200) {
-        this.services = this.services.filter((item) => item._id !== service._id);
+      try {
+        const result = await Swal.fire({
+          title: "Confirm Deletion",
+          text: "Are you sure you want to delete this service?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Delete",
+          cancelButtonText: "Cancel",
+        });
+
+        if (result.isConfirmed) {
+          const deleteResult = await axios.delete(`/service-company/${service._id}`);
+          if (deleteResult.status === 200) {
+            this.services = this.services.filter((item) => item._id !== service._id);
+            Swal.fire({ // SweetAlert success notification
+              icon: "success",
+              title: "Service Deleted!",
+              text: "The service has been successfully deleted.",
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error deleting service:", error);
+        Swal.fire({ // SweetAlert error notification
+          icon: "error",
+          title: "Delete Failed",
+          text: "Failed to delete the service. Please try again.",
+        });
       }
     },
     async onImageChange(e) {
@@ -201,8 +226,22 @@ export default {
       this.$refs.fileInput.value = ""; // Clear the file input value
     },
     async createServiceAndClearModal() {
-      this.createService();
-      this.clearFileInput(); // Clear the file input after creating a service
+      try {
+        await this.createService();
+        this.clearFileInput();
+        Swal.fire({ // SweetAlert success notification
+          icon: "success",
+          title: "Service Created!",
+          text: "The service has been successfully created.",
+        });
+      } catch (error) {
+        console.error("Error creating service:", error);
+        Swal.fire({ // SweetAlert error notification
+          icon: "error",
+          title: "Create Failed",
+          text: "Failed to create the service. Please try again.",
+        });
+      }
     },
     async openEditModal(service) {
       this.editForm.id = service._id;
@@ -229,11 +268,23 @@ export default {
       this.editForm.description = "";
       this.editForm.image = ""; // Reset the image field
       $("#editModal").modal("hide");
+
+      Swal.fire({ // SweetAlert success notification
+        icon: "success",
+        title: "Service Updated!",
+        text: "The service has been successfully updated.",
+      });
     }
   } catch (error) {
     console.error("Error updating service:", error);
+    Swal.fire({ // SweetAlert error notification
+      icon: "error",
+      title: "Update Failed",
+      text: "Failed to update the service. Please try again.",
+    });
   }
 },
+
 
     async onEditImageChange(e) {
   const fileData = e.target.files[0];
