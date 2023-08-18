@@ -2,46 +2,71 @@
   <div class="w-screen h-screen flex">
     <!-- Side bar -->
 
-    <div class="w-[250px] h-full bg-gray-200 text-white" overflow-y-auto flex v-show="showSide">
-      <div class="h-[50px] bg-gray-900 flex justify-start  items-center ">
+    <div class="w-[250px] bg-gray-200 text-white overflow-y-auto flex flex-col" v-show="showSide">
+      <div class="h-[50px] bg-gray-900 flex justify-start items-center">
         <div class="px-[50px]">
           <img src="https://static.wixstatic.com/media/74d6b3_b17a2b221c7246edb6bd50376a7a7ee4~mv2.gif" alt="logo-blue.gif" style="width:80px;height:50px">
         </div>
       </div>
-      <div class="h-[calc(100vh-50px)] bg-gray-800 py-[20px]">
-        <div class="flex flex-col justify-between h-full px-[20px] space-y-[10px]">
+      <div class="bg-gray-800 py-[20px] flex-grow">
+        <div class="flex flex-col space-y-[10px]">
           <div class=" flex flex-col justify-between space-y-[10px]">
             <router-link to="/home"
               class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md border-gray-200 hover:bg-gray-200 hover:text-gray-800  transition duration-400 ease-in-out">
               <i class="fas fa-home mr-5"></i>
               Home
             </router-link>
+<div>
+            <div class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md rounded-b-lg hover:bg-gray-300 hover:text-gray-800 transition duration-400 ease-in-out" @click="toggleHomeSlider">
+    <i class="fas fa-industry mr-5"></i>
+    Slides
+    <i v-if="showPartnerSlider" class="ml-2 fas fa-chevron-up text-gray-500"></i>
+    <i v-else class="ml-2 fas fa-chevron-down text-gray-500"></i>
+            </div>
+  <!-- Sub-link content under Home Slider -->
+  <div v-if="showHomeSlider" class="ml-6 text-sm text-gray-500">
+    <router-link to="/slider" class="block py-1 hover:text-gray-700 transition duration-300  white-text">Homepage Slider</router-link>
 
-            <router-link to="/slider" class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md border-gray-200 hover:bg-gray-300  hover:text-gray-800 transition duration-400 ease-in-out">
-              <i class="fas fa-sliders-h mr-6"></i>              
-              Home Slider
-            </router-link>
-
+    <router-link to="/partner" class="block py-1 hover:text-gray-700 transition duration-300  white-text">Partner Slider</router-link>
+    <!-- Add more sub-links as needed -->
+  </div>
+</div>
             <router-link to="/service"
               class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md border-gray-200 hover:bg-gray-300  hover:text-gray-800 transition duration-400 ease-in-out">
               <i class="fas fa-handshake align-middle mr-5"></i>
               Service
             </router-link>
+<div>
+            <div class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md rounded-b-lg hover:bg-gray-300 hover:text-gray-800 transition duration-400 ease-in-out" @click="toggleIndustryDetail">
+    <i class="fas fa-industry mr-5"></i>
+    Industries
+    <i v-if="showIndustryDetail" class="ml-2 fas fa-chevron-up text-gray-500"></i>
+    <i v-else class="ml-2 fas fa-chevron-down text-gray-500"></i>
+    </div>
+  <!-- Sub-link content under Industry -->
+  <div v-if="showIndustryDetail" class="ml-6 text-sm text-gray-500">
+    <router-link to="/industry" class="block py-1 hover:text-gray-700 transition duration-300  white-text">Industry</router-link>
 
-            <router-link to="/industry"
-              class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md rounded-b-lg hover:bg-gray-300  hover:text-gray-800 transition duration-400 ease-in-out">
-              <i class="fas fa-industry mr-5"></i>
-              Industry
-            </router-link>
-
-            <router-link to="/partner" class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md rounded-b-lg hover:bg-gray-300  hover:text-gray-800 transition duration-400 ease-in-out">
-              <i class="fa-regular fa-window-restore mr-5"></i>
-              Partner Slider
-            </router-link>
-            <router-link to="/product" class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md rounded-b-lg hover:bg-gray-300  hover:text-gray-800 transition duration-400 ease-in-out">
-              <i class="fa-brands fa-product-hunt mr-5"></i>
-              Product Model
-            </router-link>
+    <router-link to="/industrydetail" class="block py-1 hover:text-gray-700 transition duration-300  white-text">Industry Detail</router-link>
+    <!-- Add more sub-links as needed -->
+  </div>
+</div>
+    
+  <div>
+    <div class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md rounded-b-lg cursor-pointer hover:bg-gray-300 hover:text-gray-800 transition duration-400 ease-in-out" @click="toggleProductDetail">
+      <i class="fas fa-industry mr-5"></i>
+      Products
+      <i v-if="showProductDetail" class="ml-2 fas fa-chevron-up text-gray-500"></i>
+      <i v-else class="ml-2 fas fa-chevron-down text-gray-500"></i>
+    </div>
+    <!-- Sub-link content under Product Model -->
+    <div v-if="showProductDetail" class="ml-6 text-sm text-gray-500">
+      <router-link to="/product" class="block py-1 hover:text-gray-700 transition duration-300 white-text">Products Model</router-link>
+      <router-link to="/subproduct" class="block py-1 hover:text-gray-700 transition duration-300  white-text">Sub Product</router-link>
+      <router-link to="/subproductdetail" class="block py-1 hover:text-gray-700 transition duration-300  white-text">Sub Product Detail</router-link>
+      <!-- Add more sub-links as needed -->
+    </div>
+  </div>
             <router-link to="/admin/users" class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md rounded-b-lg hover:bg-gray-300  hover:text-gray-800 transition duration-400 ease-in-out">
               <i class="fas fa-users mr-5"></i>
               Users
@@ -144,10 +169,22 @@ export default {
   data() {
     return {
       showDropDown: false,
-      showSide: true
+      showSide: true,
+      showIndustryDetail: false, // Add this new data property
+      showHomeSlider: false,
+      showProductDetail: false,
     }
   },
   methods: {
+    toggleProductDetail() {
+      this.showProductDetail = !this.showProductDetail;
+    },
+    toggleHomeSlider() {
+      this.showHomeSlider = !this.showHomeSlider;
+    },
+    toggleIndustryDetail() {
+      this.showIndustryDetail = !this.showIndustryDetail;
+    },
     toggleSideBar() {
       this.showSide = !this.showSide
 
@@ -172,4 +209,8 @@ html {
   margin: 0;
   padding: 0;
   overflow: hidden;
-}</style>
+}
+.white-text {
+    color: white;
+  }
+  </style>
