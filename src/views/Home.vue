@@ -94,7 +94,7 @@ export default {
         });
 
         if (this.$store.getters.isAuthenticated) {
-          this.$router.push('/admin');
+          this.$router.push('/home');
           this.$router.removeRoute('/login');
         } else {
           this.errorMessage = 'Invalid credentials. Please try again.';
