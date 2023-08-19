@@ -16,7 +16,9 @@ import HomePage from '../admin-views/Home.vue';
 import Admin from '../admin-views/Admin.vue';
 import store from '../store';
 import Inquiry from '../admin-views/Inquiry.vue'
-
+import IndustryDetail from '../admin-views/IndustryDetail.vue'
+import SubProduct from '../admin-views/SubProduct.vue'
+import SubProductDetail from '../admin-views/SubProductDetail.vue'
 const routes = [
   {
     path: '/',
@@ -60,6 +62,11 @@ const routes = [
         component: Industry,
       },
       {
+        name: 'IndustryDetail',
+        path: '/industrydetail',
+        component: IndustryDetail,
+      },
+      {
         name: 'Partner',
         path: '/partner',
         component: Partner,
@@ -68,6 +75,16 @@ const routes = [
         name: 'Product',
         path: '/product',
         component: Product,
+      },
+      {
+        name: 'SubProduct',
+        path: '/subproduct',
+        component: SubProduct,
+      },
+      {
+        name: 'SubProductDetail',
+        path: '/subproductdetail',
+        component: SubProduct,
       },
       {
         name: 'Setting',
