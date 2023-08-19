@@ -148,7 +148,7 @@
           <div class="w-[200px] ">
             <div class="flex items-center justify-start space-x-4" @click="toggleDrop">
               <img class="w-10 h-10 rounded-full border-2 border-gray-500"
-                src="https://cdn.icon-icons.com/icons2/2248/PNG/512/account_icon_138984.png" style="cursor: pointer;">
+                src="https://static.vecteezy.com/system/resources/previews/008/442/086/original/illustration-of-human-icon-user-symbol-icon-modern-design-on-blank-background-free-vector.jpg" style="cursor: pointer; width: 10p">
               <div class="font-semibold dark:text-gray text-left">
                 <div style="cursor: pointer;">admin@drtech.com</div>
                 <div class="text-xs text-gray-500 dark:text-gray-400">Admin</div>
