@@ -59,7 +59,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-success" @click="createSliderAndClearModal" data-bs-dismiss="modal">
-            Update
+            Create
           </button>
         </div>
       </div>
