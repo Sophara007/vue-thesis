@@ -28,7 +28,7 @@
                 <button class="btn btn-danger" @click="deleteSlider(slider)">
                   Delete
                 </button>
-                <button class="btn btn-warning ml-2">Edit</button>
+                <button @click="openEditModal(slider)" data-bs-toggle="modal" data-bs-target="#editModal" class="btn btn-warning ml-2">Edit</button>
               </div>
             </td>
           </tr>
@@ -61,6 +61,35 @@
       </div>
     </div>
   </div>
+
+
+  <div class="modal fade wrapper-modal" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="editModalLabel">Edit Slider</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="wrapper-form-input">
+            <input type="text" class="form-control" placeholder="Title" v-model="editForm.title" />
+          </div>
+          <div class="input-group mt-3">
+            <input ref="editFileInput" type="file" class="form-control" @change="onEditImageChange" />
+          </div>
+        </div>
+        <!-- Inside the Edit Modal -->
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success" @click="updateSliderAndClearModal" data-bs-dismiss="modal">
+            Update
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
 </template>
   
 <script>
@@ -75,6 +104,10 @@ export default {
       form: {
         title: "",
         image: "",
+      },
+      editForm: {
+        id: "",
+        title: "",
       },
     };
   },
@@ -174,6 +207,64 @@ export default {
         });
       }
     },
+
+    // update
+    async openEditModal(slider) {
+      this.editForm.id = slider._id;
+      this.editForm.title = slider.title;
+      $("#editModal").modal("show");
+    },
+    async updateSliderAndClearModal() {
+      try {
+        const updateData = {
+          title: this.editForm.title,
+        };
+
+        if (this.editForm.image) {
+          updateData.image = this.editForm.image; // Include image if it's updated
+        }
+
+        const updateResponse = await axios.put(
+          `/slider/${this.editForm.id}`,
+          updateData
+        );
+        if (updateResponse.status === 200) {
+          this.getSlider();
+          this.editForm.id = "";
+          this.editForm.title = "";
+          this.editForm.image = "";
+          $("#editModal").modal("hide");
+
+          Swal.fire({
+            icon: "success",
+            title: "Slider Updated!",
+            text: "The slider has been successfully updated.",
+          });
+        }
+      } catch (error) {
+        console.error("Error updating slider:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Update Failed",
+          text: "Failed to update the slider. Please try again.",
+        });
+      }
+    },
+
+    async onEditImageChange(e) {
+      const fileData = e.target.files[0];
+      const config = {
+        headers: { "content-type": "multipart/form-data" },
+      };
+
+      let formData = new FormData();
+      formData.append("file", fileData);
+      const upload = await axios
+        .post("/files/upload", formData, config)
+        .then((res) => res.data);
+      this.editForm.image = upload?._id;
+    },
+
   },
   async mounted() {
     await this.getSlider();
