@@ -5,7 +5,8 @@
     <div class="w-[250px] bg-gray-200 text-white overflow-y-auto flex flex-col" v-show="showSide">
       <div class="h-[50px] bg-gray-900 flex justify-start items-center">
         <div class="px-[50px]">
-          <img src="https://static.wixstatic.com/media/74d6b3_b17a2b221c7246edb6bd50376a7a7ee4~mv2.gif" alt="logo-blue.gif" style="width:80px;height:50px">
+          <img src="https://static.wixstatic.com/media/74d6b3_b17a2b221c7246edb6bd50376a7a7ee4~mv2.gif"
+            alt="logo-blue.gif" style="width:80px;height:50px">
         </div>
       </div>
       <div class="bg-gray-800 py-[20px] flex-grow">
@@ -17,23 +18,26 @@
               Home
             </router-link>
             <div>
-  <div class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md rounded-b-lg hover:bg-gray-300 hover:text-gray-800 transition duration-400 ease-in-out" @click="toggleHomeSlider">
-    <i class="fa-regular fa-window-restore mr-5"></i>
-    Slides
-    <i v-if="showHomeSlider" class="ml-2 fas fa-angle-up text-gray-500"></i>
-    <i v-else class="ml-2 fas fa-angle-down text-gray-500"></i>
-  </div>
-  <!-- Sub-link content under Slides -->
-  <div v-if="showHomeSlider" class="ml-6 text-sm text-gray-500 space-y-2">
-    <router-link to="/slider" class="block py-1 hover:text-gray-700 transition duration-300  white-text pl-5">
-      <i class="fas fa-chevron-right mr-2 text-gray-400"></i>Homepage Slider
-    </router-link>
-    <router-link to="/partner" class="block py-1 hover:text-gray-700 transition duration-300  white-text pl-5">
-      <i class="fas fa-chevron-right mr-2 text-gray-400"></i>Partner Slider
-    </router-link>
-    <!-- Add more sub-links as needed -->
-  </div>
-</div>
+              <div
+                class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md rounded-b-lg hover:bg-gray-300 hover:text-gray-800 transition duration-400 ease-in-out"
+                @click="toggleHomeSlider">
+                <i class="fa-regular fa-window-restore mr-5"></i>
+                Slides
+                <i v-if="showHomeSlider" class="ml-2 fas fa-angle-up text-gray-500"></i>
+                <i v-else class="ml-2 fas fa-angle-down text-gray-500"></i>
+              </div>
+              <!-- Sub-link content under Slides -->
+              <div v-if="showHomeSlider" class="ml-6 text-sm text-gray-500 space-y-2">
+                <router-link to="/slider" class="block py-1 hover:text-gray-700 transition duration-300  white-text pl-5">
+                  Homepage Slider
+                </router-link>
+                <router-link to="/partner"
+                  class="block py-1 hover:text-gray-700 transition duration-300  white-text pl-5">
+                  Partner Slider
+                </router-link>
+                <!-- Add more sub-links as needed -->
+              </div>
+            </div>
 
 
             <router-link to="/service"
@@ -42,50 +46,59 @@
               Service
             </router-link>
             <div>
-  <div class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md rounded-b-lg hover:bg-gray-300 hover:text-gray-800 transition duration-400 ease-in-out" @click="toggleIndustryDetail">
-    <i class="fas fa-industry mr-5"></i>
-    Industries
-    <i v-if="showIndustryDetail" class="ml-2 fas fa-angle-up text-gray-500"></i>
-    <i v-else class="ml-2 fas fa-angle-down text-gray-500"></i>
-  </div>
-  <!-- Sub-link content under Industry -->
-  <div v-if="showIndustryDetail" class="ml-6 text-sm text-gray-500 space-y-2">
-    <router-link to="/industry" class="block py-1 hover:text-gray-700 transition duration-300  white-text pl-5">
-      <i class="fas fa-chevron-right mr-2 text-gray-400"></i>Industry
-    </router-link>
-    <router-link to="/industrydetail" class="block py-1 hover:text-gray-700 transition duration-300  white-text pl-5">
-      <i class="fas fa-chevron-right mr-2 text-gray-400"></i>Industry Detail
-    </router-link>
-    <!-- Add more sub-links as needed -->
-  </div>
-</div>
+              <div
+                class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md rounded-b-lg hover:bg-gray-300 hover:text-gray-800 transition duration-400 ease-in-out"
+                @click="toggleIndustryDetail">
+                <i class="fas fa-industry mr-5"></i>
+                Industries
+                <i v-if="showIndustryDetail" class="ml-2 fas fa-angle-up text-gray-500"></i>
+                <i v-else class="ml-2 fas fa-angle-down text-gray-500"></i>
+              </div>
+              <!-- Sub-link content under Industry -->
+              <div v-if="showIndustryDetail" class="ml-6 text-sm text-gray-500 space-y-2">
+                <router-link to="/industry"
+                  class="block py-1 hover:text-gray-700 transition duration-300  white-text pl-5">
+                  Industry
+                </router-link>
+                <router-link to="/industrydetail"
+                  class="block py-1 hover:text-gray-700 transition duration-300  white-text pl-5">
+                  Industry Detail
+                </router-link>
+                <!-- Add more sub-links as needed -->
+              </div>
+            </div>
 
 
-    
-<div>
-  <div class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md rounded-b-lg cursor-pointer hover:bg-gray-300 hover:text-gray-800 transition duration-400 ease-in-out" @click="toggleProductDetail">
-    <i class="fa-brands fa-product-hunt mr-5 "></i>
-    Products
-    <i v-if="showProductDetail" class="ml-2 fas fa-chevron-up text-gray-500"></i>
-    <i v-else class="ml-2 fas fa-chevron-down text-gray-500"></i>
-  </div>
-  <!-- Sub-link content under Product Model -->
-  <div v-if="showProductDetail" class="ml-6 text-sm text-gray-500 space-y-2">
-    <router-link to="/product" class="block py-1 hover:text-gray-700 transition duration-300 white-text pl-5">
-      <i class="fas fa-chevron-right mr-2 text-gray-400"></i>Products Model
-    </router-link>
-    <router-link to="/subproduct" class="block py-1 hover:text-gray-700 transition duration-300  white-text pl-5">
-      <i class="fas fa-chevron-right mr-2 text-gray-400"></i>Sub Product
-    </router-link>
-    <router-link to="/subproductdetail" class="block py-1 hover:text-gray-700 transition duration-300  white-text pl-5">
-      <i class="fas fa-chevron-right mr-2 text-gray-400"></i>Sub Product Detail
-    </router-link>
-    <!-- Add more sub-links as needed -->
-  </div>
-</div>
+
+            <div>
+              <div
+                class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md rounded-b-lg cursor-pointer hover:bg-gray-300 hover:text-gray-800 transition duration-400 ease-in-out"
+                @click="toggleProductDetail">
+                <i class="fa-brands fa-product-hunt mr-5 "></i>
+                Products
+                <i v-if="showProductDetail" class="ml-2 fas fa-chevron-up text-gray-500"></i>
+                <i v-else class="ml-2 fas fa-chevron-down text-gray-500"></i>
+              </div>
+              <!-- Sub-link content under Product Model -->
+              <div v-if="showProductDetail" class="ml-6 text-sm text-gray-500 space-y-2">
+                <router-link to="/product" class="block py-1 hover:text-gray-700 transition duration-300 white-text pl-5">
+                  Products Model
+                </router-link>
+                <router-link to="/subproduct"
+                  class="block py-1 hover:text-gray-700 transition duration-300  white-text pl-5">
+                  Sub Product
+                </router-link>
+                <router-link to="/subproductdetail"
+                  class="block py-1 hover:text-gray-700 transition duration-300  white-text pl-5">
+                  Sub Product Detail
+                </router-link>
+                <!-- Add more sub-links as needed -->
+              </div>
+            </div>
 
 
-            <router-link to="/admin/users" class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md rounded-b-lg hover:bg-gray-300  hover:text-gray-800 transition duration-400 ease-in-out">
+            <router-link to="/admin/users"
+              class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md rounded-b-lg hover:bg-gray-300  hover:text-gray-800 transition duration-400 ease-in-out">
               <i class="fas fa-users mr-5"></i>
               Users
             </router-link>
@@ -148,7 +161,8 @@
           <div class="w-[200px] ">
             <div class="flex items-center justify-start space-x-4" @click="toggleDrop">
               <img class="w-10 h-10 rounded-full border-2 border-gray-500"
-                src="https://static.vecteezy.com/system/resources/previews/008/442/086/original/illustration-of-human-icon-user-symbol-icon-modern-design-on-blank-background-free-vector.jpg" style="cursor: pointer; width: 10p">
+                src="https://static.vecteezy.com/system/resources/previews/008/442/086/original/illustration-of-human-icon-user-symbol-icon-modern-design-on-blank-background-free-vector.jpg"
+                style="cursor: pointer; width: 10p">
               <div class="font-semibold dark:text-gray text-left">
                 <div style="cursor: pointer;">admin@drtech.com</div>
                 <div class="text-xs text-gray-500 dark:text-gray-400">Admin</div>
@@ -228,7 +242,7 @@ html {
   padding: 0;
   overflow: hidden;
 }
+
 .white-text {
-    color: white;
-  }
-  </style>
+  color: white;
+}</style>
