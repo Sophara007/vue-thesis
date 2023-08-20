@@ -1,44 +1,342 @@
 <template>
-    <div class="industry-detail">
-      <h1>{{ industryName }}</h1>
-      <p>{{ industryDescription }}</p>
-      <h2>Key Statistics</h2>
-      <ul>
-        <li><strong>Annual Revenue:</strong> {{ annualRevenue }}</li>
-        <li><strong>Number of Employees:</strong> {{ numEmployees }}</li>
-        <li><strong>Market Share:</strong> {{ marketShare }}</li>
-      </ul>
-      <h2>Challenges and Opportunities</h2>
-      <p>{{ challengesOpportunities }}</p>
-      <h2>Recent Developments</h2>
-      <ul>
-        <li>{{ recentDevelopment1 }}</li>
-        <li>{{ recentDevelopment2 }}</li>
-        <li>{{ recentDevelopment3 }}</li>
-      </ul>
+  <div class="industry-page container-fluid">
+    <h1>Industry Detail</h1>
+    <div class="wrapper-create m-5">
+      <button class="btn btn-success custom-btn" data-bs-toggle="modal" data-bs-target="#createModal">
+        Create
+      </button>
     </div>
-  </template>
+    <div class="wrapper-table">
+      <table class="table">
+        <thead>
+          <tr style="text-align: center;">
+            <th scope="col" style="width: 5%;">No</th>
+            <th scope="col" style="width: 20%;">Title</th>
+            <th scope="col" style="width: 20%;">Description</th>
+            <th scope="col" style="width: 20%;">Image</th>
+            <th scope="col" style="width: 20%;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(industry, index) in industryDetails" :key="industry._id" style="text-align: center;">
+            <th>{{ index + 1 }}</th>
+            <td><span class="description">{{ industry.title }}</span></td>
+            <td><span class="description">{{ industry.description }}</span></td>
+            <td>
+              <img :src="industry?.image?.url" class="industry-img img-fluid" alt="industry" style="margin: auto;" />
+            </td>
+            <td>
+              <div class="wrapper-action">
+                <button class="btn btn-danger" @click="deleteIndustry(industry)">
+                  Delete
+                </button>
+                <button class="btn btn-warning ml-2" @click="openEditModal(industry)">Edit</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+
+  <!-- Modal create -->
+  <div class="modal fade wrapper-modal" id="createModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Create Industry Detail</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="wrapper-form-input">
+            <input type="text" class="form-control" placeholder="Title" v-model="form.title" />
+            <textarea class="form-control mt-3" rows="4" placeholder="Description" v-model="form.description"></textarea>
+            <div class="input-group mt-3">
+              <input ref="fileInput" type="file" class="form-control" v-on:change="onImageChange" />
+            </div>
+
+            <div class="input-group mt-3">
+
+              <select class="form-select" v-model="form.industry" aria-label="Default select example">
+                <option selected>Select Product</option>
+                <option v-for="item in listSelect" :value=item._id>{{ item.title }}</option>
+              </select>
+            </div>
+            {{ form }}
+
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success" @click="createIndustryDetailAndClearModal" data-bs-dismiss="modal">
+            Create
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Edit Modal -->
+  <div class="modal fade wrapper-modal" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="editModalLabel">Edit Industry</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="wrapper-form-input">
+            <input type="text" class="form-control" placeholder="Title" v-model="editForm.title" />
+            <textarea class="form-control mt-3" rows="4" placeholder="Description"
+              v-model="editForm.description"></textarea>
+          </div>
+          <div class="input-group mt-3">
+            <input ref="editFileInput" type="file" class="form-control" @change="onEditImageChange" />
+          </div>
+        </div>
+
+        <!-- Inside the Edit Modal -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success" @click="updateIndustryAndClearModal" data-bs-dismiss="modal">
+            Update
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
   
-  <script>
-  export default {
-    name: 'IndustryDetail',
-    data() {
-      return {
-        industryName: 'Sample Industry',
-        industryDescription: 'This is a brief overview of the sample industry...',
-        annualRevenue: '$X billion',
-        numEmployees: 'X,XXX',
-        marketShare: 'X%',
-        challengesOpportunities: 'Some challenges and opportunities in the industry...',
-        recentDevelopment1: 'A recent development or news item...',
-        recentDevelopment2: 'Another recent development or news item...',
-        recentDevelopment3: 'One more recent development or news item...'
+<script>
+
+import axios from "axios";
+import Swal from "sweetalert2";
+
+export default {
+  data() {
+    return {
+      industryDetails: [],
+      listSelect: [],
+      file: "",
+      form: {
+        title: "",
+        description: "", // Add description field
+        image: "",
+        industry: ""
+      },
+      editForm: {
+        id: "", // Store the ID of the industry being edited
+        title: "",
+        description: "",
+      },
+    };
+  },
+  methods: {
+    async onEditImageChange(e) {
+      const fileData = e.target.files[0];
+      const config = {
+        headers: { "content-type": "multipart/form-data" },
       };
+
+      let formData = new FormData();
+      formData.append("file", fileData);
+      const upload = await axios.post("/files/upload", formData, config).then((res) => res.data);
+      this.editForm.image = upload?._id;
+    },
+
+    async listIndustries() {
+      const data = await axios.get('/industry').then(res => res.data.data.items)
+      console.log(data)
+      this.listSelect = data
+    },
+
+    openEditModal(industry) {
+      this.editForm.id = industry._id;
+      this.editForm.title = industry.title;
+      this.editForm.description = industry.description;
+      $("#editModal").modal("show"); // Use jQuery to open the modal
+    },
+    async updateIndustryAndClearModal() {
+      try {
+        const updateData = {
+          title: this.editForm.title,
+          description: this.editForm.description,
+        };
+
+        if (this.editForm.image) {
+          updateData.image = this.editForm.image;
+        }
+
+        const updateResponse = await axios.put(`/industry/${this.editForm.id}`, updateData);
+        if (updateResponse.status === 200) {
+          this.getIndustries();
+          this.editForm.id = "";
+          this.editForm.title = "";
+          this.editForm.description = "";
+          this.editForm.image = "";
+          $("#editModal").modal("hide");
+          Swal.fire({
+            icon: "success",
+            title: "Industry Updated!",
+            text: "The industry has been successfully updated.",
+          });
+        }
+      } catch (error) {
+        console.error("Error updating industry:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Update Failed",
+          text: "Failed to update the industry. Please try again.",
+        });
+      }
+    },
+
+    async getIndustryDetail() {
+
+      try {
+        const response = await axios.get("/industry/detail");
+
+        if (response.data && response.data.data && Array.isArray(response.data.data.items)) {
+          const industryDetails = response.data.data.items;
+
+          this.industryDetails = industryDetails;
+        } else {
+          console.error("Invalid API response format:", response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching industries:", error);
+      }
+    },
+    async deleteIndustry(industry) {
+      try {
+        const result = await Swal.fire({
+          title: "Confirm Deletion",
+          text: "Are you sure you want to delete this industry?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Delete",
+          cancelButtonText: "Cancel",
+        });
+
+        if (result.isConfirmed) {
+          const deleteResult = await axios.delete(`/industry/${industry._id}`);
+          if (deleteResult.status === 200) {
+            this.industries = this.industries.filter(item => item._id !== industry._id);
+            Swal.fire({
+              icon: "success",
+              title: "Industry Deleted!",
+              text: "The industry has been successfully deleted.",
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error deleting industry:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Delete Failed",
+          text: "Failed to delete the industry. Please try again.",
+        });
+      }
+    },
+
+    async onImageChange(e) {
+      const fileData = e.target.files[0];
+      const config = {
+        headers: { "content-type": "multipart/form-data" },
+      };
+
+      let formData = new FormData();
+      formData.append("file", fileData);
+      const upload = await axios
+        .post("/files/upload", formData, config)
+        .then((res) => res.data);
+      this.form.image = upload?._id;
+    },
+    async createIndustryDetail() {
+      try {
+        const createResponse = await axios.post("/industry/detail", this.form);
+
+        if (createResponse.status === 201) {
+          this.getIndustryDetail()
+          this.form.title = "";
+          this.form.description = ""; // Clear description field
+          this.form.image = "";
+          this.showModal = false;
+        }
+      } catch (error) {
+        console.error("Error creating industry:", error);
+      }
+    },
+    clearFileInput() {
+      this.$refs.fileInput.value = '';
+      this.$refs.editFileInput.value = ''; // Clear the edit file input value
+    },
+
+    async createIndustryDetailAndClearModal() {
+      try {
+        await this.createIndustryDetail();
+        this.clearFileInput();
+        Swal.fire({
+          icon: "success",
+          title: "Industry Created!",
+          text: "The industry has been successfully created.",
+        });
+
+      } catch (error) {
+        console.error("Error creating industry:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Create Failed",
+          text: "Failed to create the industry. Please try again.",
+        });
+      }
+    },
+  },
+  async mounted() {
+    console.log("Component mounted. Fetching industries..."); // Add this log
+    await this.getIndustryDetail();
+    await this.listIndustries()
+  },
+};
+</script>
+
+
+<style lang="scss" scoped>
+.description {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.industry-page {
+  h1 {
+    font-size: 24px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
+  .wrapper-create {
+    display: flex;
+    justify-content: end;
+  }
+}
+
+.industry-img {
+  width: 200px;
+  height: 100px;
+  object-fit: contain;
+}
+
+.wrapper-modal {
+  .modal-footer {
+    .btn {
+      color: green;
+
+      &:hover {
+        color: white;
+      }
     }
-  };
-  </script>
-  
-  <style scoped>
-  /* Add your component-specific styles here */
-  </style>
+  }
+}
+</style>
   

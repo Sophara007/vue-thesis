@@ -43,7 +43,7 @@ export default {
   },
   methods: {
     async getUser() {
-      const users = await axios.get('/users').then(res=> res.data.data.items)
+      const users = await axios.get('/users?limit=100&sortField=_id').then(res=> res.data.data.items)
       console.log(users)
       this.users = users
     }
