@@ -96,7 +96,6 @@
               </div>
             </div>
 
-
             <router-link to="/admin/users"
               class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md rounded-b-lg hover:bg-gray-300  hover:text-gray-800 transition duration-400 ease-in-out">
               <i class="fas fa-users mr-5"></i>
@@ -109,12 +108,17 @@
               Inquiry
             </router-link>
 
+            <router-link to="/admin/create-admin"
+              class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md rounded-b-lg hover:bg-gray-300  hover:text-gray-800 transition duration-400 ease-in-out">
+              <i class="fa-solid fa-user-gear mr-5"></i>
+              Admin User
+            </router-link>
           </div>
           <div class="h-[50px]">
             <div>
               <router-link to="/setting"
                 class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md border-gray-200 hover:bg-gray-300 hover:text-gray-800  transition duration-400 ease-in-out">
-                <span class="mr-2 text-xl">⚙️</span>
+                <i class="fa-solid fa-circle-info mr-5"></i>
                 Company Info
               </router-link>
             </div>
@@ -164,7 +168,7 @@
                 src="https://static.vecteezy.com/system/resources/previews/008/442/086/original/illustration-of-human-icon-user-symbol-icon-modern-design-on-blank-background-free-vector.jpg"
                 style="cursor: pointer; width: 10p">
               <div class="font-semibold dark:text-gray text-left">
-                <div style="cursor: pointer;">admin@drtech.com</div>
+                <div style="cursor: pointer;">admin@bluetech.com</div>
                 <div class="text-xs text-gray-500 dark:text-gray-400">Admin</div>
               </div>
             </div>
