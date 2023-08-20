@@ -9,7 +9,7 @@
     <div class="wrapper-table">
       <table class="table">
         <thead>
-          <tr>
+          <tr style="text-align: center">
             <th scope="col">N0</th>
             <th scope="col">Title</th>
             <th scope="col">Image</th>
@@ -17,18 +17,20 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="slider in sliders" :key="slider.index">
-            <th>1</th>
+          <tr v-for="(slider, index) in sliders" :key="slider.index" style="text-align: center">
+            <th>{{ index + 1 }}</th>
             <td>{{ slider.title }}</td>
             <td>
-              <img :src="slider?.image?.url" class="slider-img img-fluid" alt="slider" />
+              <img :src="slider?.image?.url" class="slider-img img-fluid" alt="slider" style="margin: auto" />
             </td>
             <td>
               <div class="wrapper-action">
                 <button class="btn btn-danger" @click="deleteSlider(slider)">
                   Delete
                 </button>
-                <button class="btn btn-warning ml-2">Edit</button>
+                <button data-bs-toggle="modal" data-bs-target="#editModal" class="btn btn-warning ml-2">
+                  Edit
+                </button>
               </div>
             </td>
           </tr>
@@ -43,27 +45,56 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">Create Slider</h1>
+          <h1 class="modal-title fs-5" id="exampleModalLabel">
+            Create Partner
+          </h1>
         </div>
         <div class="modal-body">
           <div class="wrapper-form-input">
             <input type="text" class="form-control" placeholder="Title" v-model="form.title" />
             <div class="input-group mt-3">
-              <input type="file" class="form-control" v-on:change="onImageChange" />
+              <input ref="fileInput" type="file" class="form-control" v-on:change="onImageChange" />
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-success" @click="createSlider">
-            Create
+          <button type="button" class="btn btn-success" @click="createSliderAndClearModal" data-bs-dismiss="modal">
+            Update
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- edit -->
+
+  <div class="modal fade wrapper-modal" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="editModalLabel">Edit Slider</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="wrapper-form-input">
+            <input type="text" class="form-control" placeholder="Title" v-model="editForm.title" />
+          </div>
+          <div class="input-group mt-3">
+            <input ref="editFileInput" type="file" class="form-control" @change="onEditImageChange" />
+          </div>
+        </div>
+        <!-- Inside the Edit Modal -->
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success" @click="updateSliderAndClearModal" data-bs-dismiss="modal">
+            Update
           </button>
         </div>
       </div>
     </div>
   </div>
 </template>
-  
-  
   
 <script>
 import axios from "axios";
@@ -78,22 +109,58 @@ export default {
         title: "",
         image: "",
       },
+      editForm: {
+        id: "",
+        title: "",
+      },
     };
   },
   methods: {
     async getSlider() {
-      const sliders = await axios.get("/slider/partner").then((res) => res.data);
+      const sliders = await axios
+        .get("/slider/partner")
+        .then((res) => res.data);
       this.sliders = sliders;
-      console.log(this.sliders = sliders);
+      console.log((this.sliders = sliders));
     },
+
+    // delete
     async deleteSlider(slider) {
-      console.log("slider", slider._id);
-      const deleteResult = await axios.delete(`/slider/partner${slider._id}`);
-      if (deleteResult.status == 200) {
-        location.reload();
+      try {
+        const result = await Swal.fire({
+          title: "Confirm Deletion",
+          text: "Are you sure you want to delete this slider?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Delete",
+          cancelButtonText: "Cancel",
+        });
+
+        if (result.isConfirmed) {
+          const deleteResult = await axios.delete(
+            `/slider/partner/${slider._id}`
+          );
+          if (deleteResult.status === 200) {
+            this.sliders = this.sliders.filter(
+              (item) => item._id !== slider._id
+            );
+            Swal.fire({
+              icon: "success",
+              title: "Slider Deleted!",
+              text: "The slider has been successfully deleted.",
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error deleting slider:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Delete Failed",
+          text: "Failed to delete the slider. Please try again.",
+        });
       }
-      console.log(deleteResult);
     },
+
     async onImageChange(e) {
       const fileData = e.target.files[0];
       const config = {
@@ -107,13 +174,100 @@ export default {
         .then((res) => res.data);
       this.form.image = upload?._id;
     },
-    async createSlider() {
-      console.log(this.form);
-      const create = await axios.post("/slider/partner", this.form)
 
-      if (create.status == 201) {
-        location.reload();
+    async createSlider() {
+      try {
+        const createResponse = await axios.post("/slider/partner", this.form);
+        if (createResponse.status === 201) {
+          this.getSlider();
+          this.form.title = "";
+          this.form.image = "";
+        }
+      } catch (error) {
+        console.error("Error creating partner slider:", error);
       }
+    },
+
+    clearFileInput() {
+      this.$refs.fileInput.value = "";
+    },
+
+    //create
+    async createSliderAndClearModal() {
+      try {
+        await this.createSlider();
+        this.clearFileInput();
+        Swal.fire({
+          icon: "success",
+          title: "Slider Created!",
+          text: "The slider has been successfully created.",
+        });
+      } catch (error) {
+        console.error("Error creating slider:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Create Failed",
+          text: "Failed to create the slider. Please try again.",
+        });
+      }
+    },
+
+    // update
+    async openEditModal(slider) {
+
+      this.editForm.id = slider._id;
+      this.editForm.title = slider.title;
+      $("#editModal").modal("show");
+    },
+    async updateSliderAndClearModal() {
+      try {
+        const updateData = {
+          title: this.editForm.title,
+        };
+
+        if (this.editForm.image) {
+          updateData.image = this.editForm.image;
+        }
+
+        const updateResponse = await axios.put(
+          `/slider/partner/${this.editForm.id}`,
+          updateData
+        );
+        if (updateResponse.status === 200) {
+          this.getSlider();
+          this.editForm.id = "";
+          this.editForm.title = "";
+          this.editForm.image = "";
+          $("#editModal").modal("hide");
+
+          Swal.fire({
+            icon: "success",
+            title: "Slider Updated!",
+            text: "The slider has been successfully updated.",
+          });
+        }
+      } catch (error) {
+        console.error("Error updating slider:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Update Failed",
+          text: "Failed to update the slider. Please try again.",
+        });
+      }
+    },
+
+    async onEditImageChange(e) {
+      const fileData = e.target.files[0];
+      const config = {
+        headers: { "content-type": "multipart/form-data" },
+      };
+
+      let formData = new FormData();
+      formData.append("file", fileData);
+      const upload = await axios
+        .post("/files/upload", formData, config)
+        .then((res) => res.data);
+      this.editForm.image = upload?._id;
     },
   },
   async mounted() {
@@ -123,6 +277,13 @@ export default {
 </script>
   
 <style lang="scss" scoped>
+td {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .slider-page {
   h1 {
     font-size: 24px;
@@ -133,16 +294,12 @@ export default {
   .wrapper-create {
     display: flex;
     justify-content: end;
-
-    .custom-btn {}
-
-    .wrapper-table {}
   }
 }
 
 .slider-img {
-  width: 300px;
-  height: 150px;
+  width: 200px;
+  height: 100px;
   object-fit: contain;
 }
 

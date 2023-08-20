@@ -38,8 +38,6 @@
 
 <script>
 import axios from 'axios';
-
-
 export default {
     data() {
         return {
@@ -63,18 +61,20 @@ export default {
         await this.getDashboard()
     }
 }
-
 </script>
 
 <style scoped>
+  h1 {
+    font-size: 24px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
 i {
     font-size: 40px;
 }
-
 .total {
     font-size: 30px;
 }
-
 .title {
     color: rgb(71, 71, 71);
 }

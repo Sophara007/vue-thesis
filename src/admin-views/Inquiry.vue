@@ -1,9 +1,6 @@
 <template>
     <div class="inquiry-page container-fluid">
         <h1> Inquiry page</h1>
-
-
-
         <div class="wrapper-table mt-5">
             <table class="table">
                 <thead>
@@ -16,8 +13,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="inquiry in inquiries" :key="inquiry.index">
-                        <th>1</th>
+                    <tr v-for="(inquiry, index) in inquiries" :key="inquiry.index">
+                        <th>{{ index + 1 }}</th> <!-- Change this line -->
                         <td>{{ inquiry.fullName }}</td>
                         <td>
                             {{ inquiry.email }}
@@ -85,7 +82,7 @@ export default {
             this.inquiries = inquiries
         },
         async getOne(inquiry) {
-            const findOneInquiry = await axios.get(`/messages/${inquiry._id}`).then(res=> res.data.data)
+            const findOneInquiry = await axios.get(`/messages/${inquiry._id}`).then(res => res.data.data)
             this.inquiry = await findOneInquiry
         }
     },
@@ -93,8 +90,6 @@ export default {
         await this.getInquiry();
     },
 }
-
-
 </script>
 <style lang="scss" scoped>
 .inquiry-page {
@@ -103,11 +98,7 @@ export default {
         font-weight: bold;
         text-transform: uppercase;
     }
-
-
-
 }
-
 .wrapper-modal {
     .modal-footer {
         .btn {

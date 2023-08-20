@@ -1,6 +1,6 @@
 <template>
   <div class="industry-page container-fluid">
-    <h1>Industry Page</h1>
+    <h1>Industry Detail</h1>
     <div class="wrapper-create m-5">
       <button class="btn btn-success custom-btn" data-bs-toggle="modal" data-bs-target="#createModal">
         Create
@@ -18,7 +18,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(industry, index) in industries" :key="industry._id" style="text-align: center;">
+          <tr v-for="(industry, index) in industryDetails" :key="industry._id" style="text-align: center;">
             <th>{{ index + 1 }}</th>
             <td><span class="description">{{ industry.title }}</span></td>
             <td><span class="description">{{ industry.description }}</span></td>
@@ -39,13 +39,14 @@
     </div>
   </div>
 
-  <!-- Modal -->
+
+  <!-- Modal create -->
   <div class="modal fade wrapper-modal" id="createModal" tabindex="-1" aria-labelledby="exampleModalLabel"
     aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">Create Industry</h1>
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Create Industry Detail</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -55,10 +56,21 @@
             <div class="input-group mt-3">
               <input ref="fileInput" type="file" class="form-control" v-on:change="onImageChange" />
             </div>
+
+            <div class="input-group mt-3">
+
+              <select class="form-select" v-model="form.industry" aria-label="Default select example">
+                <option selected>Select Product</option>
+
+                <option v-for="item in listSelect" :value=item._id>{{ item.title }}</option>
+              </select>
+            </div>
+            {{ form }}
+
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-success" @click="createIndustryAndClearModal" data-bs-dismiss="modal">
+          <button type="button" class="btn btn-success" @click="createIndustryDetailAndClearModal" data-bs-dismiss="modal">
             Create
           </button>
         </div>
@@ -94,20 +106,23 @@
     </div>
   </div>
 </template>
-
+  
 <script>
+
 import axios from "axios";
 import Swal from "sweetalert2";
 
 export default {
   data() {
     return {
-      industries: [],
+      industryDetails: [],
+      listSelect: [],
       file: "",
       form: {
         title: "",
         description: "", // Add description field
         image: "",
+        industry: ""
       },
       editForm: {
         id: "", // Store the ID of the industry being edited
@@ -127,6 +142,12 @@ export default {
       formData.append("file", fileData);
       const upload = await axios.post("/files/upload", formData, config).then((res) => res.data);
       this.editForm.image = upload?._id;
+    },
+
+    async listIndustries() {
+      const data = await axios.get('/industry').then(res => res.data.data.items)
+      console.log(data)
+      this.listSelect = data
     },
 
     openEditModal(industry) {
@@ -170,16 +191,15 @@ export default {
       }
     },
 
-    async getIndustries() {
-      console.log("Fetching industries...");
+    async getIndustryDetail() {
+
       try {
-        const response = await axios.get("/industry");
-        console.log("API response:", response);
+        const response = await axios.get("/industry/detail");
+
         if (response.data && response.data.data && Array.isArray(response.data.data.items)) {
-          const industries = response.data.data.items;
-          console.log("Fetched industries:", industries);
-          console.log("Number of industries:", industries.length);
-          this.industries = industries;
+          const industryDetails = response.data.data.items;
+
+          this.industryDetails = industryDetails;
         } else {
           console.error("Invalid API response format:", response.data);
         }
@@ -232,12 +252,12 @@ export default {
         .then((res) => res.data);
       this.form.image = upload?._id;
     },
-    async createIndustry() {
+    async createIndustryDetail() {
       try {
-        const createResponse = await axios.post("/industry", this.form);
+        const createResponse = await axios.post("/industry/detail", this.form);
 
         if (createResponse.status === 201) {
-          this.getIndustries();
+          this.getIndustryDetail()
           this.form.title = "";
           this.form.description = ""; // Clear description field
           this.form.image = "";
@@ -252,15 +272,16 @@ export default {
       this.$refs.editFileInput.value = ''; // Clear the edit file input value
     },
 
-    async createIndustryAndClearModal() {
+    async createIndustryDetailAndClearModal() {
       try {
-        await this.createIndustry();
+        await this.createIndustryDetail();
         this.clearFileInput();
         Swal.fire({
           icon: "success",
           title: "Industry Created!",
           text: "The industry has been successfully created.",
         });
+
       } catch (error) {
         console.error("Error creating industry:", error);
         Swal.fire({
@@ -273,10 +294,12 @@ export default {
   },
   async mounted() {
     console.log("Component mounted. Fetching industries..."); // Add this log
-    await this.getIndustries();
+    await this.getIndustryDetail();
+    await this.listIndustries()
   },
 };
 </script>
+
 
 <style lang="scss" scoped>
 .description {
@@ -285,26 +308,31 @@ export default {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
 .industry-page {
   h1 {
     font-size: 24px;
     font-weight: bold;
     text-transform: uppercase;
   }
+
   .wrapper-create {
     display: flex;
     justify-content: end;
   }
 }
+
 .industry-img {
   width: 200px;
   height: 100px;
   object-fit: contain;
 }
+
 .wrapper-modal {
   .modal-footer {
     .btn {
       color: green;
+
       &:hover {
         color: white;
       }
@@ -312,3 +340,4 @@ export default {
   }
 }
 </style>
+  

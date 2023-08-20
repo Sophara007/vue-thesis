@@ -1,8 +1,6 @@
 <template>
   <div class="users-page container-fluid">
     <h1>Customer</h1>
-
-
     <div class="wrapper-table mt-5">
       <table class="table">
         <thead>
@@ -14,8 +12,8 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="user in users" :key="user.id">
-            <th>1</th>
+          <tr v-for="(user, index) in users" :key="user.id">
+            <th>{{index + 1 }}</th>
             <td>{{ user.fullName }}</td>
             <td>
               {{ user.email }}
@@ -34,7 +32,6 @@
   </div>
 </template>
 
-
 <script>
 import axios from "axios";
 
@@ -46,7 +43,7 @@ export default {
   },
   methods: {
     async getUser() {
-      const users = await axios.get('/users').then(res=> res.data.data.items)
+      const users = await axios.get('/users?limit=100&sortField=_id').then(res=> res.data.data.items)
       console.log(users)
       this.users = users
     }
