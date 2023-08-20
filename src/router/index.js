@@ -16,6 +16,7 @@ import HomePage from '../admin-views/Home.vue';
 import Admin from '../admin-views/Admin.vue';
 import store from '../store';
 import Inquiry from '../admin-views/Inquiry.vue'
+import AdminUser from '../admin-views/AdminUser.vue'
 import IndustryDetail from '../admin-views/IndustryDetail.vue'
 import SubProduct from '../admin-views/SubProduct.vue'
 import SubProductDetail from '../admin-views/SubProductDetail.vue'
@@ -99,6 +100,11 @@ const routes = [
       {
         path: '/admin/inquiry',
         component: Inquiry,
+        meta: { requiresAuth: true },
+      },
+      {
+        path: '/admin/create-admin',
+        component: AdminUser,
         meta: { requiresAuth: true },
       },
       {
