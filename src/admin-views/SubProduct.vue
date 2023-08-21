@@ -11,6 +11,7 @@
         <thead>
           <tr style="text-align: center;">
             <th scope="col" style="width: 5%;">No</th>
+            <th scope="col" style="width: 20%;">Sub Product of</th>
             <th scope="col" style="width: 20%;">Title</th>
             <th scope="col" style="width: 20%;">Description</th>
             <th scope="col" style="width: 20%;">Image</th>
@@ -20,6 +21,7 @@
         <tbody>
           <tr v-for="(SubProduct, index) in SubProducts" :key="SubProduct._id" style="text-align: center;">
             <th>{{ index + 1 }}</th>
+            <td><span class="description">{{ getProductTitleById(SubProduct.productModelId) }}</span></td>
             <td><span class="description">{{ SubProduct.title }}</span></td>
             <td><span class="description">{{ SubProduct.description }}</span></td>
             <td>
@@ -60,7 +62,7 @@
             <div class="input-group mt-3">
   <select class="form-select" v-model="form.productModelId" aria-label="Default select example">
     <option value="" disabled selected>Select a Product</option> <!-- Placeholder option -->
-    <option v-for="item in productmodels" :value="item._id">{{ item.title }}</option>
+    <option v-for="item in productmodels" :key="item._id" :value="item._id">{{ item.title }}</option>
   </select>
 </div>
 
@@ -130,6 +132,10 @@ export default {
     };
   },
   methods: {
+    getProductTitleById(productId) {
+    const product = this.productmodels.find(item => item._id === productId);
+    return product ? product.title : '';
+  },
     async onEditImageChange(e) {
       const fileData = e.target.files[0];
       const config = {
@@ -328,7 +334,7 @@ export default {
 
   .wrapper-create {
     display: flex;
-    justify-content: end;
+    justify-content: flex-end;
   }
 }
 

@@ -60,7 +60,7 @@
             <div class="input-group mt-3">
   <select class="form-select" v-model="form.industry" aria-label="Default select example">
     <option value="" disabled selected>Select an Industry</option> <!-- Placeholder option -->
-    <option v-for="item in listSelect" :value="item._id">{{ item.title }}</option>
+    <option v-for="item in listSelect" :key="item._id" :value="item._id">{{ item.title }}</option>
   </select>
 </div>
 
@@ -317,7 +317,7 @@ export default {
 
   .wrapper-create {
     display: flex;
-    justify-content: end;
+    justify-content: flex-end;
   }
 }
 

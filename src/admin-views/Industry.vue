@@ -293,7 +293,7 @@ export default {
   }
   .wrapper-create {
     display: flex;
-    justify-content: end;
+    justify-content: flex-end;
   }
 }
 .industry-img {

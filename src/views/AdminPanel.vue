@@ -71,6 +71,16 @@
               <i class="fas fa-handshake align-middle mr-5"></i>
               Service
             </router-link>
+
+            <router-link
+            :class="$route.name == 'Order' ? 'custom-active' : ''"
+              to="/order"
+              class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md border-gray-200 hover:bg-gray-300 hover:text-gray-800 transition duration-400 ease-in-out"
+            >
+            <i class="fas fa-shopping-cart align-middle mr-5"></i>
+              Orders
+            </router-link>
+
             <div>
               <div
                 class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md rounded-b-lg transition duration-400 ease-in-out"
