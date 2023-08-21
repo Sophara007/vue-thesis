@@ -88,21 +88,24 @@ const routes = [
         component: SubProductDetail,
       },
       {
-        name: 'Setting',
+        name: 'CompanyInfo',
         path: '/setting',
         component: Setting,
       },
       {
+        name: "User",
         path: '/admin/users',
         component: User,
         meta: { requiresAuth: true },
       },
       {
+        name: "Inquiry",
         path: '/admin/inquiry',
         component: Inquiry,
         meta: { requiresAuth: true },
       },
       {
+        name: "AdminUser",
         path: '/admin/create-admin',
         component: AdminUser,
         meta: { requiresAuth: true },

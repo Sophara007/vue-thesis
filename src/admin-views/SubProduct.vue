@@ -58,14 +58,12 @@
             </div>
 
             <div class="input-group mt-3">
+  <select class="form-select" v-model="form.productModelId" aria-label="Default select example">
+    <option value="" disabled selected>Select a Product</option> <!-- Placeholder option -->
+    <option v-for="item in productmodels" :value="item._id">{{ item.title }}</option>
+  </select>
+</div>
 
-              <select class="form-select" v-model="form.productModelId" aria-label="Default select example">
-                <option selected>Select Product</option>
-
-                <option v-for="item in productmodels" :value=item._id>{{ item.title }}</option>
-              </select>
-            </div>
-            {{ form }}
 
           </div>
         </div>
