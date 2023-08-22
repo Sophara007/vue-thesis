@@ -11,6 +11,7 @@
         <thead>
           <tr style="text-align: center;">
             <th scope="col" style="width: 5%;">No</th>
+            <th scope="col" style="width: 20%;">Industry Detail of</th>
             <th scope="col" style="width: 20%;">Title</th>
             <th scope="col" style="width: 20%;">Description</th>
             <th scope="col" style="width: 20%;">Image</th>
@@ -18,23 +19,24 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(industry, index) in industryDetails" :key="industry._id" style="text-align: center;">
-            <th>{{ index + 1 }}</th>
-            <td><span class="description">{{ industry.title }}</span></td>
-            <td><span class="description">{{ industry.description }}</span></td>
-            <td>
-              <img :src="industry?.image?.url" class="industry-img img-fluid" alt="industry" style="margin: auto;" />
-            </td>
-            <td>
-              <div class="wrapper-action">
-                <button class="btn btn-danger" @click="deleteIndustry(industry)">
-                  Delete
-                </button>
-                <button class="btn btn-warning ml-2" @click="openEditModal(industry)">Edit</button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
+        <tr v-for="(industry, index) in industryDetails" :key="industry._id" style="text-align: center;">
+          <th>{{ index + 1 }}</th>
+          <td><span class="description">{{ getIndustryTitleById(industry.industry) }}</span></td>
+          <td><span class="description">{{ industry.title }}</span></td>
+          <td><span class="description">{{ industry.description }}</span></td>
+          <td>
+            <img :src="industry?.image?.url" class="industry-img img-fluid" alt="industry" style="margin: auto;" />
+          </td>
+          <td>
+            <div class="wrapper-action">
+              <button class="btn btn-danger" @click="deleteIndustry(industry)">
+                Delete
+              </button>
+              <button class="btn btn-warning ml-2" @click="openEditModal(industry)">Edit</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
       </table>
     </div>
   </div>
@@ -131,6 +133,10 @@ export default {
     };
   },
   methods: {
+    getIndustryTitleById(industryId) {
+      const industry = this.listSelect.find(item => item._id === industryId);
+      return industry ? industry.title : '';
+    },
     async onEditImageChange(e) {
       const fileData = e.target.files[0];
       const config = {
@@ -156,39 +162,40 @@ export default {
       $("#editModal").modal("show"); // Use jQuery to open the modal
     },
     async updateIndustryAndClearModal() {
-      try {
-        const updateData = {
-          title: this.editForm.title,
-          description: this.editForm.description,
-        };
+  try {
+    const updateData = {
+      title: this.editForm.title,
+      description: this.editForm.description,
+    };
 
-        if (this.editForm.image) {
-          updateData.image = this.editForm.image;
-        }
+    if (this.editForm.image) {
+      updateData.image = this.editForm.image;
+    }
 
-        const updateResponse = await axios.put(`/industry/${this.editForm.id}`, updateData);
-        if (updateResponse.status === 200) {
-          this.getIndustries();
-          this.editForm.id = "";
-          this.editForm.title = "";
-          this.editForm.description = "";
-          this.editForm.image = "";
-          $("#editModal").modal("hide");
-          Swal.fire({
-            icon: "success",
-            title: "Industry Updated!",
-            text: "The industry has been successfully updated.",
-          });
-        }
-      } catch (error) {
-        console.error("Error updating industry:", error);
-        Swal.fire({
-          icon: "error",
-          title: "Update Failed",
-          text: "Failed to update the industry. Please try again.",
-        });
-      }
-    },
+    const updateResponse = await axios.put(`/industry/detail/${this.editForm.id}`, updateData);
+    if (updateResponse.status === 200) {
+      await this.getIndustryDetail(); // Fetch updated industry details
+      this.editForm.id = "";
+      this.editForm.title = "";
+      this.editForm.description = "";
+      this.editForm.image = "";
+      $("#editModal").modal("hide");
+      Swal.fire({
+        icon: "success",
+        title: "Industry Updated!",
+        text: "The industry has been successfully updated.",
+      });
+    }
+  } catch (error) {
+    console.error("Error updating industry:", error);
+    Swal.fire({
+      icon: "error",
+      title: "Update Failed",
+      text: "Failed to update the industry. Please try again.",
+    });
+  }
+},
+
 
     async getIndustryDetail() {
 
@@ -207,36 +214,37 @@ export default {
       }
     },
     async deleteIndustry(industry) {
-      try {
-        const result = await Swal.fire({
-          title: "Confirm Deletion",
-          text: "Are you sure you want to delete this industry?",
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonText: "Delete",
-          cancelButtonText: "Cancel",
-        });
+  try {
+    const result = await Swal.fire({
+      title: "Confirm Deletion",
+      text: "Are you sure you want to delete this industry?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Delete",
+      cancelButtonText: "Cancel",
+    });
 
-        if (result.isConfirmed) {
-          const deleteResult = await axios.delete(`/industry/${industry._id}`);
-          if (deleteResult.status === 200) {
-            this.industries = this.industries.filter(item => item._id !== industry._id);
-            Swal.fire({
-              icon: "success",
-              title: "Industry Deleted!",
-              text: "The industry has been successfully deleted.",
-            });
-          }
-        }
-      } catch (error) {
-        console.error("Error deleting industry:", error);
+    if (result.isConfirmed) {
+      const deleteResult = await axios.delete(`/industry/detail/${industry._id}`);
+      if (deleteResult.status === 200) {
+        this.industryDetails = this.industryDetails.filter(item => item._id !== industry._id); // Corrected line
         Swal.fire({
-          icon: "error",
-          title: "Delete Failed",
-          text: "Failed to delete the industry. Please try again.",
+          icon: "success",
+          title: "Industry Deleted!",
+          text: "The industry has been successfully deleted.",
         });
       }
-    },
+    }
+  } catch (error) {
+    console.error("Error deleting industry:", error);
+    Swal.fire({
+      icon: "error",
+      title: "Delete Failed",
+      text: "Failed to delete the industry. Please try again.",
+    });
+  }
+},
+
 
     async onImageChange(e) {
       const fileData = e.target.files[0];

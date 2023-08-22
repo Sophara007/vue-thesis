@@ -145,8 +145,10 @@ export default {
         if (this.editForm.image) {
           updateData.image = this.editForm.image;
         }
+        console.log("Updating industry with data:", updateData); // Add this log
 
         const updateResponse = await axios.put(`/industry/${this.editForm.id}`, updateData);
+        console.log("Update response:", updateResponse); // Add this log
         if (updateResponse.status === 200) {
           this.getIndustries();
           this.editForm.id = "";
