@@ -52,11 +52,12 @@ const store = createStore({
           email,
           password,
         });
-
-        const { token } = response.data;
-        commit('setToken', token);
-
-        localStorage.setItem('token', token);
+      
+        const { access_token } = response.data; // Extract access_token from response
+        console.log('Received Token:', access_token); // Add this line to check the received token
+        commit('setToken', access_token); // Use access_token to set the token
+      
+        localStorage.setItem('token', access_token);
       } catch (error) {
         commit('setError', error.response.data.error || 'Invalid credentials. Please try again.');
         console.error('Login failed:', error);
