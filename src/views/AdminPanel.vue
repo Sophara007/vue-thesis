@@ -278,6 +278,31 @@ html {
   color: white;
 }
 
+/* Hide the default scrollbar */
+::-webkit-scrollbar {
+  width: 6px; /* Width of the scrollbar */
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent; /* Background of the scrollbar track */
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.3); /* Color of the scrollbar handle */
+  border-radius: 3px; /* Rounded corners for the scrollbar handle */
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.5); /* Color of the scrollbar handle on hover */
+}
+
+/* Handle when actively dragging */
+::-webkit-scrollbar-thumb:active {
+  background: rgba(0, 0, 0, 0.7); /* Color of the scrollbar handle when dragging */
+}
 .custom-active {
   color: black;
   background-color: white;
