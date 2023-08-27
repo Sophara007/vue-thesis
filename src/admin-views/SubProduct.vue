@@ -19,8 +19,8 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(SubProduct, index) in SubProducts" :key="SubProduct._id" style="text-align: center;">
-            <th>{{ index + 1 }}</th>
+          <tr v-for="(SubProduct, index) in paginatedSubProducts" :key="SubProduct._id" style="text-align: center;">
+              <th>{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th>
             <td><span class="description">{{ getProductTitleById(SubProduct.productModelId) }}</span></td>
             <td><span class="description">{{ SubProduct.title }}</span></td>
             <td><span class="description">{{ SubProduct.description }}</span></td>
@@ -39,6 +39,26 @@
         </tbody>
       </table>
     </div>
+    <div class="pagination-container">
+  <ul class="pagination">
+    <li class="page-item">
+      <button class="page-link" @click="currentPage -= 1" :disabled="currentPage === 1">
+        &#9668; Previous
+      </button>
+    </li>
+    <li class="page-item" v-for="page in Math.ceil(SubProducts.length / itemsPerPage)" :key="page">
+      <button class="page-link" @click="currentPage = page" :class="{ active: currentPage === page }">
+        {{ page }}
+      </button>
+    </li>
+    <li class="page-item">
+      <button class="page-link" @click="currentPage += 1" :disabled="currentPage === Math.ceil(SubProducts.length / itemsPerPage)">
+        Next &#9658;
+      </button>
+    </li>
+  </ul>
+</div>
+
   </div>
 
 
@@ -117,6 +137,8 @@ export default {
     return {
       productmodels: [],
       SubProducts: [],
+      currentPage: 1,
+    itemsPerPage: 10,
       file: "",
       form: {
         title: "",
@@ -131,6 +153,13 @@ export default {
       },
     };
   },
+  computed: {
+    paginatedSubProducts() {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return this.SubProducts.slice(startIndex, endIndex);
+  },
+},
   methods: {
     getProductTitleById(productId) {
     const product = this.productmodels.find(item => item._id === productId);
@@ -198,17 +227,15 @@ export default {
 },
 
 
-    async getSubProduct() {
+async getSubProduct() {
+  try {
+    const response = await axios.get("/sub-product").then(res => res.data.data);
+    this.SubProducts = response;
+  } catch (error) {
+    console.error("Error fetching industries:", error);
+  }
+},
 
-      try {
-        const response = await axios.get("/sub-product").then(res=> res.data.data);
-        this.SubProducts = response
-      
- 
-      } catch (error) {
-        console.error("Error fetching industries:", error);
-      }
-    },
     async deleteSubProduct(SubProduct) {
       try {
         const result = await Swal.fire({
@@ -310,8 +337,9 @@ export default {
   },
   async mounted() {
     console.log("Component mounted. Fetching industries..."); // Add this log
-    await this.getSubProduct()
-    await this.ListProducts ()
+  await this.getSubProduct();
+  await this.ListProducts();
+  this.currentPage = 1; // Set the current page to 1 initially
   },
 };
 </script>
@@ -343,6 +371,53 @@ export default {
   height: 100px;
   object-fit: contain;
 }
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.pagination {
+  display: flex;
+  list-style: none;
+  padding: 0;
+}
+
+.page-item {
+  margin: 0;
+}
+
+.page-link {
+  display: inline-block;
+  padding: 4px 8px;
+  font-size: 12px;
+  border: 1px solid #ddd;
+  background-color: #f9f9f9;
+  color: #333;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.page-link.active {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.page-link:hover {
+  background-color: #e9e9e9;
+}
+
+.page-link:disabled {
+  background-color: #ddd;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.page-link:focus {
+  outline: none;
+  box-shadow: none;
+}
+
 
 .wrapper-modal {
   .modal-footer {
