@@ -194,9 +194,9 @@
                 src="https://static.vecteezy.com/system/resources/previews/008/442/086/original/illustration-of-human-icon-user-symbol-icon-modern-design-on-blank-background-free-vector.jpg"
                 style="cursor: pointer" />
               <div class="font-semibold dark:text-gray text-left" v-if="userDetails.fullname && userDetails.email" >
-                <div style="cursor: pointer">{{ userDetails.email }}</div>
+                <div style="cursor: pointer">{{ userDetails.fullname }}</div>
                 <div class="text-xs text-gray-500 dark:text-gray-400">
-                  {{ userDetails.fullname }}
+                  {{ userDetails.email }}
                 </div>
               </div>
             </div>
