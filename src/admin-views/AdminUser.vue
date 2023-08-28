@@ -13,7 +13,7 @@
             <th scope="col">No</th>
             <th scope="col">Username</th>
             <th scope="col">Email</th>
-            <th scope="col">Password</th>
+            <!-- <th scope="col">Password</th> -->
             <th scope="col" style="text-align: center;">Actions</th>
           </tr>
         </thead>
@@ -22,7 +22,7 @@
             <th>{{ index + 1 }}</th>
             <td>{{ admin.fullname }}</td>
             <td>{{ admin.email }}</td>
-            <td>{{ admin.password }}</td>
+            <!-- <td>{{ admin.password }}</td> -->
             <td>
       <div class="wrapper-action" style="text-align: center;">
         <button class="btn btn-danger" @click="confirmDeleteAdmin(admin.id)">Delete</button>

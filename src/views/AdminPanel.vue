@@ -193,10 +193,10 @@
               <img class="w-10 h-10 rounded-full border-2 border-gray-500"
                 src="https://static.vecteezy.com/system/resources/previews/008/442/086/original/illustration-of-human-icon-user-symbol-icon-modern-design-on-blank-background-free-vector.jpg"
                 style="cursor: pointer" />
-              <div class="font-semibold dark:text-gray text-left">
-                <div style="cursor: pointer">admin@bluetech.com</div>
+              <div class="font-semibold dark:text-gray text-left" v-if="userDetails.fullname && userDetails.email" >
+                <div style="cursor: pointer">{{ userDetails.email }}</div>
                 <div class="text-xs text-gray-500 dark:text-gray-400">
-                  Admin
+                  {{ userDetails.fullname }}
                 </div>
               </div>
             </div>
@@ -230,9 +230,15 @@
 </template>
 
 <script>
+import axios from 'axios';
 export default {
   data() {
     return {
+      accessToken: localStorage.getItem('token'), // Get token from local storage
+      userDetails: {
+        fullname: '',
+        email: ''
+      },
       showDropDown: false,
       showSide: true,
       showIndustryDetail: false, // Add this new data property
@@ -241,6 +247,26 @@ export default {
     };
   },
   methods: {
+    fetchUserDetails() {
+      const userDetailsEndpoint = '/admin/profile';
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${this.accessToken}`
+        }
+      };
+
+      axios.get(userDetailsEndpoint, config)
+        .then(response => {
+          this.userDetails = response.data.data.user;
+          this.isLoading = false;
+        })
+        .catch(error => {
+          console.error('Error fetching user details:', error);
+          this.isLoading = false;
+          this.error = error;
+        });
+    },
     toggleProductDetail() {
       this.showProductDetail = !this.showProductDetail;
     },
@@ -263,6 +289,9 @@ export default {
       this.$router.push("/");
     },
   },
+  created() {
+    this.fetchUserDetails();
+  }
 };
 </script>
 

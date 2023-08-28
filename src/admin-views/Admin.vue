@@ -1,28 +1,122 @@
 <template>
-    <div class="admin-setting container-fluid border-2 rounded-3 p-5">
-        <h1>Admin Setting</h1>
-        <div class="wrapper-info mt-5 mb-4">
-            <p>Name : Admin</p>
-            <p>Email : admin@drtech.com</p>
-        </div><hr>
-        <div class="wrapper-form">
-            <p class="mt-4">Update Password</p>
-            <input type="password" class="form-control mt-3 w-25" placeholder="Old Password"> <br>
-            <input type="password" class="form-control w-25" placeholder="New Password"> <br>
-            <button type="button" class="btn btn-success">Update</button>
-        </div>
+  <div>
+    <h1 class="text-3xl font-bold mb-6">Admin Profile</h1>
+    <div v-if="isLoading">
+      <p class="text-center">Loading...</p>
     </div>
+    <div v-else-if="error">
+      <div class="text-center">
+        <p>Error loading user details.</p>
+        <p>Error message: {{ error.message }}</p>
+      </div>
+    </div>
+    <div v-else>
+      <div v-if="userDetails.fullname && userDetails.email">
+        <p><strong>Full Name:</strong> {{ userDetails.fullname }}</p>
+        <p><strong>Email:</strong> {{ userDetails.email }}</p>
+      </div>
+      <div v-else>
+        <p>User details are not available.</p>
+      </div>
+      <div class="mt-4">
+        <label class="block font-semibold">Old Password</label>
+        <div class="relative flex items-center">
+          <input v-model="oldPassword" :type="oldPasswordVisible ? 'text' : 'password'" class="w-70 p-2 border rounded">
+          <button @click="toggleOldPasswordVisibility" class="ml-2">
+            <i :class="['far', oldPasswordVisible ? 'fa-eye' : 'fa-eye-slash'  ]"></i>
+          </button>
+        </div>
+      </div>
+      <div class="mt-4">
+        <label class="block font-semibold">New Password</label>
+        <div class="relative flex items-center">
+          <input v-model="newPassword" :type="newPasswordVisible ? 'text' : 'password'" class="w-70 p-2 border rounded">
+          <button @click="toggleNewPasswordVisibility" class="ml-2">
+            <i :class="['far', newPasswordVisible ?  'fa-eye' : 'fa-eye-slash' ]"></i>
+          </button>
+        </div>
+      </div>
+      <button @click="updatePassword" class="mt-4 bg-blue-500 text-white p-2 rounded">Update Password</button>
+    </div>
+  </div>
 </template>
 
+
+<script>
+import axios from 'axios';
+
+export default {
+  data() {
+    return {
+      accessToken: localStorage.getItem('token'), // Get token from local storage
+      userDetails: {
+        fullname: '',
+        email: ''
+      },
+      oldPassword: '',
+      newPassword: '',
+      oldPasswordVisible: false,
+      newPasswordVisible: false,
+      isLoading: true,
+      error: null
+    };
+  },
+  methods: {
+    fetchUserDetails() {
+      const userDetailsEndpoint = '/admin/profile';
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${this.accessToken}`
+        }
+      };
+
+      axios.get(userDetailsEndpoint, config)
+        .then(response => {
+          this.userDetails = response.data.data.user;
+          this.isLoading = false;
+        })
+        .catch(error => {
+          console.error('Error fetching user details:', error);
+          this.isLoading = false;
+          this.error = error;
+        });
+    },
+    updatePassword() {
+      const updatePasswordEndpoint = '/admin/profile';
+      const config = {
+        headers: {
+          Authorization: `Bearer ${this.accessToken}`
+        }
+      };
+      const data = {
+        oldPassword: this.oldPassword,
+        newPassword: this.newPassword
+      };
+
+      axios.put(updatePasswordEndpoint, data, config)
+        .then(response => {
+          console.log('Password update response:', response.data);
+          // Display success message or handle accordingly
+        })
+        .catch(error => {
+          console.error('Error updating password:', error);
+          // Display error message or handle accordingly
+        });
+    },
+    toggleOldPasswordVisibility() {
+      this.oldPasswordVisible = !this.oldPasswordVisible;
+    },
+    toggleNewPasswordVisibility() {
+      this.newPasswordVisible = !this.newPasswordVisible;
+    }
+  },
+  created() {
+    this.fetchUserDetails();
+  }
+};
+</script>
+
 <style scoped>
-    .btn {
-        color: green;
-    }
-    .btn:hover {
-        color: white;
-    }
-    h1 {
-        font-size: 20px;
-        font-weight: bold;
-    }
+/* Your styles */
 </style>
