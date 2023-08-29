@@ -13,7 +13,7 @@
             <th scope="col">No</th>
             <th scope="col">Username</th>
             <th scope="col">Email</th>
-            <th scope="col">Password</th>
+            <!-- <th scope="col">Password</th> -->
             <th scope="col" style="text-align: center;">Actions</th>
           </tr>
         </thead>
@@ -22,7 +22,7 @@
             <th>{{ index + 1 }}</th>
             <td>{{ admin.fullname }}</td>
             <td>{{ admin.email }}</td>
-            <td>{{ admin.password }}</td>
+            <!-- <td>{{ admin.password }}</td> -->
             <td>
       <div class="wrapper-action" style="text-align: center;">
         <button class="btn btn-danger" @click="confirmDeleteAdmin(admin.id)">Delete</button>
@@ -47,6 +47,9 @@
             <input type="text" class="form-control mb-3" placeholder="Full Name" v-model="form.fullname" />
             <input type="email" class="form-control mb-3" placeholder="Email" v-model="form.email" />
             <input type="password" class="form-control mb-3" placeholder="Password" v-model="form.password" />
+            <div v-if="form.password.length > 0 && form.password.length < 8" class="text-danger">
+             Password must be longer than or equal to 8 characters.
+           </div>
           </div>
         </div>
         <div class="modal-footer">
