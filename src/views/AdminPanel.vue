@@ -143,11 +143,11 @@
               <i class="fa-solid fa-user-gear mr-5"></i>
               Admin User
             </router-link>
-             <router-link :class="$route.name == 'CompanyInfo' ? 'custom-active' : ''" to="/setting"
-                class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md rounded-b-lg hover:bg-gray-300 hover:text-gray-800 transition duration-400 ease-in-out">
-                <i class="fa-solid fa-gear mr-5"></i>
-                Company Info
-              </router-link>
+            <router-link :class="$route.name == 'CompanyInfo' ? 'custom-active' : ''" to="/setting"
+              class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md rounded-b-lg hover:bg-gray-300 hover:text-gray-800 transition duration-400 ease-in-out">
+              <i class="fa-solid fa-gear mr-5"></i>
+              Company Info
+            </router-link>
           </div>
         </div>
       </div>
@@ -188,7 +188,77 @@
             </form>
           </div>
           <!-- User login -->
-          <div class="w-[200px]">
+
+          <div class="w-[290px] flex justify-between align-items-center">
+            <div @click="toggleDropNotify" id="icon" class="mt-1">
+              <i class="fa-regular fa-bell cursor-pointer" style="font-size: 22px"></i>
+              <span class="button__badge">3</span>
+            </div>
+            <div v-show="showNotify" id="notification">
+              <ul>
+                <li>
+                  <div class="wrapper-message">
+                    <div class="img">
+                      <img src="https://bootstrapious.com/i/snippets/sn-chat/avatar.svg" class="rounded-circle">
+                    </div>
+                    <div class="text">
+                      <p style="font-weight: bold; padding-bottom: 10px;">I would like to invite you to ...</p>
+                      <p style="font-size: 14px; margin-bottom: 10px;">Following up on my previous email about the
+                        collaboration with your website. I’m still interested in writing a guest post about the best UX
+                        practices for dating apps. With 10 years of experience in the mobile industry, I have a lot of
+                        insights to share with your audience. </p>
+                      <p style="font-size: 13px;"><span style="padding-right: 10px; font-weight: 600;;">Admin</span>Just
+                        Now</p>
+                    </div>
+                    <div class="action flex flex-row">
+                      <i class="fa-solid fa-ellipsis cursor-pointer" style="padding-right: 25px;"></i>
+                      <i class="fa-solid fa-xmark cursor-pointer"></i>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <div class="wrapper-message">
+                    <div class="img">
+                      <img src="https://bootstrapious.com/i/snippets/sn-chat/avatar.svg" class="rounded-circle">
+                    </div>
+                    <div class="text">
+                      <p style="font-weight: bold; padding-bottom: 10px;">Complaint regarding the quality</p>
+                      <p style="font-size: 14px; margin-bottom: 10px;">I have passed the B.Sc. degree examination with
+                        Electronics as the main subject. I intend to have a course in Computer Science and would like to
+                        know the details of the courses taught at your institution. Could you please send me a copy of
+                        your brochure?
+                      </p>
+                      <p style="font-size: 13px;"><span style="padding-right: 10px; font-weight: 600;">Theara</span>23mn
+                        ago</p>
+                    </div>
+                    <div class="action flex flex-row">
+                      <i class="fa-solid fa-ellipsis cursor-pointer" style="padding-right: 25px;"></i>
+                      <i class="fa-solid fa-xmark cursor-pointer"></i>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <div class="wrapper-message">
+                    <div class="img">
+                      <img src="https://bootstrapious.com/i/snippets/sn-chat/avatar.svg" class="rounded-circle">
+                    </div>
+                    <div class="text">
+                      <p style="font-weight: bold; padding-bottom: 10px;">Regarding Course Details</p>
+                      <p style="font-size: 14px; margin-bottom: 10px;">I have passed the B.Sc. degree examination with
+                        Electronics as the main subject. I intend to have a course in Computer Science and would like to
+                        know the details of the courses taught at your institution. Could you please send me a copy of
+                        your brochure? </p>
+                      <p style="font-size: 13px;"><span style="padding-right: 10px; font-weight: 600;;">Sarun</span>3days
+                        ago</p>
+                    </div>
+                    <div class="action flex flex-row">
+                      <i class="fa-solid fa-ellipsis cursor-pointer" style="padding-right: 25px;"></i>
+                      <i class="fa-solid fa-xmark cursor-pointer"></i>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
             <div class="flex items-center justify-end space-x-4" @click="toggleDrop">
               <img class="w-10 h-10 rounded-full border-2 border-gray-500"
                 src="https://static.vecteezy.com/system/resources/previews/008/442/086/original/illustration-of-human-icon-user-symbol-icon-modern-design-on-blank-background-free-vector.jpg"
@@ -202,7 +272,7 @@
             </div>
             <!-- Drop down -->
             <div v-show="showDropDown"
-              class="absolute right-[10px] z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+              class="absolute right-[15px] top-[47px] z-10 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
               role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
               <div class="py-1 text-left" role="none">
                 <!-- Active: "bg-gray-100 text-gray-900", Not Active: "text-gray-700" -->
@@ -240,6 +310,7 @@ export default {
         email: ''
       },
       showDropDown: false,
+      showNotify: false,
       showSide: true,
       showIndustryDetail: false, // Add this new data property
       showHomeSlider: false,
@@ -247,6 +318,10 @@ export default {
     };
   },
   methods: {
+
+    toggleDropNotify() {
+      this.showNotify = !this.showNotify;
+    },
     fetchUserDetails() {
       const userDetailsEndpoint = '/admin/profile';
 
@@ -296,6 +371,62 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+#icon {
+  display: inline-block;
+  position: relative;
+  padding: 2px 5px;
+}
+
+.button__badge {
+  background-color: #fa3e3e;
+  border-radius: 3px;
+  color: white;
+  padding: 0px 4px;
+  font-size: 10px;
+  cursor: pointer;
+
+  position: absolute;
+  /* Position the badge within the relatively positioned button */
+  top: 0;
+  right: 0;
+}
+
+#notification {
+  position: absolute;
+  right: 1%;
+  top: 7%;
+  z-index: 1;
+  padding: 15px;
+  // box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  border-radius: 5px;
+  background-color: #E8E8E8;
+}
+
+.wrapper-message {
+  width: 600px;
+  display: flex;
+  flex-direction: row;
+  padding: 15px;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  border-radius: 10px;
+  z-index: 1;
+  cursor: pointer;
+  margin: 10px 0;
+  background-color: white;
+}
+#notification .wrapper-message .text p {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.img {
+  width: 150px;
+  margin-right: 15px;
+
+}
+
 body,
 html {
   margin: 0;
@@ -309,31 +440,37 @@ html {
 
 /* Hide the default scrollbar */
 ::-webkit-scrollbar {
-  width: 6px; /* Width of the scrollbar */
+  width: 6px;
+  /* Width of the scrollbar */
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: transparent; /* Background of the scrollbar track */
+  background: transparent;
+  /* Background of the scrollbar track */
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.3); /* Color of the scrollbar handle */
-  border-radius: 3px; /* Rounded corners for the scrollbar handle */
+  background: rgba(0, 0, 0, 0.3);
+  /* Color of the scrollbar handle */
+  border-radius: 3px;
+  /* Rounded corners for the scrollbar handle */
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.5); /* Color of the scrollbar handle on hover */
+  background: rgba(0, 0, 0, 0.5);
+  /* Color of the scrollbar handle on hover */
 }
 
 /* Handle when actively dragging */
 ::-webkit-scrollbar-thumb:active {
-  background: rgba(0, 0, 0, 0.7); /* Color of the scrollbar handle when dragging */
+  background: rgba(0, 0, 0, 0.7);
+  /* Color of the scrollbar handle when dragging */
 }
+
 .custom-active {
   color: black;
   background-color: white;
-}
-</style>
+}</style>
