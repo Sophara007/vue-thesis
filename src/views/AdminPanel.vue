@@ -188,74 +188,43 @@
             </form>
           </div>
           <!-- User login -->
-
           <div class="w-[500px] flex justify-end align-items-center">
             <div @click="toggleDropNotify" id="icon" class="mt-1 mr-3">
               <i class="fa-regular fa-bell cursor-pointer" style="font-size: 22px"></i>
               <span class="button__badge">3</span>
             </div>
-            <div v-show="showNotify" id="notification">
-              <ul>
+            <div v-show="showNotify" id="notification" class="w-[550px] h-[630px] " style="overflow:scroll;">
+              <ul v-for="notification in notifications" :key="notification">
                 <li>
-                  <div class="wrapper-message">
-                    <div class="img">
-                      <img class="w-10 h-10 rounded-full border-2 border-gray-500"
-                src="https://static.vecteezy.com/system/resources/previews/008/442/086/original/illustration-of-human-icon-user-symbol-icon-modern-design-on-blank-background-free-vector.jpg"
-                style="cursor: pointer" />
-                    </div>
-                    <div class="text">
-                      <p style="font-weight: bold; padding-bottom: 10px;">I would like to invite you to ...</p>
-                      <p style="font-size: 14px; margin-bottom: 10px;">Following up on my previous email about the
-                        collaboration with your website. I’m still interested in writing a guest post about the best UX
-                        practices for dating apps. With 10 years of experience in the mobile industry, I have a lot of
-                        insights to share with your audience. </p>
-                      <p style="font-size: 13px;"><span style="padding-right: 10px; font-weight: 600;;">Admin</span>Just
-                        Now</p>
-                    </div>
-                    <div class="action flex flex-row">
-                      <i class="fa-solid fa-ellipsis cursor-pointer" style="padding-right: 25px;"></i>
-                      <i class="fa-solid fa-xmark cursor-pointer"></i>
-                    </div>
-                  </div>
-                </li>
-                <li>
-                  <div class="wrapper-message">
-                    <div class="img">
-                      <img class="w-10 h-10 rounded-full border-2 border-gray-500"
-                src="https://static.vecteezy.com/system/resources/previews/008/442/086/original/illustration-of-human-icon-user-symbol-icon-modern-design-on-blank-background-free-vector.jpg"
-                style="cursor: pointer" />
-                    </div>
-                    <div class="text">
-                      <p style="font-weight: bold; padding-bottom: 10px;">Complaint regarding the quality</p>
-                      <p style="font-size: 14px; margin-bottom: 10px;">I have passed the B.Sc. degree examination with
-                        Electronics as the main subject. I intend to have a course in Computer Science and would like to
-                        know the details of the courses taught at your institution. Could you please send me a copy of
-                        your brochure?
-                      </p>
-                      <p style="font-size: 13px;"><span style="padding-right: 10px; font-weight: 600;">Theara</span>23mn
-                        ago</p>
-                    </div>
-                    <div class="action flex flex-row">
-                      <i class="fa-solid fa-ellipsis cursor-pointer" style="padding-right: 25px;"></i>
-                      <i class="fa-solid fa-xmark cursor-pointer"></i>
-                    </div>
-                  </div>
-                </li>
-                <li>
-                  <div class="wrapper-message">
-                    <div class="img">
-                      <img class="w-10 h-10 rounded-full border-2 border-gray-500"
-                src="https://static.vecteezy.com/system/resources/previews/008/442/086/original/illustration-of-human-icon-user-symbol-icon-modern-design-on-blank-background-free-vector.jpg"
-                style="cursor: pointer" />
-                    </div>
-                    <div class="text">
-                      <p style="font-weight: bold; padding-bottom: 10px;">Regarding Course Details</p>
-                      <p style="font-size: 14px; margin-bottom: 10px;">I have passed the B.Sc. degree examination with
-                        Electronics as the main subject. I intend to have a course in Computer Science and would like to
-                        know the details of the courses taught at your institution. Could you please send me a copy of
-                        your brochure? </p>
-                      <p style="font-size: 13px;"><span style="padding-right: 10px; font-weight: 600;;">Sarun</span>3days
-                        ago</p>
+                  <div class="wrapper-message flex flex-row justify-between">
+                    <div class="flex">
+                      <div class="img flex flex-column justify-between" style="overflow: hidden;">
+                       <div>
+                         <img class="rounded-full border-3 border-gray-500" v-if="notification.type == 'register' "
+                        src="https://cdn-icons-png.flaticon.com/512/306/306232.png"
+                        style="cursor: pointer; width: 60%;" />
+                         <img class="rounded-full border-3 border-gray-500" v-if="notification.type == 'order' "
+                        src="https://media.istockphoto.com/id/898475764/vector/shopping-trolley-cart-icon-in-green-circle-vector.jpg?s=612x612&w=0&k=20&c=W_b90qFRpj_FyLyI19xWqB6EoNSuJYwMSN9nnKkE9Hk="
+                        style="cursor: pointer; width: 60%;" />
+                         <img class="rounded-full border-3 border-gray-500" v-if="notification.type == 'inquiry' "
+                        src="https://www.kindpng.com/picc/m/750-7507149_conversation-circle-icon-png-download-live-chat-icon.png"
+                        style="cursor: pointer; width: 60%;" />
+                       </div>
+                        <div class="wrapper-read flex justify-between align-between" v-if="notification.isRead" >
+                          <i class="fa-solid fa-circle text-primary" style="font-size: 8px;"></i>
+                        </div>
+                      </div>
+                      <div class="flex flex-column w-[350px]">
+                        <div>
+                          <p style="font-weight: bold; padding-bottom: 10px; font-size: 14px;">{{notification.title}}</p>
+                        </div>
+                        <div>
+                          <p style="font-size: 13px; margin-bottom: 10px;">{{ notification.message }}</p>
+                        </div>
+                        <div>
+                          <p style="font-size: 12px;"><span style="padding-right: 10px;">03/ 09/ 2023</span>01:18 pm</p>
+                        </div>
+                      </div>
                     </div>
                     <div class="action flex flex-row">
                       <i class="fa-solid fa-ellipsis cursor-pointer" style="padding-right: 25px;"></i>
@@ -310,6 +279,14 @@ import axios from 'axios';
 export default {
   data() {
     return {
+      notifications: {
+        title: '',
+        message: '',
+        type:'',
+        isRead: '',
+        moduleId:'',
+        createdAt: '',
+      },
       accessToken: localStorage.getItem('token'), // Get token from local storage
       userDetails: {
         fullname: '',
@@ -324,7 +301,26 @@ export default {
     };
   },
   methods: {
+    fetchNotification() {
+      const notificationEndpoint = '/notifications';
+      const config = {
+        headers: {
+          Authorization: `Bearer ${this.accessToken}`
+        }
+      };
 
+      axios.get(notificationEndpoint, config)
+        .then(response => {
+          // console.log("data -> ", response.data.data.items);
+          this.notifications = response.data.data.items;
+          this.isLoading = false;
+        })
+        .catch(error => {
+          console.error('Error fetching notification:', error);
+          this.isLoading = false;
+          this.error = error;
+        });
+    },
     toggleDropNotify() {
       this.showNotify = !this.showNotify;
     },
@@ -348,6 +344,7 @@ export default {
           this.error = error;
         });
     },
+
     toggleProductDetail() {
       this.showProductDetail = !this.showProductDetail;
     },
@@ -372,6 +369,7 @@ export default {
   },
   created() {
     this.fetchUserDetails();
+    this.fetchNotification();
   }
 };
 </script>
@@ -400,7 +398,7 @@ export default {
 #notification {
   position: absolute;
   right: 1%;
-  top: 7%;
+  top: 6%;
   z-index: 1;
   padding: 15px;
   // box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
@@ -409,7 +407,7 @@ export default {
 }
 
 .wrapper-message {
-  width: 600px;
+  width: 520px;
   display: flex;
   flex-direction: row;
   padding: 15px;
@@ -428,8 +426,9 @@ export default {
 }
 
 .img {
-  width: 150px;
-  margin-right: 15px;
+  width: 80px;
+  // margin-right: 15px;
+  padding-left: 10px;
 
 }
 
