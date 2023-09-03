@@ -1,6 +1,6 @@
 <template>
-  <div class="slider-page container-fluid">
-    <h1>partner page</h1>
+  <div class="partner-page container-fluid">
+    <h1>PARTNER PAGE</h1>
     <div class="wrapper-create m-5">
       <button class="btn btn-success custom-btn" data-bs-toggle="modal" data-bs-target="#createModal">
         Create
@@ -9,7 +9,7 @@
     <div class="wrapper-table">
       <table class="table">
         <thead>
-          <tr style="text-align: center">
+          <tr style="text-align: center;">
             <th scope="col">N0</th>
             <th scope="col">Title</th>
             <th scope="col">Image</th>
@@ -17,20 +17,18 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(slider, index) in sliders" :key="slider.index" style="text-align: center">
+          <tr v-for="(partner, index) in partners" :key="partner.index" style="text-align: center;">
             <th>{{ index + 1 }}</th>
-            <td>{{ slider.title }}</td>
+            <td>{{ partner.title }}</td>
             <td>
-              <img :src="slider?.image?.url" class="slider-img img-fluid" alt="slider" style="margin: auto" />
+              <img :src="partner?.image?.url" class="partner-img img-fluid" alt="partner"  style="margin: auto;"/>
             </td>
             <td>
               <div class="wrapper-action">
-                <button class="btn btn-danger" @click="deleteSlider(slider)">
+                <button class="btn btn-danger" @click="deletePartner(partner)">
                   Delete
                 </button>
-                <button data-bs-toggle="modal" data-bs-target="#editModal" class="btn btn-warning ml-2">
-                  Edit
-                </button>
+                <button @click="openEditModal(partner)" data-bs-toggle="modal" data-bs-target="#editModal" class="btn btn-warning ml-2">Edit</button>
               </div>
             </td>
           </tr>
@@ -45,9 +43,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">
-            Create Partner
-          </h1>
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Create Partner</h1>
         </div>
         <div class="modal-body">
           <div class="wrapper-form-input">
@@ -58,7 +54,7 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-success" @click="createSliderAndClearModal" data-bs-dismiss="modal">
+          <button type="button" class="btn btn-success" @click="createPartnerAndClearModal" data-bs-dismiss="modal">
             Create
           </button>
         </div>
@@ -67,13 +63,11 @@
   </div>
 
 
-  <!-- edit -->
-
   <div class="modal fade wrapper-modal" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="editModalLabel">Edit Slider</h1>
+          <h1 class="modal-title fs-5" id="editModalLabel">Edit Partner</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -87,13 +81,15 @@
         <!-- Inside the Edit Modal -->
 
         <div class="modal-footer">
-          <button type="button" class="btn btn-success" @click="updateSliderAndClearModal" data-bs-dismiss="modal">
+          <button type="button" class="btn btn-success" @click="updatePartnerAndClearModal" data-bs-dismiss="modal">
             Update
           </button>
         </div>
       </div>
     </div>
   </div>
+
+
 </template>
   
 <script>
@@ -103,7 +99,7 @@ import Swal from "sweetalert2";
 export default {
   data() {
     return {
-      sliders: [],
+      partners: [],
       file: "",
       form: {
         title: "",
@@ -116,20 +112,20 @@ export default {
     };
   },
   methods: {
-    async getSlider() {
-      const sliders = await axios
+    async getPartner() {
+      const partners = await axios
         .get("/slider/partner")
         .then((res) => res.data);
-      this.sliders = sliders;
-      console.log((this.sliders = sliders));
+      this.partners = partners;
+      console.log((this.partners = partners));
     },
 
     // delete
-    async deleteSlider(slider) {
+    async deletePartner(partner) {
       try {
         const result = await Swal.fire({
           title: "Confirm Deletion",
-          text: "Are you sure you want to delete this slider?",
+          text: "Are you sure you want to delete this partner?",
           icon: "warning",
           showCancelButton: true,
           confirmButtonText: "Delete",
@@ -138,25 +134,25 @@ export default {
 
         if (result.isConfirmed) {
           const deleteResult = await axios.delete(
-            `/slider/partner/${slider._id}`
+            `/slider/partner/${partner._id}`
           );
           if (deleteResult.status === 200) {
-            this.sliders = this.sliders.filter(
-              (item) => item._id !== slider._id
+            this.partners = this.partners.filter(
+              (item) => item._id !== partner._id
             );
             Swal.fire({
               icon: "success",
-              title: "Slider Deleted!",
-              text: "The slider has been successfully deleted.",
+              title: "Partner Deleted!",
+              text: "The partner has been successfully deleted.",
             });
           }
         }
       } catch (error) {
-        console.error("Error deleting slider:", error);
+        console.error("Error deleting partner:", error);
         Swal.fire({
           icon: "error",
           title: "Delete Failed",
-          text: "Failed to delete the slider. Please try again.",
+          text: "Failed to delete the partner. Please try again.",
         });
       }
     },
@@ -175,16 +171,16 @@ export default {
       this.form.image = upload?._id;
     },
 
-    async createSlider() {
+    async createPartner() {
       try {
         const createResponse = await axios.post("/slider/partner", this.form);
         if (createResponse.status === 201) {
-          this.getSlider();
+          this.getPartner();
           this.form.title = "";
           this.form.image = "";
         }
       } catch (error) {
-        console.error("Error creating partner slider:", error);
+        console.error("Error creating homepage partner:", error);
       }
     },
 
@@ -192,41 +188,40 @@ export default {
       this.$refs.fileInput.value = "";
     },
 
-    //create
-    async createSliderAndClearModal() {
+  //create
+    async createPartnerAndClearModal() {
       try {
-        await this.createSlider();
+        await this.createPartner();
         this.clearFileInput();
         Swal.fire({
           icon: "success",
-          title: "Slider Created!",
-          text: "The slider has been successfully created.",
+          title: "Partner Created!",
+          text: "The partner has been successfully created.",
         });
       } catch (error) {
-        console.error("Error creating slider:", error);
+        console.error("Error creating partner:", error);
         Swal.fire({
           icon: "error",
           title: "Create Failed",
-          text: "Failed to create the slider. Please try again.",
+          text: "Failed to create the partner. Please try again.",
         });
       }
     },
 
     // update
-    async openEditModal(slider) {
-
-      this.editForm.id = slider._id;
-      this.editForm.title = slider.title;
+    async openEditModal(partner) {
+      this.editForm.id = partner._id;
+      this.editForm.title = partner.title;
       $("#editModal").modal("show");
     },
-    async updateSliderAndClearModal() {
+    async updatePartnerAndClearModal() {
       try {
         const updateData = {
           title: this.editForm.title,
         };
 
         if (this.editForm.image) {
-          updateData.image = this.editForm.image;
+          updateData.image = this.editForm.image; // Include image if it's updated
         }
 
         const updateResponse = await axios.put(
@@ -234,7 +229,7 @@ export default {
           updateData
         );
         if (updateResponse.status === 200) {
-          this.getSlider();
+          this.getPartner();
           this.editForm.id = "";
           this.editForm.title = "";
           this.editForm.image = "";
@@ -242,16 +237,16 @@ export default {
 
           Swal.fire({
             icon: "success",
-            title: "Slider Updated!",
-            text: "The slider has been successfully updated.",
+            title: "Partner Updated!",
+            text: "The partner has been successfully updated.",
           });
         }
       } catch (error) {
-        console.error("Error updating slider:", error);
+        console.error("Error updating partner:", error);
         Swal.fire({
           icon: "error",
           title: "Update Failed",
-          text: "Failed to update the slider. Please try again.",
+          text: "Failed to update the partner. Please try again.",
         });
       }
     },
@@ -269,22 +264,23 @@ export default {
         .then((res) => res.data);
       this.editForm.image = upload?._id;
     },
+
   },
   async mounted() {
-    await this.getSlider();
+    await this.getPartner();
   },
 };
 </script>
   
 <style lang="scss" scoped>
+
 td {
   max-width: 150px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
-.slider-page {
+.partner-page {
   h1 {
     font-size: 24px;
     font-weight: bold;
@@ -297,7 +293,7 @@ td {
   }
 }
 
-.slider-img {
+.partner-img {
   width: 200px;
   height: 100px;
   object-fit: contain;

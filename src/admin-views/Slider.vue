@@ -1,6 +1,6 @@
 <template>
   <div class="slider-page container-fluid">
-    <h1>homepage slider</h1>
+    <h1>SLIDER HOMEPAGE</h1>
     <div class="wrapper-create m-5">
       <button class="btn btn-success custom-btn" data-bs-toggle="modal" data-bs-target="#createModal">
         Create
@@ -43,7 +43,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">Create Partner</h1>
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Create Slider</h1>
         </div>
         <div class="modal-body">
           <div class="wrapper-form-input">
