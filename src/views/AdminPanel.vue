@@ -189,8 +189,8 @@
           </div>
           <!-- User login -->
 
-          <div class="w-[290px] flex justify-between align-items-center">
-            <div @click="toggleDropNotify" id="icon" class="mt-1">
+          <div class="w-[500px] flex justify-end align-items-center">
+            <div @click="toggleDropNotify" id="icon" class="mt-1 mr-3">
               <i class="fa-regular fa-bell cursor-pointer" style="font-size: 22px"></i>
               <span class="button__badge">3</span>
             </div>
@@ -199,7 +199,9 @@
                 <li>
                   <div class="wrapper-message">
                     <div class="img">
-                      <img src="https://bootstrapious.com/i/snippets/sn-chat/avatar.svg" class="rounded-circle">
+                      <img class="w-10 h-10 rounded-full border-2 border-gray-500"
+                src="https://static.vecteezy.com/system/resources/previews/008/442/086/original/illustration-of-human-icon-user-symbol-icon-modern-design-on-blank-background-free-vector.jpg"
+                style="cursor: pointer" />
                     </div>
                     <div class="text">
                       <p style="font-weight: bold; padding-bottom: 10px;">I would like to invite you to ...</p>
@@ -219,7 +221,9 @@
                 <li>
                   <div class="wrapper-message">
                     <div class="img">
-                      <img src="https://bootstrapious.com/i/snippets/sn-chat/avatar.svg" class="rounded-circle">
+                      <img class="w-10 h-10 rounded-full border-2 border-gray-500"
+                src="https://static.vecteezy.com/system/resources/previews/008/442/086/original/illustration-of-human-icon-user-symbol-icon-modern-design-on-blank-background-free-vector.jpg"
+                style="cursor: pointer" />
                     </div>
                     <div class="text">
                       <p style="font-weight: bold; padding-bottom: 10px;">Complaint regarding the quality</p>
@@ -240,7 +244,9 @@
                 <li>
                   <div class="wrapper-message">
                     <div class="img">
-                      <img src="https://bootstrapious.com/i/snippets/sn-chat/avatar.svg" class="rounded-circle">
+                      <img class="w-10 h-10 rounded-full border-2 border-gray-500"
+                src="https://static.vecteezy.com/system/resources/previews/008/442/086/original/illustration-of-human-icon-user-symbol-icon-modern-design-on-blank-background-free-vector.jpg"
+                style="cursor: pointer" />
                     </div>
                     <div class="text">
                       <p style="font-weight: bold; padding-bottom: 10px;">Regarding Course Details</p>
