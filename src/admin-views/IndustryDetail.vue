@@ -83,7 +83,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="editModalLabel">Edit Industry</h1>
+          <h1 class="modal-title fs-5" id="editModalLabel">Edit Industry Detail</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -182,16 +182,16 @@ export default {
       $("#editModal").modal("hide");
       Swal.fire({
         icon: "success",
-        title: "Industry Updated!",
-        text: "The industry has been successfully updated.",
+        title: "Industry Detail Updated!",
+        text: "The industry detail has been successfully updated.",
       });
     }
   } catch (error) {
-    console.error("Error updating industry:", error);
+    console.error("Error updating industry detail:", error);
     Swal.fire({
       icon: "error",
       title: "Update Failed",
-      text: "Failed to update the industry. Please try again.",
+      text: "Failed to update the industry detail. Please try again.",
     });
   }
 },
@@ -217,7 +217,7 @@ export default {
   try {
     const result = await Swal.fire({
       title: "Confirm Deletion",
-      text: "Are you sure you want to delete this industry?",
+      text: "Are you sure you want to delete this industry detail?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Delete",
@@ -231,16 +231,16 @@ export default {
         Swal.fire({
           icon: "success",
           title: "Industry Deleted!",
-          text: "The industry has been successfully deleted.",
+          text: "The industry detail has been successfully deleted.",
         });
       }
     }
   } catch (error) {
-    console.error("Error deleting industry:", error);
+    console.error("Error deleting industry detail:", error);
     Swal.fire({
       icon: "error",
       title: "Delete Failed",
-      text: "Failed to delete the industry. Please try again.",
+      text: "Failed to delete the industry detail. Please try again.",
     });
   }
 },
@@ -271,7 +271,7 @@ export default {
           this.showModal = false;
         }
       } catch (error) {
-        console.error("Error creating industry:", error);
+        console.error("Error creating industry detail:", error);
       }
     },
     clearFileInput() {
@@ -285,22 +285,22 @@ export default {
         this.clearFileInput();
         Swal.fire({
           icon: "success",
-          title: "Industry Created!",
-          text: "The industry has been successfully created.",
+          title: "Industry Detail Created!",
+          text: "The industry detail has been successfully created.",
         });
 
       } catch (error) {
-        console.error("Error creating industry:", error);
+        console.error("Error creating industry detail:", error);
         Swal.fire({
           icon: "error",
           title: "Create Failed",
-          text: "Failed to create the industry. Please try again.",
+          text: "Failed to create the industry detail. Please try again.",
         });
       }
     },
   },
   async mounted() {
-    console.log("Component mounted. Fetching industries..."); // Add this log
+    console.log("Component mounted. Fetching industry details..."); // Add this log
     await this.getIndustryDetail();
     await this.listIndustries()
   },
