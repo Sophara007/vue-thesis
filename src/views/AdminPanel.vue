@@ -222,7 +222,7 @@
                           <p style="font-size: 13px; margin-bottom: 10px;">{{ notification.message }}</p>
                         </div>
                         <div>
-                          <p style="font-size: 12px;"><span style="padding-right: 10px;">03/ 09/ 2023</span>01:18 pm</p>
+                          <p style="font-size: 12px;"><span style="padding-right: 10px;">{{ formatDate(notification.createdAt) }}</span></p>
                         </div>
                       </div>
                     </div>
@@ -301,6 +301,19 @@ export default {
     };
   },
   methods: {
+    formatDate(isoDate) {
+      const date = new Date(isoDate);
+      const options = {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false, // 24-hour format
+      };
+      return date.toLocaleDateString('en-US', options);
+    },
     fetchNotification() {
       const notificationEndpoint = '/notifications';
       const config = {
