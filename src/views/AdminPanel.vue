@@ -189,31 +189,55 @@
           </div>
           <!-- User login -->
           <div class="w-[500px] flex justify-end align-items-center">
-            <div @click="toggleDropNotify" id="icon" class="mt-1 mr-3">
-              <i class="fa-regular fa-bell cursor-pointer" style="font-size: 22px"></i>
-              <span class="button__badge">3</span>
-            </div>
-            <div v-show="showNotify" id="notification" class="w-[550px] h-[630px] " style="overflow:scroll;">
-              <ul v-for="notification in notifications" :key="notification">
-                <li>
-                  <div class="wrapper-message flex flex-row justify-between">
+            <!-- Bell icon and badge -->
+    <div @click="toggleDropNotify" id="icon" class="mt-1 mr-3">
+      <i class="fa-regular fa-bell cursor-pointer" style="font-size: 22px"></i>
+      <span class="button__badge">{{ unreadNotificationCount }}</span>
+    </div>
+            <!-- Notification dropdown -->
+    <div v-show="showNotify" id="notification" class="w-[550px] max-h-[550px] overflow-y-auto border rounded-lg border-gray-300 shadow-md" style="overflow-x: hidden;">
+      <ul>
+        <!-- Button to mark all notifications as read -->
+      <button @click="markAllAsRead" class="px-2 py-1 text-sm text-white bg-blue-500 rounded-md">
+        Mark All as Read
+      </button>
+      <li v-for="notification in notifications" :key="notification._id">
+        
+                  <div @click="handleNotificationClick(notification)" class="wrapper-message flex flex-row justify-between">
                     <div class="flex">
                       <div class="img flex flex-column justify-between" style="overflow: hidden;">
-                       <div>
-                         <img class="rounded-full border-3 border-gray-500" v-if="notification.type == 'register' "
-                        src="https://cdn-icons-png.flaticon.com/512/306/306232.png"
-                        style="cursor: pointer; width: 60%;" />
-                         <img class="rounded-full border-3 border-gray-500" v-if="notification.type == 'order' "
-                        src="https://media.istockphoto.com/id/898475764/vector/shopping-trolley-cart-icon-in-green-circle-vector.jpg?s=612x612&w=0&k=20&c=W_b90qFRpj_FyLyI19xWqB6EoNSuJYwMSN9nnKkE9Hk="
-                        style="cursor: pointer; width: 60%;" />
-                         <img class="rounded-full border-3 border-gray-500" v-if="notification.type == 'inquiry' "
-                        src="https://www.kindpng.com/picc/m/750-7507149_conversation-circle-icon-png-download-live-chat-icon.png"
-                        style="cursor: pointer; width: 60%;" />
-                       </div>
-                        <div class="wrapper-read flex justify-between align-between" v-if="notification.isRead" >
-                          <i class="fa-solid fa-circle text-primary" style="font-size: 8px;"></i>
-                        </div>
-                      </div>
+  <div>
+    <img
+      class="rounded-full border-3"
+      :class="{ 'border-gray-500': notification.isRead, 'border-green-500': !notification.isRead }"
+      v-if="notification.type == 'register'"
+      src="https://cdn-icons-png.flaticon.com/512/306/306232.png"
+      style="cursor: pointer; width: 60%;"
+    />
+    <img
+      class="rounded-full border-3"
+      :class="{ 'border-gray-500': notification.isRead, 'border-green-500': !notification.isRead }"
+      v-if="notification.type == 'order'"
+      src="https://media.istockphoto.com/id/898475764/vector/shopping-trolley-cart-icon-in-green-circle-vector.jpg?s=612x612&w=0&k=20&c=W_b90qFRpj_FyLyI19xWqB6EoNSuJYwMSN9nnKkE9Hk="
+      style="cursor: pointer; width: 60%;"
+    />
+    <img
+      class="rounded-full border-3"
+      :class="{ 'border-gray-500': notification.isRead, 'border-green-500': !notification.isRead }"
+      v-if="notification.type == 'inquiry'"
+      src="https://www.kindpng.com/picc/m/750-7507149_conversation-circle-icon-png-download-live-chat-icon.png"
+      style="cursor: pointer; width: 60%;"
+    />
+  </div>
+  <div class="wrapper-read flex justify-between align-between">
+    <i
+      class="fa-solid"
+      :class="{ 'fa-circle': notification.isRead, 'fa-dot-circle': !notification.isRead, 'text-gray-500': notification.isRead, 'text-green-500': !notification.isRead }"
+      style="font-size: 8px;"
+    ></i>
+  </div>
+</div>
+
                       <div class="flex flex-column w-[350px]">
                         <div>
                           <p style="font-weight: bold; padding-bottom: 10px; font-size: 14px;">{{notification.title}}</p>
@@ -225,10 +249,10 @@
                           <p style="font-size: 12px;"><span style="padding-right: 10px;">{{ formatDate(notification.createdAt) }}</span></p>
                         </div>
                       </div>
-                    </div>
+                    
+                  </div>
                     <div class="action flex flex-row">
-                      <i class="fa-solid fa-ellipsis cursor-pointer" style="padding-right: 25px;"></i>
-                      <i class="fa-solid fa-xmark cursor-pointer"></i>
+                      <i @click="deleteNotification(notification, $event)" class="fa-solid fa-xmark cursor-pointer" style="font-size: 127%;"></i>
                     </div>
                   </div>
                 </li>
@@ -279,6 +303,7 @@ import axios from 'axios';
 export default {
   data() {
     return {
+      unreadNotificationCount: 0,
       notifications: {
         title: '',
         message: '',
@@ -301,6 +326,187 @@ export default {
     };
   },
   methods: {
+    async handleNotificationClick(notification) {
+    try {
+      // Mark the notification as read locally
+      if (!notification.isRead) {
+        notification.isRead = true;
+
+        // Get the token from local storage
+        const accessToken = localStorage.getItem('token');
+
+        // Make a request to mark the notification as read on the server-side with the Authorization header
+        const markOneReadEndpoint = `notifications/mark-one-read/${notification._id}`;
+        const config = {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        };
+
+        await axios.put(markOneReadEndpoint, null, config);
+
+        // Update the unreadNotificationCount
+        this.unreadNotificationCount--;
+
+        // Optionally, you can fetch updated notifications here
+        this.fetchNotification();
+      }
+
+      // Redirect based on the moduleId (if available)
+      if (notification.moduleId) {
+        // Generate the route path based on the module type
+        let routePath = '';
+
+        switch (notification.type) {
+          case 'register':
+            routePath = `/admin/users`;
+            // the original given to me i don't know how to use it routePath = `/admin/users/${notification.moduleId}`;
+            break;
+          case 'order':
+            routePath = `/order`;
+            break;
+          case 'inquiry':
+            routePath = `/admin/inquiry`;
+            break;
+          // Handle other notification types as needed
+        }
+
+        // Redirect to the generated route path
+        if (routePath) {
+          this.$router.push(routePath);
+        }
+      }
+    } catch (error) {
+      console.error('Error handling notification click:', error);
+    }
+  },
+  deleteNotification(notification, event) {
+  event.stopPropagation(); 
+      // Get the token from local storage
+      const accessToken = localStorage.getItem('token');
+
+      // Make a request to delete the notification by its ID on the server-side with the Authorization header
+      const deleteNotificationEndpoint = `notifications/delete/${notification._id}`;
+      const config = {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      };
+
+      axios
+        .delete(deleteNotificationEndpoint, config)
+        .then(response => {
+          // Handle success
+          console.log('Notification deleted:', response.data);
+
+          // Remove the deleted notification from the local list
+          const index = this.notifications.indexOf(notification);
+          if (index !== -1) {
+            this.notifications.splice(index, 1);
+          }
+        })
+        .catch(error => {
+          // Handle error
+          console.error('Error deleting notification:', error);
+        });
+    },
+    markAllAsRead() {
+    // Get the token from local storage
+    const accessToken = localStorage.getItem('token');
+
+    // Make a request to mark all notifications as read on the server-side with the Authorization header
+    const markAllReadEndpoint = 'notifications/mark-all-read';
+    const config = {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    };
+
+    axios.put(markAllReadEndpoint, null, config)
+      .then(response => {
+        // Handle success
+        console.log('All notifications marked as read:', response.data);
+
+        // Update the unreadNotificationCount
+        this.unreadNotificationCount = 0;
+
+        // Mark all notifications as read locally
+        this.notifications.forEach(notification => {
+          notification.isRead = true;
+        });
+      })
+      .catch(error => {
+        // Handle error
+        console.error('Error marking all notifications as read:', error);
+      });
+  },
+    // Method to fetch notifications (using Long Polling)
+    fetchNotification() {
+      const notificationEndpoint = '/notifications'; // Replace with your endpoint
+      
+      // Make a request to the server
+      axios.get(notificationEndpoint, {
+        headers: {
+          Authorization: `Bearer ${this.accessToken}`,
+        },
+      })
+      .then(response => {
+        // Handle the response and update the UI with new notifications
+        const newNotifications = response.data.data.items;
+        this.notifications = newNotifications;
+        this.unreadNotificationCount = newNotifications.filter(notification => !notification.isRead).length;
+        
+        // Set up the next Long Polling request (recursive)
+        setTimeout(() => {
+          this.fetchNotification();
+        }, 5000); // Poll every 5 seconds (adjust as needed)
+      })
+      .catch(error => {
+        console.error('Error fetching notification:', error);
+        // Handle errors here
+        
+        // Retry the Long Polling request (recursive) after a delay
+        setTimeout(() => {
+          this.fetchNotification();
+        }, 5000); // Retry after 5 seconds (adjust as needed)
+      });
+    },
+    // Method to mark a notification as read
+    markAsRead(notification) {
+  if (!notification.isRead) {
+    // Mark the notification as read locally
+    notification.isRead = true;
+
+   
+
+    // Get the token from local storage
+    const accessToken = localStorage.getItem('token');
+
+    // Make a request to mark the notification as read on the server-side with the Authorization header
+    const markOneReadEndpoint = `notifications/mark-one-read/${notification._id}`;
+    const config = {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    };
+
+    axios.put(markOneReadEndpoint, null, config).then(response => {
+      // Handle success or error
+      console.log('Notification marked as read:', response.data);
+
+      // Update the unreadNotificationCount
+      this.unreadNotificationCount--;
+
+      // Optionally, you can fetch updated notifications here
+       this.fetchNotification();
+    }).catch(error => {
+      // Handle error
+      console.error('Error marking notification as read:', error);
+    });
+  }
+},
+
+
     formatDate(isoDate) {
       const date = new Date(isoDate);
       const options = {
@@ -314,26 +520,7 @@ export default {
       };
       return date.toLocaleDateString('en-US', options);
     },
-    fetchNotification() {
-      const notificationEndpoint = '/notifications';
-      const config = {
-        headers: {
-          Authorization: `Bearer ${this.accessToken}`
-        }
-      };
-
-      axios.get(notificationEndpoint, config)
-        .then(response => {
-          // console.log("data -> ", response.data.data.items);
-          this.notifications = response.data.data.items;
-          this.isLoading = false;
-        })
-        .catch(error => {
-          console.error('Error fetching notification:', error);
-          this.isLoading = false;
-          this.error = error;
-        });
-    },
+    
     toggleDropNotify() {
       this.showNotify = !this.showNotify;
     },
