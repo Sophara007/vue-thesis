@@ -5,7 +5,7 @@
       <table class="table">
         <thead>
           <tr>
-            <th scope="col">N0</th>
+            <th scope="col">No</th>
             <th scope="col">Full Name</th>
             <th scope="col">Email</th>
             <th scope="col">Actions</th>
@@ -29,29 +29,22 @@
     </div>
 
     <!-- User Details Modal -->
-    <div class="modal" tabindex="-1" role="dialog" v-if="selectedUser">
+    <div class="modal fade" id="userDetailsModal" tabindex="-1" role="dialog" aria-labelledby="userDetailsModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">{{ selectedUser.fullName }} Details</h5>
-            <button type="button" class="close" aria-label="Close" @click="closeUserDetails">
-              <span aria-hidden="true">&times;</span>
-            </button>
+            <h5 class="modal-title" id="userDetailsModalLabel">{{ selectedUser ? selectedUser.fullName + ' Details' : '' }}</h5>
           </div>
           <div class="modal-body">
-            <p><strong>Email:</strong> {{ selectedUser.email }}</p>
+            <p v-if="selectedUser"><strong>Email:</strong> {{ selectedUser.email }}</p>
             <!-- Add more user details here -->
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" @click="closeUserDetails">
-              Close
-            </button>
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
+
 
 <script>
 import axios from "axios";
@@ -69,11 +62,9 @@ export default {
       this.users = users;
     },
     viewUserDetails(user) {
-    console.log("View button clicked:", user);
-    this.selectedUser = user;
-  },
-    closeUserDetails() {
-      this.selectedUser = null;
+      this.selectedUser = user;
+      // Trigger the Bootstrap modal to show
+      $('#userDetailsModal').modal('show');
     }
   },
   async mounted() {
