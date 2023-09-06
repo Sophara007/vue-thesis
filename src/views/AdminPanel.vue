@@ -224,7 +224,7 @@
                           <img class="rounded-full border-5"
                             :class="{ 'border-gray-500': notification.isRead, 'border-green-500': !notification.isRead }"
                             v-if="notification.type == 'inquiry'"
-                            src="https://www.kindpng.com/picc/m/750-7507149_conversation-circle-icon-png-download-live-chat-icon.png"
+                            src="https://www.3dprinting.com.au/wp-content/uploads/2021/03/Email-icon.png"
                             style="cursor: pointer; width: 70%;" />
                         </div>
                              <!-- <div class="wrapper-read flex justify-between align-between">
