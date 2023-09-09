@@ -21,6 +21,7 @@ import IndustryDetail from '../admin-views/IndustryDetail.vue'
 import SubProduct from '../admin-views/SubProduct.vue'
 import SubProductDetail from '../admin-views/SubProductDetail.vue'
 import Order from '../admin-views/Order.vue'
+import Topup from '../admin-views/Topup.vue'
 const routes = [
   {
     path: '/',
@@ -77,6 +78,11 @@ const routes = [
         name: 'Order',
         path: '/order',
         component: Order,
+      },
+      {
+        name: 'Topup',
+        path: '/topup',
+        component: Topup,
       },
       {
         name: 'Product',

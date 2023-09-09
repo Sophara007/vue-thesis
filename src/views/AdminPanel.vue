@@ -59,6 +59,12 @@
               Orders
             </router-link>
 
+            <router-link :class="$route.name == 'Topup' ? 'custom-active' : ''" to="/topup"
+              class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md border-gray-200 hover:bg-gray-300 hover:text-gray-800 transition duration-400 ease-in-out">
+              <i class="fas fa-credit-card align-middle mr-5"></i>
+              Top Up
+            </router-link>
+
             <div>
               <div
                 class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md rounded-b-lg hover:bg-gray-300 hover:text-gray-800 transition duration-400 ease-in-out"
@@ -219,7 +225,7 @@
                           <img class="rounded-full border-5"
                             :class="{ 'border-gray-500': notification.isRead, 'border-green-500': !notification.isRead }"
                             v-if="notification.type == 'order'"
-                            src="https://media.istockphoto.com/id/898475764/vector/shopping-trolley-cart-icon-in-green-circle-vector.jpg?s=612x612&w=0&k=20&c=W_b90qFRpj_FyLyI19xWqB6EoNSuJYwMSN9nnKkE9Hk="
+                            src="https://cdn4.iconfinder.com/data/icons/shopping-21/64/shopping-07-1024.png"
                             style="cursor: pointer; width: 70%;" />
                           <img class="rounded-full border-5"
                             :class="{ 'border-gray-500': notification.isRead, 'border-green-500': !notification.isRead }"

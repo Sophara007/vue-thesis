@@ -6,7 +6,7 @@
       <table class="table">
         <thead>
           <tr style="text-align: center;">
-            <th scope="col">Order No</th>
+            <th scope="col">No</th>
             <th scope="col">Customer Name</th>
             <th scope="col">Item</th>
             <th scope="col">Payment Method</th>
@@ -16,15 +16,34 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(order, index) in orders" :key="order._id" :class="getStatusClass(order.status)" style="text-align: center;">
+          <tr v-for="(order, index) in orders" :key="order._id" :class="getStatusClass(order.status)"
+            style="text-align: center;">
             <th>{{ index + 1 }}</th>
             <td>{{ order.fullName }}</td>
-            <td><!-- Replace this with the item information --></td>
+            <td>{{ order.subProductId.title }}</td>
             <td>{{ mapPaymentMethod(order.paymentMethod) }}</td>
-            <td><!-- Replace this with the total --></td>
+            <td>{{ order.userId.ballance }}<span>$</span></td>
             <td :class="getStatusClass(order.status)">
-              <span :class="getStatusTextClass(order.status)" style="font-weight: bold;">{{ mapStatus(order.status) }}</span>
+              <span :class="getStatusTextClass(order.status)" style="font-weight: bold;">
+                <span v-if="!order.isEditing" @click="startEditingStatus(order)">
+                  {{ mapStatus(order.status) }}
+                  <i class="fa fa-pencil ml-2" style="cursor: pointer;"></i> <!-- Edit icon -->
+                </span>
+                <span v-else>
+                  <!-- Use a div with a class for styling instead of the select element -->
+                  <div class="status-dropdown-sm">
+                    <select v-model="order.newStatus" class="form-select form-select-sm">
+                      <option value="1">Agreed</option>
+                      <option value="2">Rejected</option>
+                      <option value="3">Pending</option>
+                    </select>
+                  </div>
+                  <button class="btn btn-primary btn-sm smaller-btn" @click="updateStatus(order)">Save</button>
+                  <button class="btn btn-secondary btn-sm smaller-btn" @click="cancelEditingStatus(order)">Cancel</button>
+                </span>
+              </span>
             </td>
+
             <td>
               <button class="btn btn-primary" @click="viewOrder(order)">
                 View
@@ -58,17 +77,28 @@
         <div class="modal-body">
           <!-- Display order details here -->
           <div v-if="selectedOrder">
-            <p><strong>Order No:</strong> {{ selectedOrder._id }}</p>
+            <p><strong>Order ID:</strong> {{ selectedOrder._id }}</p>
             <p><strong>Customer Name:</strong> {{ selectedOrder.fullName }}</p>
             <p><strong>Payment Method:</strong> {{ mapPaymentMethod(selectedOrder.paymentMethod) }}</p>
-            <p><strong>Status:</strong> <span :class="getStatusTextClass(selectedOrder.status)" style="font-weight: bold;">{{ mapStatus(selectedOrder.status) }}</span></p>
+            <p><strong>Ballance:</strong> {{ selectedOrder.userId.ballance }}<span>$</span></p>
+            <p><strong>Status:</strong> <span :class="getStatusTextClass(selectedOrder.status)"
+                style="font-weight: bold;">{{ mapStatus(selectedOrder.status) }}</span></p>
             <p><strong>phoneNumber:</strong> {{ selectedOrder.phoneNumber }}</p>
+            <p><strong>Email:</strong> {{ selectedOrder.userId.email }}</p>
             <p><strong>address:</strong> {{ selectedOrder.address }}</p>
+            <hr>
+            <p><strong>Item:</strong> {{ selectedOrder.subProductId.title }}</p>
+            <p><strong>Price:</strong> {{ selectedOrder.subProductId.price }}<span> $</span></p>
+            <img
+              v-if="selectedOrder.subProductId && selectedOrder.subProductId.image && selectedOrder.subProductId.image.url"
+              :src="selectedOrder.subProductId.image.url" class="subProduct-img img-fluid"
+              :alt="selectedOrder.subProductId.title" />
             <!-- Add more order details here as needed -->
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary bg-red-500 hover:bg-red-600 text-white" data-bs-dismiss="modal" @click="closeViewModal">Close</button>
+          <button type="button" class="btn btn-secondary bg-red-500 hover:bg-red-600 text-white" data-bs-dismiss="modal"
+            @click="closeViewModal">Close</button>
         </div>
       </div>
     </div>
@@ -96,6 +126,34 @@ export default {
       });
   },
   methods: {
+
+    cancelEditingStatus(order) {
+      // Reset the isEditing property to false
+      order.isEditing = false;
+
+      // Optionally, you can revert the newStatus to the original status
+      // This step is optional and depends on your use case
+      order.newStatus = order.status;
+    },
+    startEditingStatus(order) {
+      order.isEditing = true;
+      order.newStatus = order.status; // Initialize newStatus with the current status
+    },
+    updateStatus(order) {
+      axios
+        .put(`/order/${order._id}`, { status: order.newStatus }) // Replace with your endpoint and data structure
+        .then(response => {
+          // Assuming the backend updates the order status successfully
+          // You may want to update the local data or reload the order list
+          order.status = order.newStatus; // Update the displayed status
+          order.isEditing = false; // Exit edit mode
+          console.log('Order status updated successfully:', response.data);
+        })
+        .catch(error => {
+          console.error('Error updating order status', error);
+        });
+    },
+
     viewOrder(order) {
       // Set the selectedOrder and open the modal
       this.selectedOrder = order;
@@ -119,7 +177,7 @@ export default {
         case 2:
           return 'badge bg-danger';
         case 3:
-          return '"badge bg-warning text-dark';
+          return 'badge bg-warning';
         default:
           return 'badge bg-secondary';
       }
@@ -153,6 +211,79 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+span {
+  margin-left: 2px;
+}
+
+.status-dropdown-sm {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  /* Adjust the gap as needed */
+}
+
+/* Adjust the font size and padding for the smaller buttons */
+.smaller-btn {
+  font-size: 12px;
+  padding: 2px 4px;
+}
+
+/* Adjust the padding and font size for the smaller select */
+.form-select-sm {
+  padding: 2px 5px;
+  font-size: 12px;
+}
+
+.status-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.status-dropdown select {
+  padding: 5px;
+  border: 1px solid #ccc;
+  background-color: white;
+  appearance: none;
+  /* Remove default styles */
+  color: black;
+  /* Set the text color to black */
+}
+
+.status-dropdown::before {
+  content: '\f078';
+  /* Unicode for the down arrow icon */
+  font-family: FontAwesome;
+  /* Use FontAwesome for the arrow icon */
+  position: absolute;
+  top: 50%;
+  right: 5px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  /* Allow clicks on select, not on the arrow */
+}
+
+/* Style the arrow icon */
+.status-dropdown::before {
+  content: '\f0d7';
+  /* Unicode for a down arrow (you may need to adjust the icon code) */
+  font-family: FontAwesome;
+  /* Use FontAwesome for the arrow icon */
+  position: absolute;
+  top: 50%;
+  right: 5px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  /* Allow clicks on select, not on the arrow */
+}
+
+/* Style the select dropdown when it's open */
+.status-dropdown select:focus {
+  border-color: #007bff;
+  /* Add focus style when the select is open */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  /* Add focus shadow when the select is open */
+}
+
 .order-page {
   h1 {
     font-size: 24px;
@@ -168,7 +299,9 @@ export default {
   }
 
   .table {
-    th, td {
+
+    th,
+    td {
       max-width: 150px;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -176,10 +309,18 @@ export default {
     }
   }
 
- 
+
 }
 
 .slider-img {
+  position: relative;
+  width: 200px;
+  height: 100px;
+  object-fit: contain;
+}
+
+.subProduct-img {
+  margin-left: 20px;
   width: 200px;
   height: 100px;
   object-fit: contain;
@@ -195,5 +336,4 @@ export default {
       }
     }
   }
-}
-</style>
+}</style>

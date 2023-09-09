@@ -12,6 +12,7 @@
           <tr style="text-align: center;">
             <th scope="col" style="width: 5%;">No</th>
             <th scope="col" style="width: 20%;">Sub Product of</th>
+            <th scope="col" style="width: 20%;">Price</th>
             <th scope="col" style="width: 20%;">Title</th>
             <th scope="col" style="width: 20%;">Description</th>
             <th scope="col" style="width: 20%;">Image</th>
@@ -22,6 +23,7 @@
           <tr v-for="(SubProduct, index) in paginatedSubProducts" :key="SubProduct._id" style="text-align: center;">
               <th>{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th>
             <td><span class="description">{{ getProductTitleById(SubProduct.productModelId) }}</span></td>
+            <td><span class="description">{{ SubProduct.price }} $</span></td>
             <td><span class="description">{{ SubProduct.title }}</span></td>
             <td><span class="description">{{ SubProduct.description }}</span></td>
             <td>
@@ -75,6 +77,7 @@
           <div class="wrapper-form-input">
             <input type="text" class="form-control" placeholder="Title" v-model="form.title" />
             <textarea class="form-control mt-3" rows="4" placeholder="Description" v-model="form.description"></textarea>
+            <input type="number" class="form-control mt-3" placeholder="Price" v-model="form.price" />
             <div class="input-group mt-3">
               <input ref="fileInput" type="file" class="form-control" v-on:change="onImageChange" />
             </div>
@@ -110,6 +113,7 @@
             <input type="text" class="form-control" placeholder="Title" v-model="editForm.title" />
             <textarea class="form-control mt-3" rows="4" placeholder="Description"
               v-model="editForm.description"></textarea>
+              <input type="number" class="form-control mt-3" placeholder="Price" v-model="editForm.price" />
           </div>
           <div class="input-group mt-3">
             <input ref="editFileInput" type="file" class="form-control" @change="onEditImageChange" />
@@ -143,6 +147,7 @@ export default {
       form: {
         title: "",
         description: "", // Add description field
+        price: "",
         image: "",
         productModelId: ""
       },
@@ -150,6 +155,7 @@ export default {
         id: "", // Store the ID of the SubProduct being edited
         title: "",
         description: "",
+        price: "",
       },
     };
   },
@@ -187,12 +193,14 @@ export default {
       this.editForm.id = SubProduct._id;
       this.editForm.title = SubProduct.title;
       this.editForm.description = SubProduct.description;
+      this.editForm.price = SubProduct.price;
       $("#editModal").modal("show"); // Use jQuery to open the modal
     },
     async updateSubproductAndClearModal() {
   try {
     const updateData = {
       title: this.editForm.title,
+      price: this.editForm.price,
       description: this.editForm.description,
     };
 
@@ -208,6 +216,7 @@ export default {
       this.editForm.id = "";
       this.editForm.title = "";
       this.editForm.description = "";
+      this.editForm.price = "";
       this.editForm.image = "";
       $("#editModal").modal("hide");
       Swal.fire({
@@ -291,6 +300,7 @@ async getSubProduct() {
 
       this.form.title = "";
       this.form.description = ""; // Clear description field
+      this.form.price = "";
       this.form.image = "";
       this.showModal = false;
 
