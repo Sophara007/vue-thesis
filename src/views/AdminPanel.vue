@@ -123,11 +123,6 @@
                   class="block py-1 transition duration-300 white-text pl-5 rounded pt-2 pb-2">
                   Sub Product
                 </router-link>
-                <router-link :class="$route.name == 'SubProductDetail' ? 'custom-active' : ''
-                  " to="/subproductdetail"
-                  class="block py-1 transition duration-300 white-text pl-5 rounded pt-2 pb-2">
-                  Sub Product Detail
-                </router-link>
                 <!-- Add more sub-links as needed -->
               </div>
             </div>
