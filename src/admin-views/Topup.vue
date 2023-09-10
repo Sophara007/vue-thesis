@@ -15,7 +15,7 @@
         <tbody>
           <tr v-for="(topup, index) in topups" :key="topup._id">
             <td>{{ topup._id }}</td>
-            <td>${{ topup.amount }}</td>
+            <td>{{ topup.amount }} $</td>
             <td>
               <span :class="getStatusClass(topup.status)" style="font-weight: bold;">
                 <span v-if="!topup.isEditing" @click="startEditingStatus(topup)">
@@ -26,9 +26,9 @@
                   <!-- Use a div with a class for styling instead of the select element -->
                   <div class="status-dropdown-sm">
                     <select v-model="topup.newStatus" class="form-select form-select-sm">
-                      <option value="1">Agreed</option>
-                      <option value="2">Rejected</option>
-                      <option value="3">Pending</option>
+                      <option value="1">Pending</option>
+                      <option value="2">Agreed</option>
+                      <option value="3">Rejected</option>
                     </select>
                   </div>
                   <button class="btn btn-primary btn-sm smaller-btn" @click="updateStatus(topup)">Save</button>
@@ -58,13 +58,19 @@
         <div class="modal-body">
           <!-- Display top-up details here -->
           <div v-if="selectedTopUp">
-            <p><strong>Transaction ID:</strong> {{ selectedTopUp._id }}</p>
-            <p><strong>Amount:</strong> ${{ selectedTopUp.amount.toFixed(2) }}</p>
+            <p><strong>Customer Name:</strong> {{ selectedTopUp.userId.fullName }}</p>
+            <p><strong>Amount:</strong> {{ selectedTopUp.amount.toFixed(2) }} $</p>
+            <p><strong>Ballance:</strong> {{ selectedTopUp.userId.ballance }} $</p>
             <p><strong>Status:</strong> <span :class="getStatusClass(selectedTopUp.status)">{{ mapStatus(selectedTopUp.status) }}</span></p>
             <!-- Photo area -->
             <div class="mb-3" v-if="selectedTopUp.transactionPhoto">
               <p><strong>Transaction Photo:</strong></p>
-              <img :src="selectedTopUp.transactionPhoto" alt="Transaction Photo" class="img-fluid" />
+              <img
+        :src="selectedTopUp.transactionPhoto.url"
+        :class="{ 'subProduct-img': selectedTopUp.hasPadding }" 
+        alt="Transaction Photo"
+        class="img-fluid"
+      />
             </div>
             <!-- Add more top-up details here as needed -->
           </div>
@@ -116,7 +122,7 @@ export default {
     },
     updateStatus(topup) {
       axios
-        .put(`/topup/${topup._id}`, { status: topup.newStatus }) // Replace with your endpoint and data structure
+        .put(`/topup/update-status/${topup._id}`, { status: parseInt(topup.newStatus) }) // Replace with your endpoint and data structure
         .then(response => {
           // Assuming the backend updates the top-up status successfully
           // You may want to update the local data or reload the top-up list
@@ -129,8 +135,9 @@ export default {
         });
     },
     viewTopUp(topup) {
-      // Set the selectedTopUp and open the modal
+      // Set the selectedTopUp and determine if padding should be applied
       this.selectedTopUp = topup;
+      this.selectedTopUp.hasPadding = true; // You can set this condition based on your logic
       const modal = new bootstrap.Modal(document.getElementById('viewModal'));
       modal.show();
     },
@@ -144,11 +151,11 @@ export default {
       // Define your status classes here based on "Top Up" status codes
       switch (status) {
         case 1:
-          return 'badge bg-success';
-        case 2:
-          return 'badge bg-danger';
-        case 3:
           return 'badge bg-warning';
+        case 2:
+          return 'badge bg-success';
+        case 3:
+          return 'badge bg-danger';
         default:
           return 'badge bg-secondary';
       }
@@ -162,11 +169,11 @@ export default {
       // Modify this function according to your status codes
       switch (status) {
         case 1:
-          return 'Agreed';
-        case 2:
-          return 'Rejected';
-        case 3:
           return 'Pending';
+        case 2:
+          return 'Agreed';
+        case 3:
+          return 'Rejected';
         default:
           return 'Unknown';
       }
@@ -271,11 +278,14 @@ export default {
    
   }
   
-  .slider-img {
-    width: 200px;
-    height: 100px;
-    object-fit: contain;
-  }
+  .subProduct-img {
+  margin-left: 2px;
+  padding: 10px; /* Adjust the padding to your preferred size */
+  max-width: 400px; /* Limit the maximum width */
+  max-height: 400px; /* Limit the maximum height */
+  object-fit: contain;
+}
+
   
   .wrapper-modal {
     .modal-footer {

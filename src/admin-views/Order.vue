@@ -10,7 +10,6 @@
             <th scope="col">Customer Name</th>
             <th scope="col">Item</th>
             <th scope="col">Payment Method</th>
-            <th scope="col">Total</th>
             <th scope="col">Status</th>
             <th scope="col">Actions</th>
           </tr>
@@ -22,7 +21,6 @@
             <td>{{ order.fullName }}</td>
             <td>{{ order.subProductId.title }}</td>
             <td>{{ mapPaymentMethod(order.paymentMethod) }}</td>
-            <td>{{ order.userId.ballance }}<span>$</span></td>
             <td :class="getStatusClass(order.status)">
               <span :class="getStatusTextClass(order.status)" style="font-weight: bold;">
                 <span v-if="!order.isEditing" @click="startEditingStatus(order)">
@@ -80,7 +78,6 @@
             <p><strong>Order ID:</strong> {{ selectedOrder._id }}</p>
             <p><strong>Customer Name:</strong> {{ selectedOrder.fullName }}</p>
             <p><strong>Payment Method:</strong> {{ mapPaymentMethod(selectedOrder.paymentMethod) }}</p>
-            <p><strong>Ballance:</strong> {{ selectedOrder.userId.ballance }}<span>$</span></p>
             <p><strong>Status:</strong> <span :class="getStatusTextClass(selectedOrder.status)"
                 style="font-weight: bold;">{{ mapStatus(selectedOrder.status) }}</span></p>
             <p><strong>phoneNumber:</strong> {{ selectedOrder.phoneNumber }}</p>
@@ -173,11 +170,11 @@ export default {
       // Define classes for the status text color
       switch (status) {
         case 1:
-          return 'badge bg-success';
-        case 2:
-          return 'badge bg-danger';
-        case 3:
           return 'badge bg-warning';
+        case 2:
+          return 'badge bg-success';
+        case 3:
+          return 'badge bg-danger';
         default:
           return 'badge bg-secondary';
       }
@@ -186,11 +183,11 @@ export default {
       // Map status codes to labels
       switch (status) {
         case 1:
-          return 'Agreed';
-        case 2:
-          return 'Rejected';
-        case 3:
           return 'Pending';
+        case 2:
+          return 'Agreed';
+        case 3:
+          return 'Rejected';
         default:
           return 'Unknown';
       }
