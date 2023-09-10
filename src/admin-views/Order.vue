@@ -31,9 +31,9 @@
                   <!-- Use a div with a class for styling instead of the select element -->
                   <div class="status-dropdown-sm">
                     <select v-model="order.newStatus" class="form-select form-select-sm">
-                      <option value="1">Agreed</option>
-                      <option value="2">Rejected</option>
-                      <option value="3">Pending</option>
+                      <option value="1">Pending</option>
+                      <option value="2">Agreed</option>
+                      <option value="3">Rejected</option>
                     </select>
                   </div>
                   <button class="btn btn-primary btn-sm smaller-btn" @click="updateStatus(order)">Save</button>
@@ -137,20 +137,24 @@ export default {
       order.newStatus = order.status; // Initialize newStatus with the current status
     },
     updateStatus(order) {
-      axios
-        .put(`/order/${order._id}`, { status: order.newStatus }) // Replace with your endpoint and data structure
-        .then(response => {
-          // Assuming the backend updates the order status successfully
-          // You may want to update the local data or reload the order list
-          order.status = order.newStatus; // Update the displayed status
-          order.isEditing = false; // Exit edit mode
-          console.log('Order status updated successfully:', response.data);
-        })
-        .catch(error => {
-          console.error('Error updating order status', error);
-        });
-    },
+  const newStatus = parseInt(order.newStatus);
 
+  axios
+    .put(`/order/${order._id}`, { status: newStatus }) // Replace with your endpoint and data structure
+    .then(response => {
+      if (response.status === 200) {
+        // The server has successfully updated the order status
+        order.status = newStatus; // Update the status locally
+        order.isEditing = false; // Exit edit mode
+        console.log('Order status updated successfully:', response.data);
+      } else {
+        console.error('Failed to update order status. Server returned:', response.status);
+      }
+    })
+    .catch(error => {
+      console.error('Error updating order status', error);
+    });
+},
     viewOrder(order) {
       // Set the selectedOrder and open the modal
       this.selectedOrder = order;

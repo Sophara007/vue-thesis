@@ -121,19 +121,32 @@ export default {
       topup.newStatus = topup.status; // Initialize newStatus with the current status
     },
     updateStatus(topup) {
-      axios
-        .put(`/topup/update-status/${topup._id}`, { status: parseInt(topup.newStatus) }) // Replace with your endpoint and data structure
-        .then(response => {
-          // Assuming the backend updates the top-up status successfully
-          // You may want to update the local data or reload the top-up list
-          topup.status = topup.newStatus; // Update the displayed status
-          topup.isEditing = false; // Exit edit mode
-          console.log('Top-up status updated successfully:', response.data);
-        })
-        .catch(error => {
-          console.error('Error updating top-up status', error);
-        });
-    },
+  // Store the new status before making the API call
+  const newStatus = parseInt(topup.newStatus);
+
+  axios
+    .put(`/topup/update-status/${topup._id}`, { status: newStatus })
+    .then(response => {
+      if (response.status === 200) {
+        // The server has successfully updated the top-up status
+        topup.status = newStatus; // Update the status locally
+        topup.isEditing = false; // Exit edit mode
+        console.log('Top-up status updated successfully:', response.data);
+      } else {
+        console.error('Failed to update top-up status. Server returned:', response.status);
+        // If there's an error, you can optionally revert the status back to the original
+        // topup.status = topup.status;
+      }
+    })
+    .catch(error => {
+      console.error('Error updating top-up status', error);
+      // If there's an error, you can optionally revert the status back to the original
+      // topup.status = topup.status;
+    });
+},
+
+
+
     viewTopUp(topup) {
       // Set the selectedTopUp and determine if padding should be applied
       this.selectedTopUp = topup;
