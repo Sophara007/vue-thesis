@@ -11,10 +11,10 @@
         <thead>
           <tr style="text-align: center;">
             <th scope="col" style="width: 5%;">No</th>
-            <th scope="col" style="width: 20%;">Sub Product of</th>
-            <th scope="col" style="width: 20%;">Price</th>
-            <th scope="col" style="width: 20%;">Title</th>
-            <th scope="col" style="width: 20%;">Description</th>
+            <th scope="col" style="width: 18%;">Sub Product of</th>
+            <th scope="col" style="width: 10%;">Price</th>
+            <th scope="col" style="width: 17%;">Title</th>
+            <th scope="col" style="width: 15%;">Description</th>
             <th scope="col" style="width: 20%;">Image</th>
             <th scope="col" style="width: 20%;">Actions</th>
           </tr>
@@ -31,10 +31,10 @@
             </td>
             <td>
               <div class="wrapper-action">
-                <button class="btn btn-danger" @click="deleteSubProduct(SubProduct)">
+                <button class="btn btn-danger" style="padding: 6px 9px;  font-size: 14px;" @click="deleteSubProduct(SubProduct)">
                   Delete
                 </button>
-                <button class="btn btn-warning ml-2" @click="openEditModal(SubProduct)">Edit</button>
+                <button class="btn btn-warning ml-2" style="padding: 6px 9px;  font-size: 14px;" @click="openEditModal(SubProduct)">Edit</button>
               </div>
             </td>
           </tr>

@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 import Signup from '@/views/Signup.vue';
 import AdminPanel from '@/views/AdminPanel.vue';
-import testRegister from '@/views/testRegister.vue';
+
 import User from '@/admin-views/Users.vue';
 import Logout from '@/views/Logout.vue';
 import Home from '../views/Home.vue';
@@ -19,7 +19,6 @@ import Inquiry from '../admin-views/Inquiry.vue'
 import AdminUser from '../admin-views/AdminUser.vue'
 import IndustryDetail from '../admin-views/IndustryDetail.vue'
 import SubProduct from '../admin-views/SubProduct.vue'
-import SubProductDetail from '../admin-views/SubProductDetail.vue'
 import Order from '../admin-views/Order.vue'
 import Topup from '../admin-views/Topup.vue'
 const routes = [
@@ -95,11 +94,6 @@ const routes = [
         component: SubProduct,
       },
       {
-        name: 'SubProductDetail',
-        path: '/subproductdetail',
-        component: SubProductDetail,
-      },
-      {
         name: 'CompanyInfo',
         path: '/setting',
         component: Setting,
@@ -128,11 +122,7 @@ const routes = [
       },
     ],
   },
-  {
-    path: '/admin/test',
-    component: testRegister,
-    meta: { requiresAuth: true },
-  },
+
   {
     path: '/:catchAll(.*)',
     redirect: '/admin',
