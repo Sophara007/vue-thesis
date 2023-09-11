@@ -105,7 +105,7 @@
                   justify-content: space-between;
                 ">
                 <div>
-                  <i class="fa-brands fa-product-hunt mr-5"></i>
+                  <i class="fas fa-box mr-5"></i>
                   Products
                 </div>
                 <div>

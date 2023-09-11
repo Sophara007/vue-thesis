@@ -3,7 +3,7 @@
         <h1>HomePage</h1>
         <div class="row mt-5">
             <div class="col-sm-4 card rounded-top flex-column justify-content-center align-items-center p-5">
-                <i class="fa-brands fa-product-hunt mr-5 m-3"></i>
+                <i class="fas fa-box mr-5 m-3"></i>
                 <p class="total">{{ data.count_product }}</p>
                 <p class="title">Products</p>
             </div>
