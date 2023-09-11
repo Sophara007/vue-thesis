@@ -200,6 +200,16 @@
               class="w-[550px] max-h-[550px] overflow-y-auto border rounded-lg border-gray-300 shadow-md"
               style="overflow-x: hidden;">
               <ul>
+                <!-- Close button -->
+                <button @click="toggleDropNotify"
+                  class="absolute top-0 right-0 m-2 p-2 text-gray-600 hover:text-red-600 focus:outline-none"
+                  style="transform: scale(1.3);">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
                 <!-- Button to mark all notifications as read -->
                 <button @click="markAllAsRead"
                   class="px-3 py-2 text-sm text-white bg-gradient-to-r from-blue-500 to-blue-400 hover:from-blue-600 hover:to-blue-500 rounded-md shadow-md transition duration-300 ease-in-out">
@@ -254,13 +264,8 @@
                     </div>
                     <div class="action flex flex-row">
                       <button @click="deleteNotification(notification, $event)"
-                        class="p-2 hover:bg-gray-100 rounded-full focus:outline-none">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500 hover:text-red-500"
-                          viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                          stroke-linejoin="round">
-                          <line x1="18" y1="6" x2="6" y2="18"></line>
-                          <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
+                        class="p-2 hover:bg-gray-100 rounded-full focus:outline-none transform hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-trash-can hover:text-red-500"></i>
                       </button>
                     </div>
                   </div>
@@ -285,13 +290,13 @@
               class="absolute right-[15px] top-[47px] z-10 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
               role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
               <div class="py-1 text-left" role="none">
-                <!-- Active: "bg-gray-100 text-gray-900", Not Active: "text-gray-700" -->
                 <router-link to="/admin/setting">
-                  <a href="#" class="text-gray-700 block px-4 py-2 text-sm" role="menuitem" tabindex="-1"
-                    id="menu-item-0">Account settings</a>
+                  <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900"
+                    role="menuitem" tabindex="-1" id="menu-item-0">Account settings</a>
                 </router-link>
-                <button @click="logout" class="text-gray-700 block w-full px-4 py-2 text-left text-sm" role="menuitem"
-                  tabindex="-1" id="menu-item-3">
+                <button @click="logout"
+                  class="text-gray-700 block w-full px-4 py-2 text-left text-sm hover:bg-gray-100 hover:text-gray-900"
+                  role="menuitem" tabindex="-1" id="menu-item-3">
                   Sign out
                 </button>
               </div>
