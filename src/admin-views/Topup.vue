@@ -3,12 +3,12 @@
     <h1 class="mt-4">Top Up Management</h1>
 
     <div class="mt-4">
-      <table class="table table-striped table-bordered">
+      <table class="table table-bordered">
         <thead class="thead-dark">
           <tr>
             <th scope="col">No</th>
             <th scope="col">Customer Name</th>
-            <th scope="col">Transaction ID</th>
+            <th scope="col">Email</th>
             <th scope="col">Amount</th>
             <th scope="col">Status</th>
             <th scope="col">Actions</th>
@@ -18,7 +18,7 @@
           <tr v-for="(topup, index) in topups" :key="topup._id">
             <th>{{ index + 1 }}</th>
             <td>{{ topup.userId.fullName }}</td>
-            <td>{{ topup._id }}</td>
+            <td>{{ topup.userId.email }}</td>
             <td>{{ topup.amount }} $</td>
             <td>
               <span :class="getStatusClass(topup.status)" style="font-weight: bold;">
@@ -63,6 +63,8 @@
           <!-- Display top-up details here -->
           <div v-if="selectedTopUp">
             <p><strong>Customer Name:</strong> {{ selectedTopUp.userId.fullName }}</p>
+            <p><strong>Email:</strong> {{ selectedTopUp.userId.email }}</p>
+            <p><strong>Transaction ID:</strong> {{ selectedTopUp.userId._id }}</p>
             <p><strong>Amount:</strong> {{ selectedTopUp.amount.toFixed(2) }} $</p>
             <p><strong>Ballance:</strong> {{ selectedTopUp.userId.ballance }} $</p>
             <p><strong>Status:</strong> <span :class="getStatusClass(selectedTopUp.status)">{{ mapStatus(selectedTopUp.status) }}</span></p>
