@@ -10,7 +10,7 @@
       <table class="table">
         <thead>
           <tr style="text-align: center;">
-            <th scope="col">N0</th>
+            <th scope="col">No</th>
             <th scope="col">Title</th>
             <th scope="col">Image</th>
             <th scope="col">Actions</th>

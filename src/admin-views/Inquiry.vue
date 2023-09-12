@@ -5,10 +5,10 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th scope="col">N0</th>
-                        <th scope="col">Full Name</th>
+                        <th scope="col">No</th>
+                        <th scope="col">Username</th>
                         <th scope="col">Email</th>
-                        <th scope="col">subject</th>
+                        <th scope="col">Subject</th>
                         <th scope="col">Actions</th>
                     </tr>
                 </thead>

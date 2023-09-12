@@ -6,6 +6,8 @@
       <table class="table table-striped table-bordered">
         <thead class="thead-dark">
           <tr>
+            <th scope="col">No</th>
+            <th scope="col">Customer Name</th>
             <th scope="col">Transaction ID</th>
             <th scope="col">Amount</th>
             <th scope="col">Status</th>
@@ -14,6 +16,8 @@
         </thead>
         <tbody>
           <tr v-for="(topup, index) in topups" :key="topup._id">
+            <th>{{ index + 1 }}</th>
+            <td>{{ topup.userId.fullName }}</td>
             <td>{{ topup._id }}</td>
             <td>{{ topup.amount }} $</td>
             <td>
@@ -265,6 +269,12 @@ export default {
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
   /* Add focus shadow when the select is open */
 }
+
+h1 {
+        font-size: 24px;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
   .order-page {
     h1 {
       font-size: 24px;
