@@ -238,7 +238,7 @@
                             src="https://www.3dprinting.com.au/wp-content/uploads/2021/03/Email-icon.png"
                             style="cursor: pointer; width: 70%;" />
                         </div>
-                             <!-- <div class="wrapper-read flex justify-between align-between">
+                        <!-- <div class="wrapper-read flex justify-between align-between">
                                       <i
                                         class="fa-solid"
                                          :class="{ 'fa-circle': notification.isRead, 'text-orange-500': notification.isRead }"
@@ -387,8 +387,12 @@ export default {
             // Handle other notification types as needed
           }
 
-          // Redirect to the generated route path
-          if (routePath) {
+          // Check if the generated route path matches the current route
+          if (this.$route.path === routePath) {
+            // Reload the current page
+            location.reload();
+          } else {
+            // Redirect to the generated route path
             this.$router.push(routePath);
           }
         }
