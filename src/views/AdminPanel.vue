@@ -64,6 +64,11 @@
               <i class="fas fa-credit-card align-middle mr-5"></i>
               Top Up
             </router-link>
+            <router-link :class="$route.name == 'Invoice' ? 'custom-active' : ''" to="/invoice"
+              class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md border-gray-200 hover:bg-gray-300 hover:text-gray-800 transition duration-400 ease-in-out">
+              <i class="fas fa-file-invoice align-middle mr-5"></i>
+              Invoice
+            </router-link>
 
             <div>
               <div
@@ -230,7 +235,7 @@
                           <img class="rounded-full border-5"
                             :class="{ 'border-gray-500': notification.isRead, 'border-green-500': !notification.isRead }"
                             v-if="notification.type == 'order'"
-                            src="https://cdn6.aptoide.com/imgs/8/8/f/88f5f47d7fb981277f9907a03eb8db74_icon.png"
+                            src="https://st4.depositphotos.com/11953928/25118/v/450/depositphotos_251186360-stock-illustration-colorful-shopping-cart-sale-with.jpg"
                             style="cursor: pointer; width: 70%;" />
                           <img class="rounded-full border-5"
                             :class="{ 'border-gray-500': notification.isRead, 'border-green-500': !notification.isRead }"

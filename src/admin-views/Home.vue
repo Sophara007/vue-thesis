@@ -203,6 +203,7 @@ export default {
   width: 100%;
   max-width: 1000px; /* Adjust the size as needed */
   margin: 0 auto;
+  height: 400px;
 }
 h1 {
   font-size: 28px;

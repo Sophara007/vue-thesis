@@ -21,6 +21,7 @@ import IndustryDetail from '../admin-views/IndustryDetail.vue'
 import SubProduct from '../admin-views/SubProduct.vue'
 import Order from '../admin-views/Order.vue'
 import Topup from '../admin-views/Topup.vue'
+import Invoice from '../admin-views/Invoice.vue'
 const routes = [
   {
     path: '/',
@@ -52,6 +53,11 @@ const routes = [
         name: 'Slider',
         path: '/slider',
         component: Slider,
+      },
+      {
+        name: 'Invoice',
+        path: '/invoice',
+        component: Invoice,
       },
       {
         name: 'Service',
