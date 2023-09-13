@@ -1,9 +1,10 @@
 <template>
-
+  <div>
+    <!-- Dashboard Title -->
     <h1 class="mb-4 text-center">Dashboard</h1>
 
+    <!-- Dashboard Items -->
     <div class="row row-cols-1 row-cols-md-3 g-4 mt-4">
-      <!-- Other dashboard items go here -->
       <div v-for="(item, index) in dashboardItems" :key="index" class="col">
         <div class="card shadow-lg">
           <div class="card-body text-center">
@@ -15,33 +16,110 @@
       </div>
     </div>
 
-    <!-- Sales Report -->
-    <div class="card shadow-lg mt-4">
+   <!-- Sales Report -->
+   <div class="card shadow-lg mt-4">
       <div class="card-body text-center">
         <h3 class="card-title fs-2">Sales Report</h3>
         <div class="chart-container">
-          <canvas id="salesChart"></canvas>
+          <canvas id="salesChart" width="800" height="400"></canvas>
         </div>
       </div>
     </div>
-
+  </div>
 </template>
 
 <script>
 import axios from 'axios';
 import Chart from 'chart.js/auto';
+import 'chartjs-adapter-date-fns';
 
 export default {
   data() {
     return {
       dashboardItems: [],
       salesData: {
-        labels: ['Weekly', 'Monthly', 'Yearly'],
+        labels: [
+       
+          '2023-01-08', // Weekly point
+          '2023-01-15', // Weekly point
+          '2023-01-22', // Weekly point
+          '2023-01-29', // Weekly point
+        
+          '2023-02-08', // Weekly point
+          '2023-02-15', // Weekly point
+          '2023-02-22', // Weekly point
+          '2023-02-28', // Weekly point
+        
+          '2023-03-08', // Weekly point
+          '2023-03-15', // Weekly point
+          '2023-03-22', // Weekly point
+          '2023-03-29', // Weekly point
+       
+          '2023-04-08', // Weekly point
+          '2023-04-15', // Weekly point
+          '2023-04-22', // Weekly point
+          '2023-04-29', // Weekly point
+        
+          '2023-05-08', // Weekly point
+          '2023-05-15', // Weekly point
+          '2023-05-22', // Weekly point
+          '2023-05-29', // Weekly point
+        
+          '2023-06-08', // Weekly point
+          '2023-06-15', // Weekly point
+          '2023-06-22', // Weekly point
+          '2023-06-29', // Weekly point
+         
+          '2023-07-08', // Weekly point
+          '2023-07-15', // Weekly point
+          '2023-07-22', // Weekly point
+          '2023-07-29', // Weekly point
+        
+          '2023-08-08', // Weekly point
+          '2023-08-15', // Weekly point
+          '2023-08-22', // Weekly point
+          '2023-08-29', // Weekly point
+       
+          '2023-09-08', // Weekly point
+          '2023-09-15', // Weekly point
+          '2023-09-22', // Weekly point
+          '2023-09-29', // Weekly point
+          
+          '2023-10-08', // Weekly point
+          '2023-10-15', // Weekly point
+          '2023-10-22', // Weekly point
+          '2023-10-29', // Weekly point
+        
+          '2023-11-08', // Weekly point
+          '2023-11-15', // Weekly point
+          '2023-11-22', // Weekly point
+          '2023-11-29', // Weekly point
+         
+          '2023-12-08', // Weekly point
+          '2023-12-15', // Weekly point
+          '2023-12-22', // Weekly point
+          '2023-12-29', // Weekly point
+        ],
         datasets: [
           {
             label: 'Sales',
-            data: [50, 250, 3000], // Update with your actual sales data
-            backgroundColor: ['#007bff', '#28a745', '#ffc107'], // Customize the colors
+            data: [
+  0, 1300, 1400, 1500, 1600,
+  1700, 1900, 1800, 1700, 1600,
+  1500, 1400, 1300, 1200, 1100,
+  1000, 950, 900, 850, 800,
+  750, 700, 650, 600, 550,
+  500, 450, 400, 350, 300,
+  
+
+],
+
+            borderColor: 'rgba(0, 123, 255, 1)',
+            borderWidth: 2,
+            fill: {
+              target: 'origin',
+              above: 'rgba(0, 123, 255, 0.3)',
+            },
           },
         ],
       },
@@ -49,34 +127,69 @@ export default {
   },
   methods: {
     async getDashboard() {
-      const dashboard = await axios.get('/dashboard').then((res) => res.data.data);
+      // Simulate fetching dashboard data from an API (replace with actual API call)
+      const dashboardData = await this.fetchDashboardData();
+
+      // Map fetched data to dashboardItems
       this.dashboardItems = [
-        { title: 'Products', count: dashboard.count_product, iconClasses: 'fas fa-box' },
-        { title: 'Services', count: dashboard.count_service, iconClasses: 'fas fa-handshake' },
-        { title: 'Users', count: dashboard.count_user, iconClasses: 'fas fa-users' },
-        { title: 'Inquiries', count: dashboard.count_inquiry, iconClasses: 'fa fa-commenting' },
-        { title: 'Partners', count: dashboard.count_partner, iconClasses: 'fa-regular fa-window-restore' },
-        { title: 'Industries', count: dashboard.count_industry, iconClasses: 'fas fa-industry' },
+        { title: 'Products', count: dashboardData.count_product, iconClasses: 'fas fa-box' },
+        { title: 'Services', count: dashboardData.count_service, iconClasses: 'fas fa-handshake' },
+        { title: 'Users', count: dashboardData.count_user, iconClasses: 'fas fa-users' },
+        { title: 'Inquiries', count: dashboardData.count_inquiry, iconClasses: 'fa fa-commenting' },
+        { title: 'Partners', count: dashboardData.count_partner, iconClasses: 'fa-regular fa-window-restore' },
+        { title: 'Industries', count: dashboardData.count_industry, iconClasses: 'fas fa-industry' },
       ];
 
-      // After fetching sales data, update the chart
-      this.updateSalesChart();
+      // After fetching dashboard data, create the chart
+      this.createSalesChart();
     },
-    updateSalesChart() {
+    async fetchDashboardData() {
+      // Simulate fetching data from an API (replace with your actual API endpoint)
+      const response = await axios.get('/dashboard');
+      return response.data.data;
+    },
+    createSalesChart() {
       const ctx = document.getElementById('salesChart').getContext('2d');
-      new Chart(ctx, {
-        type: 'bar', // Use a bar chart
+      const chart = new Chart(ctx, {
+        type: 'line',
         data: this.salesData,
         options: {
           responsive: true,
           maintainAspectRatio: false,
           scales: {
+            x: {
+              type: 'time',
+              time: {
+                unit: 'month',
+                tooltipFormat: 'yyyy-MM-dd',
+              },
+            },
             y: {
               beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Sales',
+              },
+            },
+          },
+          plugins: {
+            tooltip: {
+              intersect: false,
+              mode: 'index',
+              callbacks: {
+                label: function (context) {
+                  const label = context.dataset.label || '';
+                  if (label) {
+                    return label + ': ' + context.parsed.y;
+                  }
+                  return null;
+                },
+              },
             },
           },
         },
       });
+      chart.update();
     },
   },
   async mounted() {
@@ -88,7 +201,7 @@ export default {
 <style scoped>
 .chart-container {
   width: 100%;
-  max-width: 300px; /* Adjust the size as needed */
+  max-width: 1000px; /* Adjust the size as needed */
   margin: 0 auto;
 }
 h1 {
