@@ -27,7 +27,7 @@ nav {
 }
 
 .container {
-  display: flex;
+  display: inline-block;
   justify-content: space-between;
   align-items: center;
   max-width: 1200px;

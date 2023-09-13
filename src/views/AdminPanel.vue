@@ -224,18 +224,23 @@
                         <div>
                           <img class="rounded-full border-5"
                             :class="{ 'border-gray-500': notification.isRead, 'border-green-500': !notification.isRead }"
-                            v-if="notification.type == 'register'"
-                            src="https://cdn0.iconfinder.com/data/icons/creatype-essential-ui-v-3-outline/64/1_user_account_profile_user_interface-1024.png"
+                            v-if="notification.type == 'register'" 
+                            src="https://clipart-library.com/images/yckroAaoi.png"
                             style="cursor: pointer; width: 70%;" />
                           <img class="rounded-full border-5"
                             :class="{ 'border-gray-500': notification.isRead, 'border-green-500': !notification.isRead }"
                             v-if="notification.type == 'order'"
-                            src="https://cdn4.iconfinder.com/data/icons/shopping-21/64/shopping-07-1024.png"
+                            src="https://cdn6.aptoide.com/imgs/8/8/f/88f5f47d7fb981277f9907a03eb8db74_icon.png"
                             style="cursor: pointer; width: 70%;" />
                           <img class="rounded-full border-5"
                             :class="{ 'border-gray-500': notification.isRead, 'border-green-500': !notification.isRead }"
                             v-if="notification.type == 'inquiry'"
                             src="https://www.3dprinting.com.au/wp-content/uploads/2021/03/Email-icon.png"
+                            style="cursor: pointer; width: 70%;" />
+                          <img class="rounded-full border-5"
+                            :class="{ 'border-gray-500': notification.isRead, 'border-green-500': !notification.isRead }"
+                            v-if="notification.type == 'top-up'"
+                            src="https://cdn3.iconfinder.com/data/icons/bank-and-money-vol-2/512/Money_icon-07-1024.png"
                             style="cursor: pointer; width: 70%;" />
                         </div>
                         <!-- <div class="wrapper-read flex justify-between align-between">
@@ -383,6 +388,9 @@ export default {
               break;
             case 'inquiry':
               routePath = `/admin/inquiry`;
+              break;
+            case 'top-up':
+              routePath = `/topup`;
               break;
             // Handle other notification types as needed
           }
