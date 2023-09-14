@@ -64,7 +64,7 @@
           <div v-if="selectedTopUp">
             <p><strong>Customer Name:</strong> {{ selectedTopUp.userId.fullName }}</p>
             <p><strong>Email:</strong> {{ selectedTopUp.userId.email }}</p>
-            <p><strong>Transaction ID:</strong> {{ selectedTopUp.userId._id }}</p>
+            <p><strong>Transaction ID:</strong> {{ selectedTopUp._id }}</p>
             <p><strong>Amount:</strong> {{ selectedTopUp.amount.toFixed(2) }} $</p>
             <p><strong>Ballance:</strong> {{ selectedTopUp.userId.ballance }} $</p>
             <p><strong>Status:</strong> <span :class="getStatusClass(selectedTopUp.status)">{{ mapStatus(selectedTopUp.status) }}</span></p>

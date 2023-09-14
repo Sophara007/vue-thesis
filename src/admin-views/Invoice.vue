@@ -18,29 +18,12 @@
                     <tr v-for="(order, index) in orders" :key="order._id" :class="getStatusClass(order.status)"
                         style="text-align: center;">
                         <th>{{ index + 1 }}</th>
-                        <td>{{ order.fullName }}</td>
-                        <td>{{ order.subProductId.price }} $</td>
-                        <td>{{ mapPaymentMethod(order.paymentMethod) }}</td>
+                        <td>{{ order.orderId.fullName }}</td>
+                        <td>{{ order.price }} $</td>
+                        <td>{{ mapPaymentMethod(order.orderId.paymentMethod) }}</td>
                         <td :class="getStatusClass(order.status)">
                             <span :class="getStatusTextClass(order.status)" style="font-weight: bold;">
-                                <span v-if="!order.isEditing" @click="startEditingStatus(order)">
-                                    {{ mapStatus(order.status) }}
-                                    <i class="fa fa-pencil ml-2" style="cursor: pointer;"></i> <!-- Edit icon -->
-                                </span>
-                                <span v-else>
-                                    <!-- Use a div with a class for styling instead of the select element -->
-                                    <div class="status-dropdown-sm">
-                                        <select v-model="order.newStatus" class="form-select form-select-sm">
-                                            <option value="1">Pending</option>
-                                            <option value="2">Agreed</option>
-                                            <option value="3">Rejected</option>
-                                        </select>
-                                    </div>
-                                    <button class="btn btn-primary btn-sm smaller-btn"
-                                        @click="updateStatus(order)">Save</button>
-                                    <button class="btn btn-secondary btn-sm smaller-btn"
-                                        @click="cancelEditingStatus(order)">Cancel</button>
-                                </span>
+                                {{ mapStatus(order.status) }}
                             </span>
                         </td>
 
@@ -48,10 +31,10 @@
                             <button class="btn btn-primary" @click="viewOrder(order)">
                                 View
                             </button>
-                            <button class="btn btn-success ml-2 text-white bg-green-600 hover:bg-green-500 hover:text-white"
-                                @click="viewOrder(order)">
+                            <!-- <button class="btn btn-success ml-2 text-white print-button bg-green-600 hover:bg-green-500 hover:text-white"
+                            @click="generateAndPrintPDF">
                                 Print
-                            </button>
+                            </button> -->
 
                         </td>
                     </tr>
@@ -74,53 +57,50 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="viewModalLabel">View Order Details</h5>
+                    <h5 class="modal-title" id="viewModalLabel">Invoice Details</h5>
                     <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" @click="closeViewModal">
-                        <span aria-hidden="true">&times;</span>
+                        <span class=" print-button" aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <!-- Display order details here -->
                     <div v-if="selectedOrder">
-                        <p><strong>Order ID:</strong> {{ selectedOrder._id }}</p>
-                        <p><strong>Customer Name:</strong> {{ selectedOrder.fullName }}</p>
-                        <p><strong>Payment Method:</strong> {{ mapPaymentMethod(selectedOrder.paymentMethod) }}</p>
+                        <p><strong>Customer Name:</strong> {{ selectedOrder.orderId.fullName }}</p>
+                        <p><strong>Payment Method:</strong> {{ mapPaymentMethod(selectedOrder.orderId.paymentMethod) }}</p>
                         <p><strong>Status:</strong> <span :class="getStatusTextClass(selectedOrder.status)"
                                 style="font-weight: bold;">{{ mapStatus(selectedOrder.status) }}</span></p>
-                        <p><strong>phoneNumber:</strong> {{ selectedOrder.phoneNumber }}</p>
-                        <p><strong>Email:</strong> {{ selectedOrder.userId.email }}</p>
-                        <p><strong>address:</strong> {{ selectedOrder.address }}</p>
+                        <p><strong>Phone Number:</strong> {{ selectedOrder.orderId.phoneNumber }}</p>
+                        <p><strong>Email:</strong> {{ selectedOrder.orderId.userId.email }}</p>
+                        <p><strong>Address:</strong> {{ selectedOrder.orderId.address }}</p>
+                        <p><strong>Order ID:</strong> {{ selectedOrder.orderId._id }}</p>
+                        <p><strong>Invoice ID:</strong> {{ selectedOrder._id }}</p>
                         <hr>
-                        <p><strong>Item:</strong> {{ selectedOrder.subProductId.title }}</p>
-                        <p><strong>Price:</strong> {{ selectedOrder.subProductId.price }}<span> $</span></p>
-                        <img v-if="selectedOrder.subProductId && selectedOrder.subProductId.image && selectedOrder.subProductId.image.url"
-                            :src="selectedOrder.subProductId.image.url" class="subProduct-img img-fluid"
-                            :alt="selectedOrder.subProductId.title" />
-                        <!-- Add more order details here as needed -->
+                        <p><strong>Item:</strong> {{ selectedOrder.orderId.subProductId.title }}</p>
+                        <p><strong>Price:</strong> {{ selectedOrder.price }}<span> $</span></p>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary bg-red-500 hover:bg-red-600 text-white"
-                        data-bs-dismiss="modal" @click="closeViewModal">Close</button>
+                    
+                    <button class="btn btn-success bg-green-600 hover:bg-green-700 print-button" @click="generateAndPrintPDF">Print PDF</button>
                 </div>
             </div>
         </div>
     </div>
 </template>
-  
+
 <script>
 import axios from 'axios';
-
+import jsPDF from 'jspdf';
 export default {
     data() {
         return {
-            orders: [],
+            orders: [], 
+
             selectedOrder: null,
         };
     },
     created() {
-        // Fetch data from your API and update the orders array
-        axios.get('/order') // Replace with your API endpoint
+        axios.get('/reports') // Replace with your API endpoint
             .then(response => {
                 this.orders = response.data.data.items; // Assuming 'items' contains the list of orders
             })
@@ -129,38 +109,54 @@ export default {
             });
     },
     methods: {
-
-        cancelEditingStatus(order) {
-            // Reset the isEditing property to false
-            order.isEditing = false;
-
-            // Optionally, you can revert the newStatus to the original status
-            // This step is optional and depends on your use case
-            order.newStatus = order.status;
+        printInvoice() {
+            // Trigger the print action
+            window.print();
         },
-        startEditingStatus(order) {
-            order.isEditing = true;
-            order.newStatus = order.status; // Initialize newStatus with the current status
-        },
-        updateStatus(order) {
-            const newStatus = parseInt(order.newStatus);
+generateAndPrintPDF() {
+  if (this.selectedOrder) {
+    // Create a new PDF document
+    const pdf = new jsPDF();
 
-            axios
-                .put(`/order/${order._id}`, { status: newStatus }) // Replace with your endpoint and data structure
-                .then(response => {
-                    if (response.status === 200) {
-                        // The server has successfully updated the order status
-                        order.status = newStatus; // Update the status locally
-                        order.isEditing = false; // Exit edit mode
-                        console.log('Order status updated successfully:', response.data);
-                    } else {
-                        console.error('Failed to update order status. Server returned:', response.status);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error updating order status', error);
-                });
-        },
+    // Set the font size and style for the content
+    pdf.setFontSize(14);
+    pdf.setFont('Arial', 'normal');
+
+    // Get the current date
+    const currentDate = new Date().toLocaleDateString();
+
+    // Define the content of the PDF with the current date
+    const content = `
+      Blue-Technology
+      Invoice Details
+      ----------------------------
+      Date: ${currentDate}
+      Customer Name: ${this.selectedOrder.orderId.fullName}
+      Payment Method: ${this.mapPaymentMethod(this.selectedOrder.orderId.paymentMethod)}
+      Status: ${this.mapStatus(this.selectedOrder.status)}
+      Phone Number: ${this.selectedOrder.orderId.phoneNumber}
+      Email: ${this.selectedOrder.orderId.userId.email}
+      Address: ${this.selectedOrder.orderId.address}
+      Order ID: ${this.selectedOrder.orderId._id}
+      Invoice ID: ${this.selectedOrder._id}
+      
+      Item: ${this.selectedOrder.orderId.subProductId.title}
+      Price: ${this.selectedOrder.price} $
+
+      -----------------------------------
+      Thank you for your purchase!
+    `;
+
+    // Add the content to the PDF with proper line spacing
+    pdf.text(content, 10, 10);
+
+    // Print the PDF in a new window
+    pdf.autoPrint();
+    pdf.output('dataurlnewwindow');
+  }
+},
+
+
         viewOrder(order) {
             // Set the selectedOrder and open the modal
             this.selectedOrder = order;
@@ -221,7 +217,15 @@ export default {
 span {
     margin-left: 2px;
 }
+.print-button {
+    display: inline-block;
+}
 
+@media print {
+    .print-button {
+        display: none;
+    }
+}
 .status-dropdown-sm {
     display: flex;
     align-items: center;

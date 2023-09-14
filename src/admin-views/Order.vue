@@ -80,9 +80,9 @@
             <p><strong>Payment Method:</strong> {{ mapPaymentMethod(selectedOrder.paymentMethod) }}</p>
             <p><strong>Status:</strong> <span :class="getStatusTextClass(selectedOrder.status)"
                 style="font-weight: bold;">{{ mapStatus(selectedOrder.status) }}</span></p>
-            <p><strong>phoneNumber:</strong> {{ selectedOrder.phoneNumber }}</p>
+            <p><strong>Phone Number:</strong> {{ selectedOrder.phoneNumber }}</p>
             <p><strong>Email:</strong> {{ selectedOrder.userId.email }}</p>
-            <p><strong>address:</strong> {{ selectedOrder.address }}</p>
+            <p><strong>Address:</strong> {{ selectedOrder.address }}</p>
             <hr>
             <p><strong>Item:</strong> {{ selectedOrder.subProductId.title }}</p>
             <p><strong>Price:</strong> {{ selectedOrder.subProductId.price }}<span> $</span></p>
