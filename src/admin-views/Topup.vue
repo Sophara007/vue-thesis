@@ -10,6 +10,7 @@
             <th scope="col">Customer Name</th>
             <th scope="col">Email</th>
             <th scope="col">Amount</th>
+            <th scope="col">Created At</th>
             <th scope="col">Status</th>
             <th scope="col">Actions</th>
           </tr>
@@ -20,6 +21,7 @@
             <td>{{ topup.userId.fullName }}</td>
             <td>{{ topup.userId.email }}</td>
             <td>{{ topup.amount }} $</td>
+            <td>{{formatDate(topup.createdAt) }}</td>
             <td>
               <span :class="getStatusClass(topup.status)" style="font-weight: bold;">
                 <span v-if="!topup.isEditing" @click="startEditingStatus(topup)">
@@ -114,6 +116,19 @@ export default {
       });
   },
   methods: {
+    formatDate(isoDate) {
+      const date = new Date(isoDate);
+      const options = {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false, // 24-hour format
+      };
+      return date.toLocaleDateString('en-US', options);
+    },
     cancelEditingStatus(topup) {
       // Reset the isEditing property to false
       topup.isEditing = false;

@@ -9,6 +9,7 @@
                         <th scope="col">Username</th>
                         <th scope="col">Email</th>
                         <th scope="col">Subject</th>
+                        <th scope="col">Created At</th>
                         <th scope="col">Actions</th>
                     </tr>
                 </thead>
@@ -22,6 +23,7 @@
                         <td>
                             {{ inquiry.subject }}
                         </td>
+                        <td>{{formatDate(inquiry.createdAt) }}</td>
                         <td>
                             <div class="wrapper-action">
                                 <button class="btn btn-info" data-bs-toggle="modal" @click="getOne(inquiry)"
@@ -77,6 +79,19 @@ export default {
         }
     },
     methods: {
+        formatDate(isoDate) {
+      const date = new Date(isoDate);
+      const options = {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false, // 24-hour format
+      };
+      return date.toLocaleDateString('en-US', options);
+    },
         async getInquiry() {
             const inquiries = await axios.get('/messages?limit=100&sortField=_id').then(res => res.data.data.items)
             this.inquiries = inquiries
