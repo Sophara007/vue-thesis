@@ -18,7 +18,7 @@
                     <tr v-for="(order, index) in orders" :key="order._id" :class="getStatusClass(order.status)"
                         style="text-align: center;">
                         <th>{{ index + 1 }}</th>
-                        <td>{{ order.orderId.fullName }}</td>
+                        <td>{{ order.orderId.userId.fullName }}</td>
                         <td>{{ order.price }} $</td>
                         <td>{{ mapPaymentMethod(order.orderId.paymentMethod) }}</td>
                         <td :class="getStatusClass(order.status)">
@@ -65,7 +65,7 @@
                 <div class="modal-body">
                     <!-- Display order details here -->
                     <div v-if="selectedOrder">
-                        <p><strong>Customer Name:</strong> {{ selectedOrder.orderId.fullName }}</p>
+                        <p><strong>Customer Name:</strong> {{ selectedOrder.orderId.userId.fullName }}</p>
                         <p><strong>Payment Method:</strong> {{ mapPaymentMethod(selectedOrder.orderId.paymentMethod) }}</p>
                         <p><strong>Status:</strong> <span :class="getStatusTextClass(selectedOrder.status)"
                                 style="font-weight: bold;">{{ mapStatus(selectedOrder.status) }}</span></p>
@@ -81,7 +81,10 @@
                 </div>
                 <div class="modal-footer">
                     
-                    <button class="btn btn-success bg-green-600 hover:bg-green-700 print-button" @click="generateAndPrintPDF">Print PDF</button>
+                    <button v-if="selectedOrder && selectedOrder.status !== 3"
+        class="btn btn-success bg-green-600 hover:bg-green-700 print-button"
+        @click="generateAndPrintPDF">Print PDF</button>
+
                 </div>
             </div>
         </div>
@@ -91,6 +94,8 @@
 <script>
 import axios from 'axios';
 import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+const logoImageURL = 'https://static.wixstatic.com/media/4ec883_1768ba30e5b14ff28e8f5cdfc17de94a~mv2.png/v1/crop/x_0,y_121,w_505,h_279/fill/w_318,h_170,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/bt-i%20logo%20-%20white%20background%20-%20single%20color%20-%20shaded%20500%20x%20500.png';
 export default {
     data() {
         return {
@@ -100,7 +105,7 @@ export default {
         };
     },
     created() {
-        axios.get('/reports') // Replace with your API endpoint
+        axios.get('/reports?limit=1000') // Replace with your API endpoint
             .then(response => {
                 this.orders = response.data.data.items; // Assuming 'items' contains the list of orders
             })
@@ -113,7 +118,7 @@ export default {
             // Trigger the print action
             window.print();
         },
-generateAndPrintPDF() {
+        generateAndPrintPDF() {
   if (this.selectedOrder) {
     // Create a new PDF document
     const pdf = new jsPDF();
@@ -125,34 +130,70 @@ generateAndPrintPDF() {
     // Get the current date
     const currentDate = new Date().toLocaleDateString();
 
-    // Define the content of the PDF with the current date
-    const content = `
-      Blue-Technology
-      Invoice Details
-      ----------------------------
-      Date: ${currentDate}
-      Customer Name: ${this.selectedOrder.orderId.fullName}
-      Payment Method: ${this.mapPaymentMethod(this.selectedOrder.orderId.paymentMethod)}
-      Status: ${this.mapStatus(this.selectedOrder.status)}
-      Phone Number: ${this.selectedOrder.orderId.phoneNumber}
-      Email: ${this.selectedOrder.orderId.userId.email}
-      Address: ${this.selectedOrder.orderId.address}
-      Order ID: ${this.selectedOrder.orderId._id}
-      Invoice ID: ${this.selectedOrder._id}
-      
-      Item: ${this.selectedOrder.orderId.subProductId.title}
-      Price: ${this.selectedOrder.price} $
+    // Create an array for the table data
+    const tableData = [
+      ['Description', 'Quantity', 'Unit Price', 'Total'],
+      [this.selectedOrder.orderId.subProductId.title, '1', this.selectedOrder.price + ' $', this.selectedOrder.price + ' $'],
+    ];
 
-      -----------------------------------
-      Thank you for your purchase!
-    `;
+    // Define the columns for the table
+    const tableColumns = {
+      startY: 100, // Adjust the starting Y position
+      head: [['Item Description', 'Quantity', 'Unit Price', 'Total']],
+      body: tableData.slice(1), // Exclude the header from the body
+      styles: {
+        cellWidth: 'auto',
+        fontSize: 12,
+        halign: 'center',
+      },
+      columnStyles: {
+        0: { cellWidth: 'auto' },
+        3: { halign: 'right' },
+      },
+    };
 
-    // Add the content to the PDF with proper line spacing
-    pdf.text(content, 10, 10);
+    // Calculate the total amount
+    const totalAmount = this.selectedOrder.price;
 
-    // Print the PDF in a new window
-    pdf.autoPrint();
-    pdf.output('dataurlnewwindow');
+    // Add a header
+    pdf.setFontSize(18);
+    pdf.text('Invoice', 105, 20, null, null, 'center');
+
+    // Load the logo image
+    const logoWidth = 24; // Set the width of the logo
+    const logoHeight = 12; // Set the height of the logo
+    pdf.addImage(logoImageURL, 'PNG', 10, 10, logoWidth, logoHeight); // Adjust the position and size as needed
+    // Add the current date
+    pdf.setFontSize(12);
+    pdf.text(`Date: ${currentDate}`, 10, 30);
+
+    // Add customer details
+    pdf.setFontSize(12);
+    pdf.text(`Customer Name: ${this.selectedOrder.orderId.userId.fullName}`, 10, 40);
+    pdf.text(`Phone Number: ${this.selectedOrder.orderId.phoneNumber}`, 10, 50);
+    pdf.text(`Email: ${this.selectedOrder.orderId.userId.email}`, 10, 60);
+    pdf.text(`Address: ${this.selectedOrder.orderId.address}`, 10, 70);
+    pdf.text(`Payment Method: ${this.mapPaymentMethod(this.selectedOrder.orderId.paymentMethod)}`, 10, 80);
+    pdf.text(`Status: ${this.mapStatus(this.selectedOrder.status)}`, 10, 90);
+
+    // Add Order ID and Invoice ID at the top right
+    pdf.setFontSize(12);
+    pdf.text(`Order ID: ${this.selectedOrder.orderId._id}`, 125, 30); // Further adjusted X-coordinate
+    pdf.text(`Invoice ID: ${this.selectedOrder._id}`, 125, 40); // Further adjusted X-coordinate
+
+    // Add the table to the PDF
+    pdf.autoTable(tableColumns);
+
+    // Add the total amount
+    pdf.setFontSize(14);
+    pdf.text(`Total Amount: ${totalAmount} $`, 10, pdf.autoTable.previous.finalY + 20);
+
+    // Add a thank you message
+    pdf.setFontSize(12);
+    pdf.text('Thank you for your purchase!', 10, pdf.autoTable.previous.finalY + 30);
+
+    // Save or print the PDF
+    pdf.save('invoice.pdf');
   }
 },
 

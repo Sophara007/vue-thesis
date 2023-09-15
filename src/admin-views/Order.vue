@@ -18,7 +18,7 @@
           <tr v-for="(order, index) in orders" :key="order._id" :class="getStatusClass(order.status)"
             style="text-align: center;">
             <th>{{ index + 1 }}</th>
-            <td>{{ order.fullName }}</td>
+            <td>{{ order.userId.fullName }}</td>
             <td>{{ order.subProductId.title }}</td>
             <td>{{ mapPaymentMethod(order.paymentMethod) }}</td>
             <td :class="getStatusClass(order.status)">
@@ -76,7 +76,7 @@
           <!-- Display order details here -->
           <div v-if="selectedOrder">
             <p><strong>Order ID:</strong> {{ selectedOrder._id }}</p>
-            <p><strong>Customer Name:</strong> {{ selectedOrder.fullName }}</p>
+            <p><strong>Customer Name:</strong> {{ selectedOrder.userId.fullName }}</p>
             <p><strong>Payment Method:</strong> {{ mapPaymentMethod(selectedOrder.paymentMethod) }}</p>
             <p><strong>Status:</strong> <span :class="getStatusTextClass(selectedOrder.status)"
                 style="font-weight: bold;">{{ mapStatus(selectedOrder.status) }}</span></p>
@@ -114,7 +114,7 @@ export default {
   },
   created() {
     // Fetch data from your API and update the orders array
-    axios.get('/order') // Replace with your API endpoint
+    axios.get('/order?limit=1000') // Replace with your API endpoint
       .then(response => {
         this.orders = response.data.data.items; // Assuming 'items' contains the list of orders
       })

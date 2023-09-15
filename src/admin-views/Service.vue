@@ -123,7 +123,7 @@ export default {
   methods: {
     async getServices() {
       try {
-        const response = await axios.get("/service-company");
+        const response = await axios.get("/service-company?limit=1000");
         if (
           response.data &&
           response.data.data &&

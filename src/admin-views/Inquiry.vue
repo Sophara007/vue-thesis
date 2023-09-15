@@ -93,7 +93,7 @@ export default {
       return date.toLocaleDateString('en-US', options);
     },
         async getInquiry() {
-            const inquiries = await axios.get('/messages?limit=100&sortField=_id').then(res => res.data.data.items)
+            const inquiries = await axios.get('/messages?limit=1000').then(res => res.data.data.items)
             this.inquiries = inquiries
         },
         async getOne(inquiry) {

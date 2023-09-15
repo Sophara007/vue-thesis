@@ -173,7 +173,7 @@ export default {
 
     async createPartner() {
       try {
-        const createResponse = await axios.post("/slider/partner", this.form);
+        const createResponse = await axios.post("/slider/partner?limit=1000", this.form);
         if (createResponse.status === 201) {
           this.getPartner();
           this.form.title = "";

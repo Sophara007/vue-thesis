@@ -120,7 +120,7 @@ export default {
   methods: {
     async getProducts() {
       try {
-        const response = await axios.get("/product");
+        const response = await axios.get("/product?limit=1000");
         if (response.data && response.data.data && Array.isArray(response.data.data.items)) {
           this.products = response.data.data.items;
         } else {

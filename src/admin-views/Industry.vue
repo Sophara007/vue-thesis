@@ -175,7 +175,7 @@ export default {
     async getIndustries() {
       console.log("Fetching industries...");
       try {
-        const response = await axios.get("/industry");
+        const response = await axios.get("/industry?limit=1000");
         console.log("API response:", response);
         if (response.data && response.data.data && Array.isArray(response.data.data.items)) {
           const industries = response.data.data.items;

@@ -107,7 +107,7 @@ export default {
       Authorization: `Bearer ${token}`,
     };
 
-    axios.get('/topup', { headers }) // Include the headers in the request
+    axios.get('/topup?limit=1000', { headers }) // Include the headers in the request
       .then(response => {
         this.topups = response.data.data.items; // Assuming 'items' contains the list of "Top Up" records
       })

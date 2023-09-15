@@ -21,45 +21,52 @@
         </thead>
         <tbody>
           <tr v-for="(SubProduct, index) in paginatedSubProducts" :key="SubProduct._id" style="text-align: center;">
-              <th>{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th>
+            <th>{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th>
             <td><span class="description">{{ getProductTitleById(SubProduct.productModelId) }}</span></td>
             <td><span class="description">{{ SubProduct.price }} $</span></td>
             <td><span class="description">{{ SubProduct.title }}</span></td>
             <td><span class="description">{{ SubProduct.description }}</span></td>
             <td>
-              <img :src="SubProduct?.image?.url" class="SubProduct-img img-fluid" alt="SubProduct" style="margin: auto;" />
+              <img :src="SubProduct?.image?.url" class="SubProduct-img img-fluid" alt="SubProduct"
+                style="margin: auto;" />
             </td>
             <td>
               <div class="wrapper-action">
-                <button class="btn btn-danger" style="padding: 6px 9px;  font-size: 14px;" @click="deleteSubProduct(SubProduct)">
+                <button class="btn btn-danger" style="padding: 6px 9px;  font-size: 14px;"
+                  @click="deleteSubProduct(SubProduct)">
                   Delete
                 </button>
-                <button class="btn btn-warning ml-2" style="padding: 6px 9px;  font-size: 14px;" @click="openEditModal(SubProduct)">Edit</button>
+                <button class="btn btn-warning ml-2" style="padding: 6px 9px;  font-size: 14px;"
+                  @click="openEditModal(SubProduct)">Edit</button>
               </div>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-    <div class="pagination-container">
-  <ul class="pagination">
-    <li class="page-item">
-      <button class="page-link" @click="currentPage -= 1" :disabled="currentPage === 1">
-        &#9668; Previous
-      </button>
-    </li>
-    <li class="page-item" v-for="page in Math.ceil(SubProducts.length / itemsPerPage)" :key="page">
-      <button class="page-link" @click="currentPage = page" :class="{ active: currentPage === page }">
-        {{ page }}
-      </button>
-    </li>
-    <li class="page-item">
-      <button class="page-link" @click="currentPage += 1" :disabled="currentPage === Math.ceil(SubProducts.length / itemsPerPage)">
-        Next &#9658;
-      </button>
-    </li>
-  </ul>
-</div>
+   <div class="pagination-container">
+    <ul class="pagination">
+      <li class="page-item">
+        <button class="page-link" @click="currentPage -= 1" :disabled="currentPage === 1">
+          &#9668; Previous
+        </button>
+      </li>
+      <li v-for="page in visiblePages" :key="page">
+        <button
+          class="page-link"
+          @click="currentPage = page"
+          :class="{ 'active': currentPage === page }" 
+        >
+          {{ page }}
+        </button>
+      </li>
+      <li class="page-item">
+        <button class="page-link" @click="currentPage += 1" :disabled="currentPage === totalPages">
+          Next &#9658;
+        </button>
+      </li>
+    </ul>
+  </div>
 
   </div>
 
@@ -83,11 +90,11 @@
             </div>
 
             <div class="input-group mt-3">
-  <select class="form-select" v-model="form.productModelId" aria-label="Default select example">
-    <option value="" disabled selected>Select a Product</option> <!-- Placeholder option -->
-    <option v-for="item in productmodels" :key="item._id" :value="item._id">{{ item.title }}</option>
-  </select>
-</div>
+              <select class="form-select" v-model="form.productModelId" aria-label="Default select example">
+                <option value="" disabled selected>Select a Product</option> <!-- Placeholder option -->
+                <option v-for="item in productmodels" :key="item._id" :value="item._id">{{ item.title }}</option>
+              </select>
+            </div>
 
 
           </div>
@@ -113,7 +120,7 @@
             <input type="text" class="form-control" placeholder="Title" v-model="editForm.title" />
             <textarea class="form-control mt-3" rows="4" placeholder="Description"
               v-model="editForm.description"></textarea>
-              <input type="number" class="form-control mt-3" placeholder="Price" v-model="editForm.price" />
+            <input type="number" class="form-control mt-3" placeholder="Price" v-model="editForm.price" />
           </div>
           <div class="input-group mt-3">
             <input ref="editFileInput" type="file" class="form-control" @change="onEditImageChange" />
@@ -142,7 +149,7 @@ export default {
       productmodels: [],
       SubProducts: [],
       currentPage: 1,
-    itemsPerPage: 10,
+      itemsPerPage: 10,
       file: "",
       form: {
         title: "",
@@ -161,16 +168,61 @@ export default {
   },
   computed: {
     paginatedSubProducts() {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    return this.SubProducts.slice(startIndex, endIndex);
+      const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+      const endIndex = startIndex + this.itemsPerPage;
+      return this.SubProducts.slice(startIndex, endIndex);
+    },
+    totalPages() {
+      return Math.ceil(this.SubProducts.length / this.itemsPerPage);
+    },
+    visiblePages() {
+      const maxVisiblePages = 5; // Adjust this value as needed
+      const pages = [];
+
+      if (this.totalPages <= maxVisiblePages) {
+        for (let i = 1; i <= this.totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        if (this.currentPage <= maxVisiblePages - 2) {
+          for (let i = 1; i <= maxVisiblePages - 2; i++) {
+            pages.push(i);
+          }
+          pages.push("...");
+          pages.push(this.totalPages - 1);
+          pages.push(this.totalPages);
+        } else if (this.currentPage >= this.totalPages - maxVisiblePages + 3) {
+          pages.push(1);
+          pages.push(2);
+          pages.push("...");
+          for (let i = this.totalPages - maxVisiblePages + 3; i <= this.totalPages; i++) {
+            pages.push(i);
+          }
+        } else {
+          pages.push(1);
+          pages.push(2);
+          pages.push("...");
+          for (let i = this.currentPage - 1; i <= this.currentPage + 1; i++) {
+            pages.push(i);
+          }
+          pages.push("...");
+          pages.push(this.totalPages - 1);
+          pages.push(this.totalPages);
+        }
+      }
+
+      return pages;
+    },
   },
-},
+  
   methods: {
-    getProductTitleById(productId) {
-    const product = this.productmodels.find(item => item._id === productId);
-    return product ? product.title : '';
+    setCurrentPage(page) {
+    this.currentPage = page;
   },
+    getProductTitleById(productId) {
+      const product = this.productmodels.find(item => item._id === productId);
+      return product ? product.title : '';
+    },
     async onEditImageChange(e) {
       const fileData = e.target.files[0];
       const config = {
@@ -197,53 +249,53 @@ export default {
       $("#editModal").modal("show"); // Use jQuery to open the modal
     },
     async updateSubproductAndClearModal() {
-  try {
-    const updateData = {
-      title: this.editForm.title,
-      price: this.editForm.price,
-      description: this.editForm.description,
-    };
+      try {
+        const updateData = {
+          title: this.editForm.title,
+          price: this.editForm.price,
+          description: this.editForm.description,
+        };
 
-    if (this.editForm.image) {
-      updateData.image = this.editForm.image;
-    }
+        if (this.editForm.image) {
+          updateData.image = this.editForm.image;
+        }
 
-    const updateResponse = await axios.put(`/sub-product/${this.editForm.id}`, updateData);
-    if (updateResponse.status === 200) {
-      await this.getSubProduct(); // Refresh SubProducts array
-      await this.ListProducts(); // Refresh productmodels array
+        const updateResponse = await axios.put(`/sub-product/${this.editForm.id}`, updateData);
+        if (updateResponse.status === 200) {
+          await this.getSubProduct(); // Refresh SubProducts array
+          await this.ListProducts(); // Refresh productmodels array
 
-      this.editForm.id = "";
-      this.editForm.title = "";
-      this.editForm.description = "";
-      this.editForm.price = "";
-      this.editForm.image = "";
-      $("#editModal").modal("hide");
-      Swal.fire({
-        icon: "success",
-        title: "SubProduct Updated!",
-        text: "The SubProduct has been successfully updated.",
-      });
-    }
-  } catch (error) {
-    console.error("Error updating SubProduct:", error);
-    Swal.fire({
-      icon: "error",
-      title: "Update Failed",
-      text: "Failed to update the SubProduct. Please try again.",
-    });
-  }
-},
+          this.editForm.id = "";
+          this.editForm.title = "";
+          this.editForm.description = "";
+          this.editForm.price = "";
+          this.editForm.image = "";
+          $("#editModal").modal("hide");
+          Swal.fire({
+            icon: "success",
+            title: "SubProduct Updated!",
+            text: "The SubProduct has been successfully updated.",
+          });
+        }
+      } catch (error) {
+        console.error("Error updating SubProduct:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Update Failed",
+          text: "Failed to update the SubProduct. Please try again.",
+        });
+      }
+    },
 
 
-async getSubProduct() {
-  try {
-    const response = await axios.get("/sub-product").then(res => res.data.data);
-    this.SubProducts = response;
-  } catch (error) {
-    console.error("Error fetching industries:", error);
-  }
-},
+    async getSubProduct() {
+      try {
+        const response = await axios.get("/sub-product?limit=1000").then(res => res.data.data);
+        this.SubProducts = response;
+      } catch (error) {
+        console.error("Error fetching industries:", error);
+      }
+    },
 
     async deleteSubProduct(SubProduct) {
       try {
@@ -292,33 +344,33 @@ async getSubProduct() {
       this.form.image = upload?._id;
     },
     async createSubProduct() {
-  try {
-    const createResponse = await axios.post("/sub-product", this.form);
+      try {
+        const createResponse = await axios.post("/sub-product", this.form);
 
-    if (createResponse.status === 201) {
-      await this.getSubProduct(); // Refresh SubProducts array
+        if (createResponse.status === 201) {
+          await this.getSubProduct(); // Refresh SubProducts array
 
-      this.form.title = "";
-      this.form.description = ""; // Clear description field
-      this.form.price = "";
-      this.form.image = "";
-      this.showModal = false;
+          this.form.title = "";
+          this.form.description = ""; // Clear description field
+          this.form.price = "";
+          this.form.image = "";
+          this.showModal = false;
 
-      Swal.fire({
-        icon: "success",
-        title: "SubProduct Created!",
-        text: "The SubProduct has been successfully created.",
-      });
-    }
-  } catch (error) {
-    console.error("Error creating SubProduct:", error);
-    Swal.fire({
-      icon: "error",
-      title: "Create Failed",
-      text: "Failed to create the SubProduct. Please try again.",
-    });
-  }
-},
+          Swal.fire({
+            icon: "success",
+            title: "SubProduct Created!",
+            text: "The SubProduct has been successfully created.",
+          });
+        }
+      } catch (error) {
+        console.error("Error creating SubProduct:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Create Failed",
+          text: "Failed to create the SubProduct. Please try again.",
+        });
+      }
+    },
 
     clearFileInput() {
       this.$refs.fileInput.value = '';
@@ -347,9 +399,9 @@ async getSubProduct() {
   },
   async mounted() {
     console.log("Component mounted. Fetching industries..."); // Add this log
-  await this.getSubProduct();
-  await this.ListProducts();
-  this.currentPage = 1; // Set the current page to 1 initially
+    await this.getSubProduct();
+    await this.ListProducts();
+    this.currentPage = 1; // Set the current page to 1 initially
   },
 };
 </script>
@@ -381,6 +433,7 @@ async getSubProduct() {
   height: 100px;
   object-fit: contain;
 }
+
 .pagination-container {
   display: flex;
   justify-content: center;
@@ -439,6 +492,5 @@ async getSubProduct() {
       }
     }
   }
-}
-</style>
+}</style>
   

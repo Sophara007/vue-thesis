@@ -114,7 +114,7 @@ export default {
   methods: {
     async getSlider() {
       const sliders = await axios
-        .get("/slider")
+        .get("/slider?limit=1000")
         .then((res) => res.data);
       this.sliders = sliders;
       console.log((this.sliders = sliders));

@@ -73,7 +73,7 @@ export default {
   methods: {
     async getUser() {
       const users = await axios
-        .get("/users?limit=100&sortField=_id")
+        .get("/users?limit=1000")
         .then((res) => res.data.data.items);
       this.users = users;
     },

@@ -150,7 +150,7 @@ export default {
     },
 
     async listIndustries() {
-      const data = await axios.get('/industry').then(res => res.data.data.items)
+      const data = await axios.get('/industry?limit=1000').then(res => res.data.data.items)
       console.log(data)
       this.listSelect = data
     },

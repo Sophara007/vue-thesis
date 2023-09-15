@@ -138,7 +138,7 @@ export default {
 
     async fetchAdminList() {
       try {
-        const response = await axios.get("/admin");
+        const response = await axios.get("/admin?limit=1000");
         this.adminList = response.data.data.items;
       } catch (error) {
         console.error("Error fetching admin list:", error);
