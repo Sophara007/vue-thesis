@@ -19,7 +19,7 @@
         </thead>
         <tbody>
           <tr v-for="(admin, index) in paginatedadminList" :key="admin.id">
-            <th>{{ index + 1 }}</th>
+            <th>{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th>
             <td>{{ admin.fullname }}</td>
             <td>{{ admin.email }}</td>
             <!-- <td>{{ admin.password }}</td> -->

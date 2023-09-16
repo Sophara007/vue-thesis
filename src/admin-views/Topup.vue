@@ -17,7 +17,7 @@
         </thead>
         <tbody>
           <tr v-for="(topup, index) in paginatedtopups" :key="topup._id" >
-            <th>{{ index + 1 }}</th>
+            <th>{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th>
             <td>{{ topup.userId.fullName }}</td>
             <td>{{ topup.userId.email }}</td>
             <td>{{ topup.amount }} $</td>

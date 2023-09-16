@@ -19,7 +19,7 @@
         </thead>
         <tbody>
           <tr v-for="(product, index) in paginatedproducts" :key="product._id" style="text-align: center;">
-            <th>{{ index + 1 }}</th>
+            <th>{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th>
             <td><span class="description">{{ product.title }}</span></td>
             <td><span class="description">{{ product.description }}</span></td>
             <td>

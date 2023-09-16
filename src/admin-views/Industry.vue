@@ -19,7 +19,7 @@
         </thead>
         <tbody>
           <tr v-for="(industry, index) in paginatedindustries" :key="industry._id" style="text-align: center;">
-            <th>{{ index + 1 }}</th>
+            <th>{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th>
             <td><span class="description">{{ industry.title }}</span></td>
             <td><span class="description">{{ industry.description }}</span></td>
             <td>

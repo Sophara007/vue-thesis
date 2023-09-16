@@ -18,7 +18,7 @@
         </thead>
         <tbody>
           <tr v-for="(slider, index) in paginatedsliders" :key="slider.index" style="text-align: center;">
-            <th>{{ index + 1 }}</th>
+            <th>{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th>
             <td>{{ slider.title }}</td>
             <td>
               <img :src="slider?.image?.url" class="slider-img img-fluid" alt="slider"  style="margin: auto;"/>

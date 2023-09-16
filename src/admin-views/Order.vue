@@ -17,7 +17,7 @@
         <tbody>
           <tr v-for="(order, index) in paginatedorders" :key="order._id" :class="getStatusClass(order.status)"
             style="text-align: center;">
-            <th>{{ index + 1 }}</th>
+            <th>{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th>
             <td>{{ order.userId.fullName }}</td>
             <td>{{ order.subProductId.title }}</td>
             <td>{{ mapPaymentMethod(order.paymentMethod) }}</td>

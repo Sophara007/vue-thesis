@@ -19,7 +19,7 @@
         </thead>
         <tbody>
           <tr v-for="(service, index) in paginatedservices" :key="service._id" style="text-align: center">
-            <th>{{ index + 1 }}</th>
+            <th>{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th>
             <td>{{ service.title }}</td>
             <td><span class="description">{{ service.description }}</span></td>
             <td>

@@ -15,7 +15,7 @@
                 </thead>
                 <tbody>
                     <tr v-for="(inquiry, index) in paginatedinquiries" :key="inquiry.index">
-                        <th>{{ index + 1 }}</th> <!-- Change this line -->
+                      <th>{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th> <!-- Change this line -->
                         <td>{{ inquiry.fullName }}</td>
                         <td>
                             {{ inquiry.email }}

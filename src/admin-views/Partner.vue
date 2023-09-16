@@ -18,7 +18,7 @@
         </thead>
         <tbody>
           <tr v-for="(partner, index) in paginatedpartners" :key="partner.index" style="text-align: center;">
-            <th>{{ index + 1 }}</th>
+            <th>{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th>
             <td>{{ partner.title }}</td>
             <td>
               <img :src="partner?.image?.url" class="partner-img img-fluid" alt="partner"  style="margin: auto;"/>

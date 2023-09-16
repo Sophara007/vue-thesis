@@ -14,7 +14,7 @@
         </thead>
         <tbody>
           <tr v-for="(user, index) in paginatedusers" :key="user.id" >
-            <th>{{ index + 1 }}</th>
+            <th>{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th>
             <td>{{ user.fullName }}</td>
             <td>{{ user.email }}</td>
             <td>{{ user.ballance }} $</td>
