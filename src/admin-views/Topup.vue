@@ -16,7 +16,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(topup, index) in topups" :key="topup._id">
+          <tr v-for="(topup, index) in paginatedtopups" :key="topup._id" >
             <th>{{ index + 1 }}</th>
             <td>{{ topup.userId.fullName }}</td>
             <td>{{ topup.userId.email }}</td>
@@ -49,6 +49,28 @@
         </tbody>
       </table>
     </div>
+    <!-- Only show pagination if there are more than 10 items -->
+    <div class="pagination-container" v-if="topups.length > 10">
+      <ul class="pagination">
+        <li class="page-item">
+  <button class="page-link" @click="currentPage -= 1" :disabled="currentPage === 1">
+    &#8592; Previous
+  </button>
+</li>
+
+        <li v-for="page in visiblePages" :key="page">
+          <button class="page-link" @click="currentPage = page" :class="{ 'active': currentPage === page }">
+            {{ page }}
+          </button>
+        </li>
+        <li class="page-item">
+  <button class="page-link" @click="currentPage += 1" :disabled="currentPage === totalPages">
+    Next &#8594;
+  </button>
+</li>
+
+      </ul>
+    </div>
   </div>
 
   <!-- Modal for viewing top-up details -->
@@ -75,7 +97,7 @@
               <p><strong>Transaction Photo:</strong></p>
               <img
         :src="selectedTopUp.transactionPhoto.url"
-        :class="{ 'subProduct-img': selectedTopUp.hasPadding }" 
+        :class="{ 'topups-img': selectedTopUp.hasPadding }" 
         alt="Transaction Photo"
         class="img-fluid"
       />
@@ -99,7 +121,59 @@ export default {
     return {
       topups: [],
       selectedTopUp: null,
+      currentPage: 1,
+      itemsPerPage: 10,
+      limit: 1000, // Default limit
+      page: 1,   // Default page
     };
+  },
+  computed: {
+    paginatedtopups() {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return this.topups.slice(startIndex, endIndex); // Change this line
+  },
+    totalPages() {
+      return Math.ceil(this.topups.length / this.itemsPerPage);
+    },
+    visiblePages() {
+      const maxVisiblePages = 5; // Adjust this value as needed
+      const pages = [];
+
+      if (this.totalPages <= maxVisiblePages) {
+        for (let i = 1; i <= this.totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        if (this.currentPage <= maxVisiblePages - 2) {
+          for (let i = 1; i <= maxVisiblePages - 2; i++) {
+            pages.push(i);
+          }
+          pages.push("...");
+          pages.push(this.totalPages - 1);
+          pages.push(this.totalPages);
+        } else if (this.currentPage >= this.totalPages - maxVisiblePages + 3) {
+          pages.push(1);
+          pages.push(2);
+          pages.push("...");
+          for (let i = this.totalPages - maxVisiblePages + 3; i <= this.totalPages; i++) {
+            pages.push(i);
+          }
+        } else {
+          pages.push(1);
+          pages.push(2);
+          pages.push("...");
+          for (let i = this.currentPage - 1; i <= this.currentPage + 1; i++) {
+            pages.push(i);
+          }
+          pages.push("...");
+          pages.push(this.totalPages - 1);
+          pages.push(this.totalPages);
+        }
+      }
+
+      return pages;
+    },
   },
   created() {
     const token = localStorage.getItem('token'); // Get the token from local storage
@@ -107,15 +181,21 @@ export default {
       Authorization: `Bearer ${token}`,
     };
 
-    axios.get('/topup?limit=1000', { headers }) // Include the headers in the request
-      .then(response => {
-        this.topups = response.data.data.items; // Assuming 'items' contains the list of "Top Up" records
-      })
-      .catch(error => {
-        console.error('Error fetching data', error);
-      });
+    axios.get(`/topup?limit=${this.limit}&page=${this.page}`, { headers })
+  .then(response => {
+    this.topups = response.data.data.items;
+    console.log('Fetched top-ups:', this.topups); // Add this line for debugging
+  })
+  .catch(error => {
+    console.error('Error fetching data', error);
+  });
+
+
   },
   methods: {
+    setCurrentPage(page) {
+      this.currentPage = page;
+    },
     formatDate(isoDate) {
       const date = new Date(isoDate);
       const options = {
@@ -213,6 +293,22 @@ export default {
       }
     },
   },
+  async mounted() {
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const limitParam = urlParams.get('limit');
+    const pageParam = urlParams.get('page');
+
+    // Update limit and page with query parameter values if provided
+    if (limitParam) {
+      this.limit = parseInt(limitParam);
+    }
+    if (pageParam) {
+      this.page = parseInt(pageParam);
+    }
+
+
+  },
 };
 </script>
   
@@ -224,6 +320,52 @@ export default {
   /* Adjust the gap as needed */
 }
 
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.pagination {
+  display: flex;
+  list-style: none;
+  padding: 0;
+}
+
+.page-item {
+  margin: 0;
+}
+
+.page-link {
+  display: inline-block;
+  padding: 4px 8px;
+  font-size: 12px;
+  border: 1px solid #ddd;
+  background-color: #f9f9f9;
+  color: #333;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.page-link.active {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.page-link:hover {
+  background-color: #e9e9e9;
+}
+
+.page-link:disabled {
+  background-color: #ddd;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.page-link:focus {
+  outline: none;
+  box-shadow: none;
+}
 
 /* Adjust the font size and padding for the smaller buttons */
 .smaller-btn {
@@ -318,7 +460,7 @@ h1 {
    
   }
   
-  .subProduct-img {
+  .topups-img {
   margin-left: 2px;
   padding: 10px; /* Adjust the padding to your preferred size */
   max-width: 400px; /* Limit the maximum width */

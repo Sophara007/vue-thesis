@@ -9,7 +9,7 @@
     <div class="wrapper-table">
       <table class="table">
         <thead>
-          <tr style="text-align: center;">
+          <tr style="text-align: left;">
             <th scope="col" style="width: 5%;">No</th>
             <th scope="col" style="width: 18%;">Sub Product of</th>
             <th scope="col" style="width: 10%;">Price</th>
@@ -20,7 +20,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(SubProduct, index) in paginatedSubProducts" :key="SubProduct._id" style="text-align: center;">
+          <tr v-for="(SubProduct, index) in paginatedSubProducts" :key="SubProduct._id" >
             <th>{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th>
             <td><span class="description">{{ getProductTitleById(SubProduct.productModelId) }}</span></td>
             <td><span class="description">{{ SubProduct.price }} $</span></td>
@@ -44,29 +44,26 @@
         </tbody>
       </table>
     </div>
-   <div class="pagination-container">
-    <ul class="pagination">
-      <li class="page-item">
-        <button class="page-link" @click="currentPage -= 1" :disabled="currentPage === 1">
-          &#9668; Previous
-        </button>
-      </li>
-      <li v-for="page in visiblePages" :key="page">
-        <button
-          class="page-link"
-          @click="currentPage = page"
-          :class="{ 'active': currentPage === page }" 
-        >
-          {{ page }}
-        </button>
-      </li>
-      <li class="page-item">
-        <button class="page-link" @click="currentPage += 1" :disabled="currentPage === totalPages">
-          Next &#9658;
-        </button>
-      </li>
-    </ul>
-  </div>
+    <div class="pagination-container" v-if="SubProducts.length > 10">
+      <ul class="pagination">
+        <li class="page-item">
+          <button class="page-link" @click="currentPage -= 1" :disabled="currentPage === 1">
+            &#8592; Previous
+          </button>
+        </li>
+        <li v-for="page in visiblePages" :key="page">
+          <button class="page-link" @click="currentPage = page" :class="{ 'active': currentPage === page }">
+            {{ page }}
+          </button>
+        </li>
+        <li class="page-item">
+          <button class="page-link" @click="currentPage += 1" :disabled="currentPage === totalPages">
+            Next &#8594;
+          </button>
+        </li>
+
+      </ul>
+    </div>
 
   </div>
 
@@ -150,6 +147,8 @@ export default {
       SubProducts: [],
       currentPage: 1,
       itemsPerPage: 10,
+      limit: 1000, // Default limit
+      page: 1,   // Default page
       file: "",
       form: {
         title: "",
@@ -214,11 +213,11 @@ export default {
       return pages;
     },
   },
-  
+
   methods: {
     setCurrentPage(page) {
-    this.currentPage = page;
-  },
+      this.currentPage = page;
+    },
     getProductTitleById(productId) {
       const product = this.productmodels.find(item => item._id === productId);
       return product ? product.title : '';
@@ -290,7 +289,7 @@ export default {
 
     async getSubProduct() {
       try {
-        const response = await axios.get("/sub-product?limit=1000").then(res => res.data.data);
+        const response = await axios.get(`/sub-product?limit=${this.limit}&page=${this.page}`).then(res => res.data.data);
         this.SubProducts = response;
       } catch (error) {
         console.error("Error fetching industries:", error);
@@ -399,9 +398,20 @@ export default {
   },
   async mounted() {
     console.log("Component mounted. Fetching industries..."); // Add this log
+    const urlParams = new URLSearchParams(window.location.search);
+    const limitParam = urlParams.get('limit');
+    const pageParam = urlParams.get('page');
+
+    // Update limit and page with query parameter values if provided
+    if (limitParam) {
+      this.limit = parseInt(limitParam);
+    }
+    if (pageParam) {
+      this.page = parseInt(pageParam);
+    }
+
     await this.getSubProduct();
     await this.ListProducts();
-    this.currentPage = 1; // Set the current page to 1 initially
   },
 };
 </script>
@@ -492,5 +502,6 @@ export default {
       }
     }
   }
-}</style>
+}
+</style>
   

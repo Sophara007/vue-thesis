@@ -15,7 +15,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(order, index) in orders" :key="order._id" :class="getStatusClass(order.status)"
+                    <tr v-for="(order, index) in paginatedorders" :key="order._id" :class="getStatusClass(order.status)"
                         style="text-align: center;">
                         <th>{{ index + 1 }}</th>
                         <td>{{ order.orderId.userId.fullName }}</td>
@@ -41,6 +41,27 @@
                 </tbody>
             </table>
         </div>
+        <!-- Only show pagination if there are more than 10 items -->
+    <div class="pagination-container" v-if="orders.length > 10">
+      <ul class="pagination">
+        <li class="page-item">
+          <button class="page-link" @click="currentPage -= 1" :disabled="currentPage === 1">
+            &#8592; Previous
+          </button>
+        </li>
+        <li v-for="page in visiblePages" :key="page">
+          <button class="page-link" @click="currentPage = page" :class="{ 'active': currentPage === page }">
+            {{ page }}
+          </button>
+        </li>
+        <li class="page-item">
+          <button class="page-link" @click="currentPage += 1" :disabled="currentPage === totalPages">
+            Next &#8594;
+          </button>
+        </li>
+
+      </ul>
+    </div>
     </div>
 
     <!-- Modal for creating an order -->
@@ -100,20 +121,78 @@ export default {
     data() {
         return {
             orders: [], 
+            currentPage: 1,
+      itemsPerPage: 10,
+      limit: 1000, // Default limit
+      page: 1,   // Default page
 
             selectedOrder: null,
         };
     },
+    computed: {
+    paginatedorders() {
+      const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+      const endIndex = startIndex + this.itemsPerPage;
+      return this.orders.slice(startIndex, endIndex);
+
+    },
+    totalPages() {
+      return Math.ceil(this.orders.length / this.itemsPerPage);
+    },
+
+    visiblePages() {
+      const maxVisiblePages = 5; // Adjust this value as needed
+      const pages = [];
+
+      if (this.totalPages <= maxVisiblePages) {
+        for (let i = 1; i <= this.totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        if (this.currentPage <= maxVisiblePages - 2) {
+          for (let i = 1; i <= maxVisiblePages - 2; i++) {
+            pages.push(i);
+          }
+          pages.push("...");
+          pages.push(this.totalPages - 1);
+          pages.push(this.totalPages);
+        } else if (this.currentPage >= this.totalPages - maxVisiblePages + 3) {
+          pages.push(1);
+          pages.push(2);
+          pages.push("...");
+          for (let i = this.totalPages - maxVisiblePages + 3; i <= this.totalPages; i++) {
+            pages.push(i);
+          }
+        } else {
+          pages.push(1);
+          pages.push(2);
+          pages.push("...");
+          for (let i = this.currentPage - 1; i <= this.currentPage + 1; i++) {
+            pages.push(i);
+          }
+          pages.push("...");
+          pages.push(this.totalPages - 1);
+          pages.push(this.totalPages);
+        }
+      }
+
+      return pages;
+    },
+  },
     created() {
-        axios.get('/reports?limit=1000') // Replace with your API endpoint
-            .then(response => {
-                this.orders = response.data.data.items; // Assuming 'items' contains the list of orders
-            })
-            .catch(error => {
-                console.error('Error fetching data', error);
-            });
+        axios.get(`/reports?limit=${this.limit}&page=${this.page}`) // Replace with your API endpoint
+  .then(response => {
+    this.orders = response.data.data.items; // Assuming 'items' contains the list of orders
+  })
+  .catch(error => {
+    console.error('Error fetching data', error);
+  });
+
     },
     methods: {
+        setCurrentPage(page) {
+      this.currentPage = page;
+    },
         printInvoice() {
             // Trigger the print action
             window.print();
@@ -251,10 +330,71 @@ export default {
             }
         },
     },
+    async mounted() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const limitParam = urlParams.get('limit');
+    const pageParam = urlParams.get('page');
+
+    // Update limit and page with query parameter values if provided
+    if (limitParam) {
+      this.limit = parseInt(limitParam);
+    }
+    if (pageParam) {
+      this.page = parseInt(pageParam);
+    }
+  
+  },
 };
 </script>
   
 <style lang="scss" scoped>
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.pagination {
+  display: flex;
+  list-style: none;
+  padding: 0;
+}
+
+.page-item {
+  margin: 0;
+}
+
+.page-link {
+  display: inline-block;
+  padding: 4px 8px;
+  font-size: 12px;
+  border: 1px solid #ddd;
+  background-color: #f9f9f9;
+  color: #333;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.page-link.active {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.page-link:hover {
+  background-color: #e9e9e9;
+}
+
+.page-link:disabled {
+  background-color: #ddd;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.page-link:focus {
+  outline: none;
+  box-shadow: none;
+}
+
 span {
     margin-left: 2px;
 }
