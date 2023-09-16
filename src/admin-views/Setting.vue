@@ -67,6 +67,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+ h1 {
+    font-size: 24px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
     .btn {
       color: green;
 
