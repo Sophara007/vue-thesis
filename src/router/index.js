@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
-import Signup from '@/views/Signup.vue';
+
 import AdminPanel from '@/views/AdminPanel.vue';
 
 import User from '@/admin-views/Users.vue';
@@ -26,16 +26,16 @@ const routes = [
   {
     path: '/',
     component: Home,
+    meta: {
+      title: 'Welcome To BlueTech' // Specify the title for the Product page
+    }
   },
   {
     path: '/logout',
     component: Logout,
   },
 
-  {
-    path: '/signup',
-    component: Signup,
-  },
+
   {
     path: '/admin',
     component: AdminPanel,
@@ -48,83 +48,131 @@ const routes = [
         name: 'HomePage',
         path: '/home',
         component: HomePage,
+        meta: {
+          title: 'Home-Dashboard | BlueTech' // Specify the title for the Product page
+        }
       },
       {
         name: 'Slider',
         path: '/slider',
         component: Slider,
+        meta: {
+          title: 'Homepage-Slider | BlueTech' // Specify the title for the Product page
+        }
       },
       {
         name: 'Invoice',
         path: '/invoice',
         component: Invoice,
+        meta: {
+          title: 'Invoice | BlueTech' // Specify the title for the Product page
+        }
       },
       {
         name: 'Service',
         path: '/service',
         component: Service,
+        meta: {
+          title: 'Service | BlueTech' // Specify the title for the Product page
+        }
       },
       {
         name: 'Industry',
         path: '/industry',
         component: Industry,
+        meta: {
+          title: 'Industry | BlueTech' // Specify the title for the Product page
+        }
       },
       {
         name: 'IndustryDetail',
         path: '/industrydetail',
         component: IndustryDetail,
+        meta: {
+          title: 'Industry-Detail | BlueTech' // Specify the title for the Product page
+        }
       },
       {
         name: 'Partner',
         path: '/partner',
         component: Partner,
+        meta: {
+          title: 'Partner | BlueTech' // Specify the title for the Product page
+        }
       },
       {
         name: 'Order',
         path: '/order',
         component: Order,
+        meta: {
+          title: 'Order | BlueTech' // Specify the title for the Product page
+        }
       },
       {
         name: 'Topup',
         path: '/topup',
         component: Topup,
+        meta: {
+          title: 'Top up | BlueTech' // Specify the title for the Product page
+        }
       },
       {
         name: 'Product',
         path: '/product',
         component: Product,
+        meta: {
+          title: 'Product | BlueTech' // Specify the title for the Product page
+        }
       },
       {
         name: 'SubProduct',
         path: '/subproduct',
         component: SubProduct,
+        meta: {
+          title: 'Sub-Product | BlueTech' // Specify the title for the Product page
+        }
       },
       {
         name: 'CompanyInfo',
         path: '/setting',
         component: Setting,
+        meta: {
+          title: 'Info-Setting | BlueTech' // Specify the title for the Product page
+        }
       },
       {
         name: "User",
         path: '/admin/users',
         component: User,
-        meta: { requiresAuth: true },
-      },
+        meta: {
+          title: 'User | BlueTech', // Specify the title for the User Management page
+          requiresAuth: true
+        },
+      },      
       {
         name: "Inquiry",
         path: '/admin/inquiry',
         component: Inquiry,
-        meta: { requiresAuth: true },
+        meta: { 
+          title: 'Inquiry | BlueTech',
+          requiresAuth: true },
       },
       {
         name: "AdminUser",
         path: '/admin/create-admin',
         component: AdminUser,
-        meta: { requiresAuth: true },
+        meta: { 
+          title: 'Admin-User | BlueTech',
+          requiresAuth: true },
       },
       {
+        name: 'AdminSetting',
         path: '/admin/setting',
-        component: Admin
+        component: Admin,
+        meta: {
+          title: 'Admin Setting | BlueTech',
+          requiresAuth: true, // Require authentication for this route
+        },
       },
     ],
   },
@@ -132,6 +180,9 @@ const routes = [
   {
     path: '/:catchAll(.*)',
     redirect: '/admin',
+    meta: {
+      requiresAuth: true, // Require authentication for the Catch-All Route
+    },
   },
 ];
 

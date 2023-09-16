@@ -10,6 +10,7 @@
                         <th scope="col">Customer Name</th>
                         <th scope="col">Price</th>
                         <th scope="col">Payment Method</th>
+                        <th scope="col">Created At</th>
                         <th scope="col">Status</th>
                         <th scope="col">Actions</th>
                     </tr>
@@ -21,6 +22,7 @@
                         <td>{{ order.orderId.userId.fullName }}</td>
                         <td>{{ order.price }} $</td>
                         <td>{{ mapPaymentMethod(order.orderId.paymentMethod) }}</td>
+                        <td>{{ formatDate(order.createdAt) }}</td>
                         <td :class="getStatusClass(order.status)">
                             <span :class="getStatusTextClass(order.status)" style="font-weight: bold;">
                                 {{ mapStatus(order.status) }}
@@ -190,6 +192,19 @@ export default {
 
     },
     methods: {
+        formatDate(isoDate) {
+      const date = new Date(isoDate);
+      const options = {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false, // 24-hour format
+      };
+      return date.toLocaleDateString('en-US', options);
+    },
         setCurrentPage(page) {
       this.currentPage = page;
     },
