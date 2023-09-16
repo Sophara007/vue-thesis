@@ -9,7 +9,7 @@
     <div class="wrapper-table">
       <table class="table">
         <thead>
-          <tr style="text-align: left;">
+          <tr style="text-align: center;">
             <th scope="col" style="width: 5%;">No</th>
             <th scope="col" style="width: 18%;">Sub Product of</th>
             <th scope="col" style="width: 10%;">Price</th>
@@ -20,7 +20,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(SubProduct, index) in paginatedSubProducts" :key="SubProduct._id" >
+          <tr v-for="(SubProduct, index) in paginatedSubProducts" :key="SubProduct._id" style="text-align: center;" >
             <th>{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th>
             <td><span class="description">{{ getProductTitleById(SubProduct.productModelId) }}</span></td>
             <td><span class="description">{{ SubProduct.price }} $</span></td>

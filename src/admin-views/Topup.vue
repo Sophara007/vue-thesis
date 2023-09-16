@@ -23,25 +23,29 @@
             <td>{{ topup.amount }} $</td>
             <td>{{formatDate(topup.createdAt) }}</td>
             <td>
-              <span :class="getStatusClass(topup.status)" style="font-weight: bold;">
-                <span v-if="!topup.isEditing" @click="startEditingStatus(topup)">
-                  {{ mapStatus(topup.status) }}
-                  <i class="fa fa-pencil ml-2" style="cursor: pointer;"></i> <!-- Edit icon -->
-                </span>
-                <span v-else>
-                  <!-- Use a div with a class for styling instead of the select element -->
-                  <div class="status-dropdown-sm">
-                    <select v-model="topup.newStatus" class="form-select form-select-sm">
-                      <option value="1">Pending</option>
-                      <option value="2">Agreed</option>
-                      <option value="3">Rejected</option>
-                    </select>
-                  </div>
-                  <button class="btn btn-primary btn-sm smaller-btn" @click="updateStatus(topup)">Save</button>
-                  <button class="btn btn-secondary btn-sm smaller-btn" @click="cancelEditingStatus(topup)">Cancel</button>
-                </span>
-              </span>
-            </td>
+  <span :class="getStatusClass(topup.status)" style="font-weight: bold;">
+    <span v-if="!topup.isEditing">
+      {{ mapStatus(topup.status) }}
+    </span>
+    <span v-else>
+      <span v-if="topup.status !== 2 && topup.status !== 3">
+        <!-- Only show if status is not Agreed or Rejected -->
+        <div class="status-dropdown-sm">
+          <select v-model="topup.newStatus" class="form-select form-select-sm">
+            <option value="1">Pending</option>
+            <option value="2">Agreed</option>
+            <option value="3">Rejected</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-sm smaller-btn" @click="updateStatus(topup)">Save</button>
+        <button class="btn btn-secondary btn-sm smaller-btn" @click="cancelEditingStatus(topup)">Cancel</button>
+      </span>
+    </span>
+    <i v-if="!topup.isEditing && topup.status === 1" class="fa fa-pencil ml-2" style="cursor: pointer;"
+       @click="startEditingStatus(topup)"></i> <!-- Edit icon -->
+  </span>
+</td>
+
             <td>
               <button class="btn btn-primary" @click="viewTopUp(topup)">View</button>
             </td>
@@ -79,9 +83,9 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="viewModalLabel">View Top-Up Details</h5>
-          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" @click="closeViewModal">
+          <!-- <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" @click="closeViewModal">
             <span aria-hidden="true">&times;</span>
-          </button>
+          </button> -->
         </div>
         <div class="modal-body">
           <!-- Display top-up details here -->
@@ -106,7 +110,8 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary bg-danger text-white" data-bs-dismiss="modal" @click="closeViewModal">Close</button>
+          <button type="button" class="btn btn-secondary bg-red-500 hover:bg-red-600 text-white" data-bs-dismiss="modal"
+            @click="closeViewModal">Close</button>
         </div>
       </div>
     </div>
@@ -218,8 +223,11 @@ export default {
       topup.newStatus = topup.status;
     },
     startEditingStatus(topup) {
-      topup.isEditing = true;
-      topup.newStatus = topup.status; // Initialize newStatus with the current status
+      // Allow editing only if the status is "Pending"
+      if (topup.status === 1) {
+        topup.isEditing = true;
+        topup.newStatus = topup.status; // Initialize newStatus with the current status
+      }
     },
     updateStatus(topup) {
   // Store the new status before making the API call

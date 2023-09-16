@@ -22,25 +22,31 @@
             <td>{{ order.subProductId.title }}</td>
             <td>{{ mapPaymentMethod(order.paymentMethod) }}</td>
             <td :class="getStatusClass(order.status)">
-              <span :class="getStatusTextClass(order.status)" style="font-weight: bold;">
-                <span v-if="!order.isEditing" @click="startEditingStatus(order)">
-                  {{ mapStatus(order.status) }}
-                  <i class="fa fa-pencil ml-2" style="cursor: pointer;"></i> <!-- Edit icon -->
-                </span>
-                <span v-else>
-                  <!-- Use a div with a class for styling instead of the select element -->
-                  <div class="status-dropdown-sm">
-                    <select v-model="order.newStatus" class="form-select form-select-sm">
-                      <option value="1">Pending</option>
-                      <option value="2">Agreed</option>
-                      <option value="3">Rejected</option>
-                    </select>
-                  </div>
-                  <button class="btn btn-primary btn-sm smaller-btn" @click="updateStatus(order)">Save</button>
-                  <button class="btn btn-secondary btn-sm smaller-btn" @click="cancelEditingStatus(order)">Cancel</button>
-                </span>
-              </span>
-            </td>
+  <span :class="getStatusTextClass(order.status)" style="font-weight: bold;">
+    <span v-if="!order.isEditing">
+      {{ mapStatus(order.status) }}
+    </span>
+    <span v-else>
+      <span v-if="order.status !== 2 && order.status !== 3">
+        <!-- Only show if status is not Agreed or Rejected -->
+        <div class="status-dropdown-sm">
+          <select v-model="order.newStatus" class="form-select form-select-sm">
+            <option value="1">Pending</option>
+            <option value="2">Agreed</option>
+            <option value="3">Rejected</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-sm smaller-btn" @click="updateStatus(order)">Save</button>
+        <button class="btn btn-secondary btn-sm smaller-btn" @click="cancelEditingStatus(order)">Cancel</button>
+      </span>
+    </span>
+    <i v-if="!order.isEditing && order.status === 1" class="fa fa-pencil ml-2" style="cursor: pointer;"
+       @click="startEditingStatus(order)"></i> <!-- Edit icon -->
+  </span>
+</td>
+
+
+
 
             <td>
               <button class="btn btn-primary" @click="viewOrder(order)">
@@ -89,9 +95,9 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="viewModalLabel">View Order Details</h5>
-          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" @click="closeViewModal">
+          <!-- <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" @click="closeViewModal">
             <span aria-hidden="true">&times;</span>
-          </button>
+          </button> -->
         </div>
         <div class="modal-body">
           <!-- Display order details here -->
@@ -190,12 +196,12 @@ export default {
   created() {
     // Fetch data from your API and update the orders array
     axios.get(`/order?limit=${this.limit}&page=${this.page}`) // Replace with your API endpoint
-  .then(response => {
-    this.orders = response.data.data.items; // Assuming 'items' contains the list of orders
-  })
-  .catch(error => {
-    console.error('Error fetching data', error);
-  });
+      .then(response => {
+        this.orders = response.data.data.items; // Assuming 'items' contains the list of orders
+      })
+      .catch(error => {
+        console.error('Error fetching data', error);
+      });
 
   },
   methods: {
@@ -211,28 +217,31 @@ export default {
       order.newStatus = order.status;
     },
     startEditingStatus(order) {
-      order.isEditing = true;
-      order.newStatus = order.status; // Initialize newStatus with the current status
+      // Allow editing only if the status is "Pending"
+      if (order.status === 1) {
+        order.isEditing = true;
+        order.newStatus = order.status; // Initialize newStatus with the current status
+      }
     },
     updateStatus(order) {
-  const newStatus = parseInt(order.newStatus);
+      const newStatus = parseInt(order.newStatus);
 
-  axios
-    .put(`/order/${order._id}`, { status: newStatus }) // Replace with your endpoint and data structure
-    .then(response => {
-      if (response.status === 200) {
-        // The server has successfully updated the order status
-        order.status = newStatus; // Update the status locally
-        order.isEditing = false; // Exit edit mode
-        console.log('Order status updated successfully:', response.data);
-      } else {
-        console.error('Failed to update order status. Server returned:', response.status);
-      }
-    })
-    .catch(error => {
-      console.error('Error updating order status', error);
-    });
-},
+      axios
+        .put(`/order/${order._id}`, { status: newStatus }) // Replace with your endpoint and data structure
+        .then(response => {
+          if (response.status === 200) {
+            // The server has successfully updated the order status
+            order.status = newStatus; // Update the status locally
+            order.isEditing = false; // Exit edit mode
+            console.log('Order status updated successfully:', response.data);
+          } else {
+            console.error('Failed to update order status. Server returned:', response.status);
+          }
+        })
+        .catch(error => {
+          console.error('Error updating order status', error);
+        });
+    },
     viewOrder(order) {
       // Set the selectedOrder and open the modal
       this.selectedOrder = order;
@@ -298,7 +307,7 @@ export default {
     if (pageParam) {
       this.page = parseInt(pageParam);
     }
-  
+
   },
 };
 </script>

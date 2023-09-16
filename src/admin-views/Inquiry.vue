@@ -82,10 +82,10 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success">
-                        Close
-                    </button>
-                </div>
+          <button type="button" class="btn btn-secondary bg-red-500 hover:bg-red-600 text-white" data-bs-dismiss="modal"
+            @click="closeViewModal">Close</button>
+        </div>
+
             </div>
         </div>
     </div>
