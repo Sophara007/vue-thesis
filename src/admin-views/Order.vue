@@ -1,6 +1,23 @@
 <template>
   <div class="order-page container-fluid">
     <h1>Order Management</h1>
+<!-- Move the search bar and buttons to the right -->
+<div class="d-flex justify-content-end mb-3">
+    <div class="input-group input-group-sm" style="max-width: 150px;">
+        <input
+            type="text"
+            class="form-control form-control-sm"
+            placeholder="Search by Order ID"
+            v-model="searchOrderID"
+        />
+    </div>
+    <button class="btn btn-sm btn-primary" @click="searchOrderByID">
+        <i class="fas fa-search"></i> <!-- Font Awesome search icon -->
+    </button>
+    <button class="btn btn-sm btn-secondary" @click="resetSearch">Reset</button>
+</div>
+
+
 
     <div class="wrapper-table">
       <table class="table">
@@ -10,6 +27,7 @@
             <th scope="col">Customer Name</th>
             <th scope="col">Item</th>
             <th scope="col">Payment Method</th>
+            <th scope="col">Created At</th>
             <th scope="col">Status</th>
             <th scope="col">Actions</th>
           </tr>
@@ -21,6 +39,7 @@
             <td>{{ order.userId.fullName }}</td>
             <td>{{ order.subProductId.title }}</td>
             <td>{{ mapPaymentMethod(order.paymentMethod) }}</td>
+            <td>{{ formatDate(order.createdAt) }}</td>
             <td :class="getStatusClass(order.status)">
   <span :class="getStatusTextClass(order.status)" style="font-weight: bold;">
     <span v-if="!order.isEditing">
@@ -136,7 +155,9 @@ export default {
   data() {
     return {
       orders: [],
+      searchOrderID: "",
       selectedOrder: null,
+      searchedOrderIndex: -1, // Initialize to -1, indicating no search results
       currentPage: 1,
       itemsPerPage: 10,
       limit: 1000, // Default limit
@@ -203,8 +224,83 @@ export default {
         console.error('Error fetching data', error);
       });
 
+       // Fetch the initial data when the component is created
+    this.fetchInitialData();
+
   },
   methods: {
+      formatDate(isoDate) {
+      const date = new Date(isoDate);
+      const options = {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false, // 24-hour format
+      };
+      return date.toLocaleDateString('en-US', options);
+    },
+    resetSearch() {
+      // Clear the search input
+      this.searchOrderID = "";
+
+      // Reset the searchedOrderIndex to remove styling
+      this.searchedOrderIndex = -1;
+
+      // Fetch the initial data again to reset the list
+      this.fetchInitialData();
+    },
+
+    fetchInitialData() {
+      // Fetch data from your API and update the orders array
+      axios.get(`/order?limit=${this.limit}&page=${this.page}`)
+        .then(response => {
+          this.orders = response.data.data.items;
+        })
+        .catch(error => {
+          console.error('Error fetching data', error);
+        });
+    },
+    searchOrderByID() {
+  const orderIDToSearch = this.searchOrderID.trim();
+
+  // Check if the search input is empty
+  if (!orderIDToSearch) {
+    // You can display a message or handle it as needed
+    return;
+  }
+
+  // Find the order by Order ID
+  const foundOrder = this.orders.find((order) => order._id === orderIDToSearch);
+
+  if (foundOrder) {
+    // If the order is found, set it as the selected order and open the view modal
+    this.selectedOrder = foundOrder;
+
+    // Clear the current list of orders and add only the found order
+    this.orders = [foundOrder];
+
+    // Reset the current page to 1
+    this.currentPage = 1;
+
+    const modal = new bootstrap.Modal(document.getElementById("viewModal"));
+    modal.show();
+  } else {
+    // If the order is not found, you can display an error message or handle it as needed
+    alert("Order not found.");
+
+    // Clear the list of orders
+    this.orders = [];
+
+    // Clear the selectedOrder
+    this.selectedOrder = null;
+  }
+},
+
+
+
     setCurrentPage(page) {
       this.currentPage = page;
     },
@@ -249,11 +345,13 @@ export default {
       modal.show();
     },
     closeViewModal() {
-      // Clear the selected order and close the modal
-      this.selectedOrder = null;
-      const modal = new bootstrap.Modal(document.getElementById('viewModal'));
-      modal.hide();
-    },
+  // Clear the selected order, close the modal, and clear the search input
+  this.selectedOrder = null;
+  this.searchOrderID = "";
+  const modal = new bootstrap.Modal(document.getElementById("viewModal"));
+  modal.hide();
+},
+
     getStatusClass(status) {
       // Define your status classes here as you did in your original code
     },

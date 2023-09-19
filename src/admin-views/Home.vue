@@ -32,17 +32,18 @@
 import axios from 'axios';
 import Chart from 'chart.js/auto';
 import 'chartjs-adapter-date-fns';
+import { format, parseISO } from 'date-fns';
 
 export default {
   data() {
     return {
       dashboardItems: [],
       salesData: {
-        labels: [], // Initialize labels as an empty array
+        labels: [],
         datasets: [
           {
-            label: 'Price', // Change label to 'Price'
-            data: [], // Initialize data as an empty array
+            label: 'Price',
+            data: [],
             borderColor: 'rgba(0, 123, 255, 1)',
             borderWidth: 2,
             fill: {
@@ -76,33 +77,37 @@ export default {
       }
     },
     async fetchSalesData() {
-      try {
-        const salesResponse = await axios.get('/reports');
-        const salesData = salesResponse.data.data;
+  try {
+    const salesResponse = await axios.get('/reports');
+    const salesData = salesResponse.data.data;
 
-        // Filter sales data where isPaid is true
-        const filteredSalesData = salesData.items.filter((item) => item.isPaid);
+    // Filter sales data where isPaid is true
+    const filteredSalesData = salesData.items.filter((item) => item.isPaid);
 
-        // Extract createdAt dates from the filtered sales data
-        const saleDates = filteredSalesData.map((item) => item.createdAt);
+    // Extract createdAt dates from the filtered sales data
+    const saleDates = filteredSalesData.map((item) => parseISO(item.createdAt)); // Parse date string to Date object
 
-        // Extract prices from the filtered sales data
-        const salePrices = filteredSalesData.map((item) => item.price);
+    // Extract prices from the filtered sales data
+    const salePrices = filteredSalesData.map((item) => item.price);
 
-        // Update the salesData object
-        this.salesData.labels = saleDates; // Use saleDates as the X-axis labels
-        this.salesData.datasets[0].data = salePrices; // Use salePrices as the Y-axis data
+    // Format saleDates for chart labels
+    const formattedSaleDates = saleDates.map((date) => format(date, 'yyyy-MM-dd HH:mm:ss')); // Format date with time
 
-        // After fetching data and updating the salesData object, create the chart
-        this.createSalesChart();
-      } catch (error) {
-        console.error('Error fetching sales data:', error);
-      }
-    },
-    createSalesChart() {
+    // Update the salesData object
+    this.salesData.labels = formattedSaleDates;
+    this.salesData.datasets[0].data = salePrices;
+
+    // After fetching data and updating the salesData object, create the chart
+    this.createSalesChart();
+  } catch (error) {
+    console.error('Error fetching sales data:', error);
+  }
+},
+
+createSalesChart() {
   const ctx = document.getElementById('salesChart').getContext('2d');
   const chart = new Chart(ctx, {
-    type: 'line',
+    type: 'line', // Use only the 'line' chart type
     data: this.salesData,
     options: {
       responsive: true,
@@ -121,6 +126,13 @@ export default {
             display: true,
             text: 'Price',
           },
+          ticks: {
+            stepSize: 1,
+            precision: 0,
+            callback: (value) => {
+              return value === 0 || value === 1 ? '' : value.toFixed(0); // Format as integer, hide 0 and 1
+            },
+          },
         },
       },
       plugins: {
@@ -131,7 +143,7 @@ export default {
             label: function (context) {
               const label = context.dataset.label || '';
               if (label) {
-                return label + ': ' + context.parsed.y;
+                return label + ': ' + (context.parsed.y === 0 || context.parsed.y === 1 ? '' : context.parsed.y.toFixed(0)); // Format tooltip value as integer, hide 0 and 1
               }
               return null;
             },
@@ -139,12 +151,21 @@ export default {
         },
       },
       legend: {
-        display: false, // Hide legend
+        display: false,
+      },
+      interaction: {
+        // Remove interaction options to disable switching between chart types
+        mode: 'index',
+        intersect: false,
       },
     },
   });
   chart.update();
 },
+
+
+
+
 
   },
   async mounted() {
@@ -157,7 +178,7 @@ export default {
 <style scoped>
 .chart-container {
   width: 100%;
-  max-width: 1000px; /* Adjust the size as needed */
+  max-width: 1000px;
   margin: 0 auto;
   height: 400px;
 }

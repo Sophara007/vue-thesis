@@ -73,11 +73,11 @@
                 </div>
                 <div class="modal-body">
                     <div class="wrapper-inquiry">
-                        <h6>From : {{ inquiry.fullName }}</h6>
-                        <h6>Email : {{ inquiry.email }}</h6>
-                        <h6>Promotion Code : {{ inquiries.promotionCode }}</h6>
+                        <h6><strong>From</strong> : {{ inquiry.fullName }}</h6>
+                        <h6><strong>Email</strong> : {{ inquiry.email }}</h6>
+                        <h6><strong>Promotion Code</strong> : {{ inquiry.promotionCode }}</h6>
                         <br>
-                        <h6>Subject : {{ inquiry.subject }}</h6>
+                        <h6><strong>Subject</strong> : {{ inquiry.subject }}</h6>
                         <p>{{ inquiry.message }}</p>
                     </div>
                 </div>
