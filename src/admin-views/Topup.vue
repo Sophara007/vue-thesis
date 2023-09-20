@@ -1,8 +1,23 @@
 <template>
   <div class="container-fluid">
-    <h1 class="mt-4">Top Up Management</h1>
+    <h1>Top Up Management</h1>
+        <!-- Move the search bar and buttons to the right -->
+<div class="d-flex justify-content-end mb-3 mt-5">
+    <div class="input-group input-group-sm" style="max-width: 200px;">
+      <input
+  type="text"
+  class="form-control form-control-sm"
+  placeholder="Search by Email" 
+  v-model="searchEmail" 
+/>
+    </div>
+    <button class="btn btn-sm btn-primary" @click="searchOrderByEmail">
+  <i class="fas fa-search"></i> <!-- Font Awesome search icon -->
+</button>
+    <button class="btn btn-sm btn-secondary" @click="resetSearch">Reset</button>
+</div>
 
-    <div class="mt-4">
+    <div class="">
       <table class="table table-bordered">
         <thead class="thead-dark">
           <tr>
@@ -82,7 +97,7 @@
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="viewModalLabel">View Top-Up Details</h5>
+          <h5 class="modal-title" id="viewModalLabel">Top-Up Details</h5>
           <!-- <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" @click="closeViewModal">
             <span aria-hidden="true">&times;</span>
           </button> -->
@@ -124,7 +139,11 @@ import axios from 'axios';
 export default {
   data() {
     return {
+      originalTopups: [], // Store the original top-ups data here
       topups: [],
+  
+      searchEmail: "",
+ 
       selectedTopUp: null,
       currentPage: 1,
       itemsPerPage: 10,
@@ -181,23 +200,61 @@ export default {
     },
   },
   created() {
-    const token = localStorage.getItem('token'); // Get the token from local storage
-    const headers = {
-      Authorization: `Bearer ${token}`,
-    };
+  // Fetch the initial data when the component is created
+  this.fetchInitialData();
+  const token = localStorage.getItem('token');
+  const headers = {
+    Authorization: `Bearer ${token}`,
+  };
 
-    axios.get(`/topup?limit=${this.limit}&page=${this.page}`, { headers })
-  .then(response => {
-    this.topups = response.data.data.items;
-    console.log('Fetched top-ups:', this.topups); // Add this line for debugging
-  })
-  .catch(error => {
-    console.error('Error fetching data', error);
-  });
+  axios.get(`/topup?limit=${this.limit}&page=${this.page}`, { headers })
+    .then(response => {
+      this.originalTopups = response.data.data.items; // Populate the original data
+      this.topups = [...this.originalTopups]; // Copy the data to the working array
+      console.log('Fetched top-ups:', this.topups);
+    })
+    .catch(error => {
+      console.error('Error fetching data', error);
+    });
+},
 
-
-  },
   methods: {
+    resetSearch() {
+  this.searchEmail = ""; // Clear the search input
+
+  this.topups = [...this.originalTopups]; // Reset the topups array to original data
+},
+
+
+    
+    fetchInitialData() {
+      // Fetch data from your API and update the 'users' array
+      axios.get(`/topup?limit=${this.limit}&page=${this.page}`)
+        .then(response => {
+          this.topups = response.data.data.items; // Updated to use 'users' data
+        })
+        .catch(error => {
+          console.error('Error fetching data', error);
+        });
+    },
+    searchOrderByEmail() {
+  const emailToSearch = this.searchEmail.trim();
+
+  if (!emailToSearch) {
+    // Handle empty search input as needed
+    return;
+  }
+
+  // Filter the topups based on email in the originalTopups list
+  this.topups = this.originalTopups.filter(
+    (topup) => topup.userId.email.toLowerCase() === emailToSearch.toLowerCase()
+  );
+
+  // Reset the current page to 1
+  this.currentPage = 1;
+},
+
+
     setCurrentPage(page) {
       this.currentPage = page;
     },
@@ -302,6 +359,9 @@ export default {
     },
   },
   async mounted() {
+
+       // Fetch the initial user data
+       await this.fetchInitialData();
 
     const urlParams = new URLSearchParams(window.location.search);
     const limitParam = urlParams.get('limit');
@@ -438,10 +498,11 @@ export default {
 }
 
 h1 {
-        font-size: 24px;
-        font-weight: bold;
-        text-transform: uppercase;
-    }
+    font-size: 24px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 90px;
+  }
   .order-page {
     h1 {
       font-size: 24px;

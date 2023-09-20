@@ -41,9 +41,10 @@ export default {
         labels: [], // Initialize labels as an empty array
         datasets: [
           {
-            label: 'Price', // Change label to 'Price'
+            label: 'Sales', // Change label to 'Number of Sales'
             data: [], // Initialize data as an empty array
             borderColor: 'rgba(0, 123, 255, 1)',
+             backgroundColor: 'rgba(0, 123, 255, 0.3)', // Add a background color
             borderWidth: 2,
             fill: {
               target: 'origin',
@@ -76,80 +77,105 @@ export default {
       }
     },
     async fetchSalesData() {
-      try {
-        const salesResponse = await axios.get('/reports');
-        const salesData = salesResponse.data.data;
+  try {
+    const today = new Date(); // Get the current date
+    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
-        // Filter sales data where isPaid is true
-        const filteredSalesData = salesData.items.filter((item) => item.isPaid);
+    const salesResponse = await axios.get('/reports?limit=1000');
+    const salesData = salesResponse.data.data;
 
-        // Extract createdAt dates from the filtered sales data
-        const saleDates = filteredSalesData.map((item) => item.createdAt);
+    // Filter sales data where isPaid is true and createdAt is within the current month
+    const filteredSalesData = salesData.items.filter((item) => {
+      const saleDate = new Date(item.createdAt);
+      return item.isPaid && saleDate >= firstDayOfMonth && saleDate <= today;
+    });
 
-        // Extract prices from the filtered sales data
-        const salePrices = filteredSalesData.map((item) => item.price);
+    // Create an object to store sales counts by date
+    const salesCountsByDate = {};
 
-        // Update the salesData object
-        this.salesData.labels = saleDates; // Use saleDates as the X-axis labels
-        this.salesData.datasets[0].data = salePrices; // Use salePrices as the Y-axis data
+    // Process each sale to aggregate sales counts by date
+    filteredSalesData.forEach((item) => {
+      const saleDate = new Date(item.createdAt).toLocaleDateString();
 
-        // After fetching data and updating the salesData object, create the chart
-        this.createSalesChart();
-      } catch (error) {
-        console.error('Error fetching sales data:', error);
+      if (salesCountsByDate[saleDate]) {
+        salesCountsByDate[saleDate]++;
+      } else {
+        salesCountsByDate[saleDate] = 1;
       }
-    },
+    });
+
+    // Extract date labels and sales counts from the aggregated data
+    const saleDates = Object.keys(salesCountsByDate);
+    const saleCounts = Object.values(salesCountsByDate);
+
+    // Update the salesData object
+    this.salesData.labels = saleDates; // Use saleDates as the X-axis labels
+    this.salesData.datasets[0].data = saleCounts; // Use saleCounts as the Y-axis data
+
+    // After fetching data and updating the salesData object, create the chart
+    this.createSalesChart();
+  } catch (error) {
+    console.error('Error fetching sales data:', error);
+  }
+},
+
+
     createSalesChart() {
-  const ctx = document.getElementById('salesChart').getContext('2d');
-  const chart = new Chart(ctx, {
-    type: 'line',
-    data: this.salesData,
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        x: {
-          type: 'time',
-          time: {
-            unit: 'month',
-            tooltipFormat: 'yyyy-MM-dd',
-          },
-        },
-        y: {
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: 'Price',
-          },
-        },
-      },
-      plugins: {
-        tooltip: {
-          intersect: false,
-          mode: 'index',
-          callbacks: {
-            label: function (context) {
-              const label = context.dataset.label || '';
-              if (label) {
-                return label + ': ' + context.parsed.y;
-              }
-              return null;
+      const ctx = document.getElementById('salesChart').getContext('2d');
+
+      // Destroy the existing chart if it exists
+      if (this.salesChart) {
+        this.salesChart.destroy();
+      }
+
+      this.salesChart = new Chart(ctx, {
+        type: 'bar',
+        data: this.salesData,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              beginAtZero: true,
+              suggestedMin: 0,
+            },
+            y: {
+              beginAtZero: true,
+              suggestedMin: 0,
+              suggestedMax: Math.max(...this.salesData.datasets[0].data) + 1,
+              title: {
+                display: true,
+                text: 'Sales',
+              },
             },
           },
+          plugins: {
+            tooltip: {
+              intersect: false,
+              mode: 'index',
+              callbacks: {
+                label: function (context) {
+                  const label = context.dataset.label || '';
+                  if (label) {
+                    return label + ': ' + context.parsed.y;
+                  }
+                  return null;
+                },
+              },
+            },
+          },
+          legend: {
+            display: false,
+          },
         },
-      },
-      legend: {
-        display: false, // Hide legend
-      },
+      });
     },
-  });
-  chart.update();
-},
 
   },
   async mounted() {
     await this.getDashboard();
     await this.fetchSalesData();
+    this.createSalesChart(); // Call createSalesChart after fetching data
   },
 };
 </script>

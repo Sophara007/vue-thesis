@@ -1,6 +1,6 @@
 <template>
   <div class="slider-page container-fluid">
-    <h1>SLIDER HOMEPAGE</h1>
+    <h1>HOMEPAGE SLIDER</h1>
     <div class="wrapper-create m-5">
       <button class="btn btn-success custom-btn" data-bs-toggle="modal" data-bs-target="#createModal">
         Create
