@@ -1,6 +1,6 @@
 <template>
   <div class="industry-page container-fluid">
-    <h1>Industry Detail</h1>
+    <h1>Industry Detail Page</h1>
     <div class="wrapper-create m-5">
       <button class="btn btn-success custom-btn" data-bs-toggle="modal" data-bs-target="#createModal">
         Create

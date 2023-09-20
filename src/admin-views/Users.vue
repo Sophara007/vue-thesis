@@ -1,7 +1,22 @@
 <template>
   <div class="users-page container-fluid">
-    <h1>Customer</h1>
-    <div class="wrapper-table mt-5">
+    <h1>Customer Page</h1>
+        <!-- Move the search bar and buttons to the right -->
+        <div class="d-flex justify-content-end mb-3 mt-5">
+    <div class="input-group input-group-sm" style="max-width: 200px;">
+      <input
+  type="text"
+  class="form-control form-control-sm"
+  placeholder="Search by Email" 
+  v-model="searchEmail" 
+/>
+    </div>
+    <button class="btn btn-sm btn-primary" @click="searchOrderByEmail">
+  <i class="fas fa-search"></i> <!-- Font Awesome search icon -->
+</button>
+    <button class="btn btn-sm btn-secondary" @click="resetSearch">Reset</button>
+</div>
+    <div class="wrapper-table">
       <table class="table">
         <thead>
           <tr>
@@ -9,6 +24,7 @@
             <th scope="col">Full Name</th>
             <th scope="col">Email</th>
             <th scope="col">Ballance</th>
+            <th scope="col">Registered Date</th>
             <th scope="col">Actions</th>
           </tr>
         </thead>
@@ -18,6 +34,7 @@
             <td>{{ user.fullName }}</td>
             <td>{{ user.email }}</td>
             <td>{{ user.ballance }} $</td>
+            <td>{{ formatDate(user.createdAt) }}</td>
             <td>
               <div class="wrapper-action">
                 <button class="btn btn-info" @click="viewUserDetails(user)">
@@ -87,10 +104,11 @@ import axios from "axios";
 export default {
   data() {
     return {
-      users: [],
+      users: [], // Changed to 'users'
       selectedUser: null,
       currentPage: 1,
       itemsPerPage: 10,
+      searchEmail: "",
       limit: 1000, // Default limit
       page: 1,   // Default page
     };
@@ -143,7 +161,63 @@ export default {
       return pages;
     },
   },
+  created() {
+
+           // Fetch the initial data when the component is created
+           this.fetchInitialData();
+
+    },
   methods: {
+    formatDate(isoDate) {
+      const date = new Date(isoDate);
+      const options = {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false, // 24-hour format
+      };
+      return date.toLocaleDateString('en-US', options);
+    },
+    resetSearch() {
+  // Clear the search input
+  this.searchEmail = "";
+
+
+  // Fetch the initial data again to reset the list
+  this.fetchInitialData();
+},
+
+    
+    fetchInitialData() {
+  // Fetch data from your API and update the 'users' and 'originalUsers' arrays
+  axios.get(`/users?limit=${this.limit}&page=${this.page}`)
+    .then(response => {
+      this.users = response.data.data.items;
+      this.originalUsers = response.data.data.items; // Initialize originalUsers
+    })
+    .catch(error => {
+      console.error('Error fetching data', error);
+    });
+},
+    searchOrderByEmail() {
+    const emailToSearch = this.searchEmail.trim();
+
+    if (!emailToSearch) {
+      // Handle empty search input as needed
+      return;
+    }
+
+    // Filter the users based on email in the originalUsers list
+    this.users = this.originalUsers.filter(
+      (user) => user.email.toLowerCase() === emailToSearch.toLowerCase()
+    );
+
+    // Reset the current page to 1
+    this.currentPage = 1;
+  },
     setCurrentPage(page) {
       this.currentPage = page;
     },
@@ -172,7 +246,8 @@ export default {
       this.page = parseInt(pageParam);
     }
     await this.getUser();
-    
+    // Fetch the initial user data
+    await this.fetchInitialData();
   },
 };
 </script>
@@ -229,6 +304,7 @@ export default {
     font-size: 24px;
     font-weight: bold;
     text-transform: uppercase;
+    margin-bottom: 90px;
   }
 }
 </style>

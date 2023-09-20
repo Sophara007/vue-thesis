@@ -179,7 +179,7 @@ const routes = [
 
   {
     path: '/:catchAll(.*)',
-    redirect: '/admin',
+    redirect: '/home',
     meta: {
       requiresAuth: true, // Require authentication for the Catch-All Route
     },

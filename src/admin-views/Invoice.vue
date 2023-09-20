@@ -1,19 +1,19 @@
 <template>
     <div class="order-page container-fluid">
         <h1>Customer invoice Report</h1>
-        <!-- Move the search bar and buttons to the right -->
-<div class="d-flex justify-content-end mb-3">
-    <div class="input-group input-group-sm" style="max-width: 150px;">
-        <input
-            type="text"
-            class="form-control form-control-sm"
-            placeholder="Search by Invoice ID"
-            v-model="searchOrderID"
-        />
+       <!-- Move the search bar and buttons to the right -->
+       <div class="d-flex justify-content-end mb-3 mt-5">
+    <div class="input-group input-group-sm" style="max-width: 200px;">
+      <input
+  type="text"
+  class="form-control form-control-sm"
+  placeholder="Search by Email" 
+  v-model="searchEmail" 
+/>
     </div>
-    <button class="btn btn-sm btn-primary" @click="searchOrderByID">
-        <i class="fas fa-search"></i> <!-- Font Awesome search icon -->
-    </button>
+    <button class="btn btn-sm btn-primary" @click="searchOrderByEmail">
+  <i class="fas fa-search"></i> <!-- Font Awesome search icon -->
+</button>
     <button class="btn btn-sm btn-secondary" @click="resetSearch">Reset</button>
 </div>
 
@@ -139,8 +139,9 @@ export default {
         return {
             orders: [], 
             currentPage: 1,
-            searchOrderID: "",
-            searchedOrderIndex: -1, // Initialize to -1, indicating no search results
+            searchEmail: "",
+            originalOrders: [], // Initialize the originalOrders array
+          
       itemsPerPage: 10,
       limit: 1000, // Default limit
       page: 1,   // Default page
@@ -199,74 +200,60 @@ export default {
     },
   },
     created() {
-        axios.get(`/reports?limit=${this.limit}&page=${this.page}`) // Replace with your API endpoint
-  .then(response => {
-    this.orders = response.data.data.items; // Assuming 'items' contains the list of orders
-  })
-  .catch(error => {
-    console.error('Error fetching data', error);
-  });
-           // Fetch the initial data when the component is created
-           this.fetchInitialData();
-
-    },
+      axios.get(`/reports?limit=${this.limit}&page=${this.page}`)
+      .then(response => {
+        this.orders = response.data.data.items;
+        this.originalOrders = response.data.data.items; // Initialize originalOrders
+      })
+      .catch(error => {
+        console.error('Error fetching data', error);
+      });
+    // Fetch the initial data when the component is created
+    this.fetchInitialData();
+  },
     methods: {
       resetSearch() {
-      // Clear the search input
-      this.searchOrderID = "";
+  // Clear the search input
+  this.searchEmail = "";
 
-      // Reset the searchedOrderIndex to remove styling
-      this.searchedOrderIndex = -1;
+  // Reset the searchedOrderIndex to remove styling
+  this.searchedOrderIndex = -1;
 
-      // Fetch the initial data again to reset the list
-      this.fetchInitialData();
-    },
-
-    fetchInitialData() {
-      // Fetch data from your API and update the orders array
-      axios.get(`/reports?limit=${this.limit}&page=${this.page}`)
-        .then(response => {
-          this.orders = response.data.data.items;
-        })
-        .catch(error => {
-          console.error('Error fetching data', error);
-        });
-    },
-    searchOrderByID() {
-  const orderIDToSearch = this.searchOrderID.trim();
-
-  // Check if the search input is empty
-  if (!orderIDToSearch) {
-    // You can display a message or handle it as needed
-    return;
-  }
-
-  // Find the order by Order ID
-  const foundOrder = this.orders.find((order) => order._id === orderIDToSearch);
-
-  if (foundOrder) {
-    // If the order is found, set it as the selected order and open the view modal
-    this.selectedOrder = foundOrder;
-
-    // Clear the current list of orders and add only the found order
-    this.orders = [foundOrder];
-
-    // Reset the current page to 1
-    this.currentPage = 1;
-
-    const modal = new bootstrap.Modal(document.getElementById("viewModal"));
-    modal.show();
-  } else {
-    // If the order is not found, you can display an error message or handle it as needed
-    alert("Order not found.");
-
-    // Clear the list of orders
-    this.orders = [];
-
-    // Clear the selectedOrder
-    this.selectedOrder = null;
-  }
+  // Fetch the initial data again to reset the list
+  this.fetchInitialData();
 },
+
+    
+    fetchInitialData() {
+  // Fetch data from your API and update the 'users' and 'originalUsers' arrays
+  axios.get(`/reports?limit=${this.limit}&page=${this.page}`)
+    .then(response => {
+      this.orders = response.data.data.items;
+      this.originalUsers = response.data.data.items; // Initialize originalUsers
+    })
+    .catch(error => {
+      console.error('Error fetching data', error);
+    });
+},
+searchOrderByEmail() {
+      const emailToSearch = this.searchEmail.trim();
+
+      if (!emailToSearch) {
+        // Handle empty search input as needed
+        return;
+      }
+
+      // Filter the orders based on email in the originalOrders list
+      this.orders = this.originalOrders.filter((order) => {
+        if (order.orderId && order.orderId.userId && order.orderId.userId.email) {
+          return order.orderId.userId.email.toLowerCase() === emailToSearch.toLowerCase();
+        }
+        return false;
+      });
+
+      // Reset the current page to 1
+      this.currentPage = 1;
+    },
 
         formatDate(isoDate) {
       const date = new Date(isoDate);
@@ -377,7 +364,7 @@ export default {
         closeViewModal() {
   // Clear the selected order, close the modal, and clear the search input
   this.selectedOrder = null;
-  this.searchOrderID = "";
+ 
   const modal = new bootstrap.Modal(document.getElementById("viewModal"));
   modal.hide();
 },

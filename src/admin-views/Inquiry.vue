@@ -1,7 +1,22 @@
 <template>
     <div class="inquiry-page container-fluid">
         <h1> Inquiry page</h1>
-        <div class="wrapper-table mt-5">
+       <!-- Move the search bar and buttons to the right -->
+       <div class="d-flex justify-content-end mb-3 mt-5">
+    <div class="input-group input-group-sm" style="max-width: 200px;">
+      <input
+  type="text"
+  class="form-control form-control-sm"
+  placeholder="Search by Email" 
+  v-model="searchEmail" 
+/>
+    </div>
+    <button class="btn btn-sm btn-primary" @click="searchOrderByEmail">
+  <i class="fas fa-search"></i> <!-- Font Awesome search icon -->
+</button>
+    <button class="btn btn-sm btn-secondary" @click="resetSearch">Reset</button>
+</div>
+        <div class="wrapper-table">
             <table class="table">
                 <thead>
                     <tr>
@@ -96,6 +111,10 @@ export default {
     data() {
         return {
             currentPage: 1,
+          
+            searchEmail: "",
+            originalOrders: [], // Initialize the originalOrders array
+     
       itemsPerPage: 10,
       limit: 1000, // Default limit
       page: 1,   // Default page
@@ -103,6 +122,12 @@ export default {
             inquiry: {}
         }
     },
+    created() {
+
+// Fetch the initial data when the component is created
+this.fetchInitialData();
+
+},
     computed: {
     paginatedinquiries() {
       const startIndex = (this.currentPage - 1) * this.itemsPerPage;
@@ -154,6 +179,44 @@ export default {
     },
   },
     methods: {
+      resetSearch() {
+  // Clear the search input
+  this.searchEmail = "";
+
+  // Fetch the initial data again to reset the list
+  this.fetchInitialData();
+},
+
+    
+    fetchInitialData() {
+      // Fetch data from your API and update the 'users' array
+      axios.get(`/messages?limit=${this.limit}&page=${this.page}`)
+        .then(response => {
+          this.inquiries = response.data.data.items; // Updated to use 'users' data
+        })
+        .catch(error => {
+          console.error('Error fetching data', error);
+        });
+    },
+    searchOrderByEmail() {
+  const emailToSearch = this.searchEmail.trim();
+
+  if (!emailToSearch) {
+    // Handle empty search input as needed
+    return;
+  }
+
+  // Filter the inquiries based on the email field
+  this.inquiries = this.inquiries.filter((inquiry) => {
+    // Check if the email field in lowercase contains the searched email in lowercase
+    return inquiry.email.toLowerCase().includes(emailToSearch.toLowerCase());
+  });
+
+  // Reset the current page to 1
+  this.currentPage = 1;
+},
+
+
         setCurrentPage(page) {
       this.currentPage = page;
     },
@@ -193,6 +256,8 @@ export default {
       this.page = parseInt(pageParam);
     }
         await this.getInquiry();
+           // Fetch the initial user data
+    await this.fetchInitialData();
     },
 }
 </script>
@@ -244,11 +309,12 @@ export default {
   box-shadow: none;
 }
 .inquiry-page {
-    h1 {
-        font-size: 24px;
-        font-weight: bold;
-        text-transform: uppercase;
-    }
+  h1 {
+    font-size: 24px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 90px;
+  }
 }
 .wrapper-modal {
     .modal-footer {
