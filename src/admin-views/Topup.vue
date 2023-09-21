@@ -532,8 +532,8 @@ h1 {
   .topups-img {
   margin-left: 2px;
   padding: 10px; /* Adjust the padding to your preferred size */
-  max-width: 400px; /* Limit the maximum width */
-  max-height: 400px; /* Limit the maximum height */
+  max-width: 500px; /* Limit the maximum width */
+  max-height: 500px; /* Limit the maximum height */
   object-fit: contain;
 }
 
