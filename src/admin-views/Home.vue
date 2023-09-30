@@ -32,7 +32,7 @@
 import axios from 'axios';
 import Chart from 'chart.js/auto';
 import 'chartjs-adapter-date-fns';
-import { format, parseISO } from 'date-fns';
+
 
 export default {
   data() {

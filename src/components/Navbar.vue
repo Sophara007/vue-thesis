@@ -15,14 +15,15 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 /* Scoped styles specific to the Navbar.vue component */
 nav {
   background-color: #007bff;
   padding: 10px;
   color: white;
-  position: sticky;
+  position: fixed;
   top: 0;
+  width: 100%;
   z-index: 1;
 }
 

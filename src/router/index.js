@@ -194,25 +194,11 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
   const requiresGuest = to.matched.some((record) => record.meta.requiresGuest);
-   
-  
-  console.log('Requires Auth:', requiresAuth);
 
-  console.log('Requires Guest:', requiresGuest);
-
-
-  if (requiresAuth) {
-    if (!store.getters.isAuthenticated) {
-      next('/');
-    } else {
-      next();
-    }
-  } else if (requiresGuest) {
-    if (store.getters.isAuthenticated) {
-      next('/admin');
-    } else {
-      next();
-    }
+  if (requiresAuth && !store.getters.isAuthenticated) {
+    next('/');
+  } else if (requiresGuest && store.getters.isAuthenticated) {
+    next('/admin');
   } else {
     next();
   }

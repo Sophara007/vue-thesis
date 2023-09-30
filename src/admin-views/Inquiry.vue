@@ -1,21 +1,43 @@
 <template>
     <div class="inquiry-page container-fluid">
         <h1> Inquiry page</h1>
-       <!-- Move the search bar and buttons to the right -->
-       <div class="d-flex justify-content-end mb-3 mt-5">
+
+        <div class="d-flex justify-content-between align-items-center mb-3 mt-5">
+  <!-- "Items Per Page" select element on the left -->
+  <div class="items-per-page">
+    <label for="itemsPerPageSelect" class="mr-2">Show:</label>
+    <select
+      id="itemsPerPageSelect"
+      v-model="itemsPerPage"
+      @change="updateItemsPerPage"
+      class="custom-select custom-select-sm"
+    >
+      <option value="10">10</option>
+      <option value="20">20</option>
+      <option value="50">50</option>
+      <!-- Add more options as needed -->
+    </select>
+  </div>
+
+  <!-- Search-related elements on the right -->
+  <div class="d-flex">
     <div class="input-group input-group-sm" style="max-width: 200px;">
       <input
-  type="text"
-  class="form-control form-control-sm"
-  placeholder="Search by Email" 
-  v-model="searchEmail" 
-/>
+        type="text"
+        class="form-control form-control-sm"
+        placeholder="Search by Email"
+        v-model="searchEmail"
+      />
     </div>
     <button class="btn btn-sm btn-primary" @click="searchOrderByEmail">
-  <i class="fas fa-search"></i> <!-- Font Awesome search icon -->
-</button>
+      <i class="fas fa-search"></i> <!-- Font Awesome search icon -->
+    </button>
     <button class="btn btn-sm btn-secondary" @click="resetSearch">Reset</button>
+  </div>
 </div>
+
+
+
         <div class="wrapper-table">
             <table class="table">
                 <thead>
@@ -131,7 +153,7 @@ this.fetchInitialData();
     computed: {
     paginatedinquiries() {
       const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-      const endIndex = startIndex + this.itemsPerPage;
+      const endIndex = startIndex + parseInt(this.itemsPerPage); // Parse the selected itemsPerPage
       return this.inquiries.slice(startIndex, endIndex);
 
     },
@@ -179,6 +201,10 @@ this.fetchInitialData();
     },
   },
     methods: {
+      updateItemsPerPage() {
+    // Reset the current page to 1 when changing the items per page
+    this.currentPage = 1;
+  },
       resetSearch() {
   // Clear the search input
   this.searchEmail = "";

@@ -54,10 +54,6 @@
                 </button>
                 <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
               </form>
-              <div class="signup-link d-none">
-                Don't have an account?
-                <router-link to="/signup">Sign Up</router-link>
-              </div>
             </div>
           </div>
         </div>
@@ -126,6 +122,10 @@ export default {
     background-repeat: no-repeat;
     background-position: center;
   }
+  
+  /* Ensure that the .left-side element does not exceed the viewport height */
+  overflow: hidden; /* Hide content that overflows the element */
+
   .right-side {
     /* Styles for the login form */
     .login-container {
