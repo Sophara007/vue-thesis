@@ -202,8 +202,8 @@
             </div>
             <!-- Notification dropdown -->
             <div v-show="showNotify" id="notification"
-              class="w-[550px] max-h-[550px] overflow-y-auto border rounded-lg border-gray-300 shadow-md"
-              style="overflow-x: hidden;">
+  class="w-[550px] max-h-[550px] overflow-y-auto border rounded-lg border-gray-300 shadow-md"
+  style="overflow-x: hidden; z-index: 1000;">
               <ul>
                 <!-- Close button -->
                 <button @click="toggleDropNotify"
