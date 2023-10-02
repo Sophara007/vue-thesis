@@ -31,7 +31,7 @@ nav {
   display: inline-block;
   justify-content: space-between;
   align-items: center;
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto;
 }
 

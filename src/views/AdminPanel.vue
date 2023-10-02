@@ -261,7 +261,8 @@
 
                       <div class="flex flex-column w-[350px]">
                         <div>
-                          <p style="font-weight: bold; padding-bottom: 10px; font-size: 14px;">{{ notification.title }}
+                          <p style="font-weight: bold; padding-bottom: 5px; font-size: 14px;">{{ notification && notification.data && notification.data.email ? notification.data.email : 'No email available' }}</p>
+                          <p style="font-weight: bold; padding-bottom: 5px; font-size: 14px;">{{ notification.title }}
                           </p>
                         </div>
                         <div>
