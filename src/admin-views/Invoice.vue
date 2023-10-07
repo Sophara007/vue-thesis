@@ -57,7 +57,15 @@
                         style="text-align: center;">
                         <th>{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th>
                         <td>{{ order.orderId.userId.fullName }}</td>
-                        <td>{{ order.price }} $</td>
+                        <td>
+  <span v-if="order.orderId.paymentMethod === 2">
+    {{ (order.price * 0.8).toFixed(2) }} $
+  </span>
+  <span v-else>
+    {{ order.price }} $
+  </span>
+</td>
+
                         <td>{{ mapPaymentMethod(order.orderId.paymentMethod) }}</td>
                         <td>{{ formatDate(order.createdAt) }}</td>
                         <td :class="getStatusClass(order.status)">
@@ -136,7 +144,13 @@
                         <p><strong>Invoice ID:</strong> {{ selectedOrder._id }}</p>
                         <hr>
                         <p><strong>Item:</strong> {{ selectedOrder.orderId.subProductId.title }}</p>
-                        <p><strong>Price:</strong> {{ selectedOrder.price }}<span> $</span></p>
+                        <p v-if="selectedOrder.orderId.paymentMethod === 2">
+    <strong>Price(Discount 20%):</strong>
+    {{ (selectedOrder.price * 0.8).toFixed(2) }} <span> $</span>
+  </p>
+  <p v-else>
+    <strong>Price:</strong> {{ selectedOrder.price }} <span> $</span>
+  </p>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -159,6 +173,12 @@ const logoImageURL = 'https://static.wixstatic.com/media/4ec883_1768ba30e5b14ff2
 export default {
     data() {
         return {
+          form: {
+        address: "",
+        phoneNumber: "",
+        telegram: "",
+        companyEmail: "",
+      },
             orders: [], 
             currentPage: 1,
             searchEmail: "",
@@ -234,6 +254,10 @@ export default {
     this.fetchInitialData();
   },
     methods: {
+      async getCompanyInfo(){
+        const info = await axios.get('/company-info').then(res=> res.data)
+        this.form = info
+    },
       updateItemsPerPage() {
     // Reset the current page to 1 when changing the items per page
     this.currentPage = 1;
@@ -313,10 +337,18 @@ searchOrderByEmail() {
     // Get the current date
     const currentDate = new Date().toLocaleDateString();
 
+    // Calculate the unit price with or without the discount based on the payment method
+    const unitPrice = this.selectedOrder.orderId.paymentMethod === 2
+      ? this.selectedOrder.price * 0.8 // Apply a 20% discount for online payment
+      : this.selectedOrder.price;
+
+    // Calculate the total amount
+    const totalAmount = unitPrice;
+
     // Create an array for the table data
     const tableData = [
       ['Description', 'Quantity', 'Unit Price', 'Total'],
-      [this.selectedOrder.orderId.subProductId.title, '1', this.selectedOrder.price + ' $', this.selectedOrder.price + ' $'],
+      [this.selectedOrder.orderId.subProductId.title, '1', unitPrice.toFixed(2) + ' $', unitPrice.toFixed(2) + ' $'],
     ];
 
     // Define the columns for the table
@@ -334,9 +366,6 @@ searchOrderByEmail() {
         3: { halign: 'right' },
       },
     };
-
-    // Calculate the total amount
-    const totalAmount = this.selectedOrder.price;
 
     // Add a header
     pdf.setFontSize(18);
@@ -369,11 +398,19 @@ searchOrderByEmail() {
 
     // Add the total amount
     pdf.setFontSize(14);
-    pdf.text(`Total Amount: ${totalAmount} $`, 10, pdf.autoTable.previous.finalY + 20);
+    pdf.text(`Total Amount: ${totalAmount.toFixed(2)} $`, 10, pdf.autoTable.previous.finalY + 20);
 
     // Add a thank you message
     pdf.setFontSize(12);
     pdf.text('Thank you for your purchase!', 10, pdf.autoTable.previous.finalY + 30);
+    
+     // Add your company information in the bottom corner
+     pdf.setFontSize(8);
+pdf.text(`Address: ${this.form.address}`, 10, pdf.internal.pageSize.height - 20);
+pdf.text(`Tel: ${this.form.phoneNumber}`, 10, pdf.internal.pageSize.height - 15);
+pdf.text(`Telegram: ${this.form.telegram}`, 10, pdf.internal.pageSize.height - 10);
+pdf.text(`Email: ${this.form.companyEmail}`, 10, pdf.internal.pageSize.height - 5);
+
 
     // Save or print the PDF
     pdf.save('invoice.pdf');
@@ -429,13 +466,14 @@ searchOrderByEmail() {
                 case 1:
                     return 'Cash on Delivery';
                 case 2:
-                    return 'Online Payment';
+                    return 'Online Payment (20% OFF)';
                 default:
                     return 'Unknown';
             }
         },
     },
     async mounted() {
+      await this.getCompanyInfo();
     const urlParams = new URLSearchParams(window.location.search);
     const limitParam = urlParams.get('limit');
     const pageParam = urlParams.get('page');
