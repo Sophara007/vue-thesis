@@ -2,6 +2,43 @@
     <div class="order-page container-fluid">
         <h1>Customer invoice Report</h1>
 
+        <div class="d-flex justify-content-between align-items-center mb-3 mt-5">
+  <!-- "Items Per Page" select element on the left -->
+  <div class="items-per-page">
+    <label for="itemsPerPageSelect" class="mr-2">Show:</label>
+    <select
+      id="itemsPerPageSelect"
+      v-model="itemsPerPage"
+      @change="updateItemsPerPage"
+      class="custom-select custom-select-sm"
+    >
+      <option value="10">10</option>
+      <option value="20">20</option>
+      <option value="50">50</option>
+      <!-- Add more options as needed -->
+    </select>
+  </div>
+
+  <!-- Search-related elements on the right -->
+  <div class="d-flex">
+    <div class="input-group input-group-sm" style="max-width: 200px;">
+      <input
+        type="text"
+        class="form-control form-control-sm"
+        placeholder="Search by Email"
+        v-model="searchEmail"
+      />
+    </div>
+    <button class="btn btn-sm btn-primary" @click="searchOrderByEmail">
+      <i class="fas fa-search"></i> <!-- Font Awesome search icon -->
+    </button>
+    <button class="btn btn-sm btn-secondary" @click="resetSearch">Reset</button>
+  </div>
+</div>
+
+
+
+
         <div class="wrapper-table">
             <table class="table">
                 <thead>
@@ -10,17 +47,27 @@
                         <th scope="col">Customer Name</th>
                         <th scope="col">Price</th>
                         <th scope="col">Payment Method</th>
+                        <th scope="col">Created At</th>
                         <th scope="col">Status</th>
                         <th scope="col">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(order, index) in orders" :key="order._id" :class="getStatusClass(order.status)"
+                    <tr v-for="(order, index) in paginatedorders" :key="order._id" :class="getStatusClass(order.status)"
                         style="text-align: center;">
-                        <th>{{ index + 1 }}</th>
-                        <td>{{ order.orderId.fullName }}</td>
-                        <td>{{ order.price }} $</td>
+                        <th>{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th>
+                        <td>{{ order.orderId.userId.fullName }}</td>
+                        <td>
+  <span v-if="order.orderId.paymentMethod === 2">
+    {{ (order.price * 0.8).toFixed(2) }} $
+  </span>
+  <span v-else>
+    {{ order.price }} $
+  </span>
+</td>
+
                         <td>{{ mapPaymentMethod(order.orderId.paymentMethod) }}</td>
+                        <td>{{ formatDate(order.createdAt) }}</td>
                         <td :class="getStatusClass(order.status)">
                             <span :class="getStatusTextClass(order.status)" style="font-weight: bold;">
                                 {{ mapStatus(order.status) }}
@@ -41,6 +88,27 @@
                 </tbody>
             </table>
         </div>
+        <!-- Only show pagination if there are more than 10 items -->
+    <div class="pagination-container" v-if="orders.length > 10">
+      <ul class="pagination">
+        <li class="page-item">
+          <button class="page-link" @click="currentPage -= 1" :disabled="currentPage === 1">
+            &#8592; Previous
+          </button>
+        </li>
+        <li v-for="page in visiblePages" :key="page">
+          <button class="page-link" @click="currentPage = page" :class="{ 'active': currentPage === page }">
+            {{ page }}
+          </button>
+        </li>
+        <li class="page-item">
+          <button class="page-link" @click="currentPage += 1" :disabled="currentPage === totalPages">
+            Next &#8594;
+          </button>
+        </li>
+
+      </ul>
+    </div>
     </div>
 
     <!-- Modal for creating an order -->
@@ -65,7 +133,7 @@
                 <div class="modal-body">
                     <!-- Display order details here -->
                     <div v-if="selectedOrder">
-                        <p><strong>Customer Name:</strong> {{ selectedOrder.orderId.fullName }}</p>
+                        <p><strong>Customer Name:</strong> {{ selectedOrder.orderId.userId.fullName }}</p>
                         <p><strong>Payment Method:</strong> {{ mapPaymentMethod(selectedOrder.orderId.paymentMethod) }}</p>
                         <p><strong>Status:</strong> <span :class="getStatusTextClass(selectedOrder.status)"
                                 style="font-weight: bold;">{{ mapStatus(selectedOrder.status) }}</span></p>
@@ -76,12 +144,21 @@
                         <p><strong>Invoice ID:</strong> {{ selectedOrder._id }}</p>
                         <hr>
                         <p><strong>Item:</strong> {{ selectedOrder.orderId.subProductId.title }}</p>
-                        <p><strong>Price:</strong> {{ selectedOrder.price }}<span> $</span></p>
+                        <p v-if="selectedOrder.orderId.paymentMethod === 2">
+    <strong>Price(Discount 20%):</strong>
+    {{ (selectedOrder.price * 0.8).toFixed(2) }} <span> $</span>
+  </p>
+  <p v-else>
+    <strong>Price:</strong> {{ selectedOrder.price }} <span> $</span>
+  </p>
                     </div>
                 </div>
                 <div class="modal-footer">
                     
-                    <button class="btn btn-success bg-green-600 hover:bg-green-700 print-button" @click="generateAndPrintPDF">Print PDF</button>
+                    <button v-if="selectedOrder && selectedOrder.status !== 3"
+        class="btn btn-success bg-green-600 hover:bg-green-700 print-button"
+        @click="generateAndPrintPDF">Print PDF</button>
+
                 </div>
             </div>
         </div>
@@ -91,29 +168,164 @@
 <script>
 import axios from 'axios';
 import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+const logoImageURL = 'https://static.wixstatic.com/media/4ec883_1768ba30e5b14ff28e8f5cdfc17de94a~mv2.png/v1/crop/x_0,y_121,w_505,h_279/fill/w_318,h_170,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/bt-i%20logo%20-%20white%20background%20-%20single%20color%20-%20shaded%20500%20x%20500.png';
 export default {
     data() {
         return {
+          form: {
+        address: "",
+        phoneNumber: "",
+        telegram: "",
+        companyEmail: "",
+      },
             orders: [], 
+            currentPage: 1,
+            searchEmail: "",
+            originalOrders: [], // Initialize the originalOrders array
+          
+      itemsPerPage: 10,
+      limit: 1000, // Default limit
+      page: 1,   // Default page
 
             selectedOrder: null,
         };
     },
-    created() {
-        axios.get('/reports') // Replace with your API endpoint
-            .then(response => {
-                this.orders = response.data.data.items; // Assuming 'items' contains the list of orders
-            })
-            .catch(error => {
-                console.error('Error fetching data', error);
-            });
+    computed: {
+    paginatedorders() {
+      const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+      const endIndex = startIndex + parseInt(this.itemsPerPage); // Parse the selected itemsPerPage
+      return this.orders.slice(startIndex, endIndex);
+
     },
+    totalPages() {
+      return Math.ceil(this.orders.length / this.itemsPerPage);
+    },
+
+    visiblePages() {
+      const maxVisiblePages = 5; // Adjust this value as needed
+      const pages = [];
+
+      if (this.totalPages <= maxVisiblePages) {
+        for (let i = 1; i <= this.totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        if (this.currentPage <= maxVisiblePages - 2) {
+          for (let i = 1; i <= maxVisiblePages - 2; i++) {
+            pages.push(i);
+          }
+          pages.push("...");
+          pages.push(this.totalPages - 1);
+          pages.push(this.totalPages);
+        } else if (this.currentPage >= this.totalPages - maxVisiblePages + 3) {
+          pages.push(1);
+          pages.push(2);
+          pages.push("...");
+          for (let i = this.totalPages - maxVisiblePages + 3; i <= this.totalPages; i++) {
+            pages.push(i);
+          }
+        } else {
+          pages.push(1);
+          pages.push(2);
+          pages.push("...");
+          for (let i = this.currentPage - 1; i <= this.currentPage + 1; i++) {
+            pages.push(i);
+          }
+          pages.push("...");
+          pages.push(this.totalPages - 1);
+          pages.push(this.totalPages);
+        }
+      }
+
+      return pages;
+    },
+  },
+    created() {
+      axios.get(`/reports?limit=${this.limit}&page=${this.page}`)
+      .then(response => {
+        this.orders = response.data.data.items;
+        this.originalOrders = response.data.data.items; // Initialize originalOrders
+      })
+      .catch(error => {
+        console.error('Error fetching data', error);
+      });
+    // Fetch the initial data when the component is created
+    this.fetchInitialData();
+  },
     methods: {
+      async getCompanyInfo(){
+        const info = await axios.get('/company-info').then(res=> res.data)
+        this.form = info
+    },
+      updateItemsPerPage() {
+    // Reset the current page to 1 when changing the items per page
+    this.currentPage = 1;
+  },
+      resetSearch() {
+  // Clear the search input
+  this.searchEmail = "";
+
+  // Reset the searchedOrderIndex to remove styling
+  this.searchedOrderIndex = -1;
+
+  // Fetch the initial data again to reset the list
+  this.fetchInitialData();
+},
+
+    
+    fetchInitialData() {
+  // Fetch data from your API and update the 'users' and 'originalUsers' arrays
+  axios.get(`/reports?limit=${this.limit}&page=${this.page}`)
+    .then(response => {
+      this.orders = response.data.data.items;
+      this.originalUsers = response.data.data.items; // Initialize originalUsers
+    })
+    .catch(error => {
+      console.error('Error fetching data', error);
+    });
+},
+searchOrderByEmail() {
+      const emailToSearch = this.searchEmail.trim();
+
+      if (!emailToSearch) {
+        // Handle empty search input as needed
+        return;
+      }
+
+      // Filter the orders based on email in the originalOrders list
+      this.orders = this.originalOrders.filter((order) => {
+        if (order.orderId && order.orderId.userId && order.orderId.userId.email) {
+          return order.orderId.userId.email.toLowerCase() === emailToSearch.toLowerCase();
+        }
+        return false;
+      });
+
+      // Reset the current page to 1
+      this.currentPage = 1;
+    },
+
+        formatDate(isoDate) {
+      const date = new Date(isoDate);
+      const options = {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false, // 24-hour format
+      };
+      return date.toLocaleDateString('en-US', options);
+    },
+        setCurrentPage(page) {
+      this.currentPage = page;
+    },
         printInvoice() {
             // Trigger the print action
             window.print();
         },
-generateAndPrintPDF() {
+        generateAndPrintPDF() {
   if (this.selectedOrder) {
     // Create a new PDF document
     const pdf = new jsPDF();
@@ -125,34 +337,83 @@ generateAndPrintPDF() {
     // Get the current date
     const currentDate = new Date().toLocaleDateString();
 
-    // Define the content of the PDF with the current date
-    const content = `
-      Blue-Technology
-      Invoice Details
-      ----------------------------
-      Date: ${currentDate}
-      Customer Name: ${this.selectedOrder.orderId.fullName}
-      Payment Method: ${this.mapPaymentMethod(this.selectedOrder.orderId.paymentMethod)}
-      Status: ${this.mapStatus(this.selectedOrder.status)}
-      Phone Number: ${this.selectedOrder.orderId.phoneNumber}
-      Email: ${this.selectedOrder.orderId.userId.email}
-      Address: ${this.selectedOrder.orderId.address}
-      Order ID: ${this.selectedOrder.orderId._id}
-      Invoice ID: ${this.selectedOrder._id}
-      
-      Item: ${this.selectedOrder.orderId.subProductId.title}
-      Price: ${this.selectedOrder.price} $
+    // Calculate the unit price with or without the discount based on the payment method
+    const unitPrice = this.selectedOrder.orderId.paymentMethod === 2
+      ? this.selectedOrder.price * 0.8 // Apply a 20% discount for online payment
+      : this.selectedOrder.price;
 
-      -----------------------------------
-      Thank you for your purchase!
-    `;
+    // Calculate the total amount
+    const totalAmount = unitPrice;
 
-    // Add the content to the PDF with proper line spacing
-    pdf.text(content, 10, 10);
+    // Create an array for the table data
+    const tableData = [
+      ['Description', 'Quantity', 'Unit Price', 'Total'],
+      [this.selectedOrder.orderId.subProductId.title, '1', unitPrice.toFixed(2) + ' $', unitPrice.toFixed(2) + ' $'],
+    ];
 
-    // Print the PDF in a new window
-    pdf.autoPrint();
-    pdf.output('dataurlnewwindow');
+    // Define the columns for the table
+    const tableColumns = {
+      startY: 100, // Adjust the starting Y position
+      head: [['Item Description', 'Quantity', 'Unit Price', 'Total']],
+      body: tableData.slice(1), // Exclude the header from the body
+      styles: {
+        cellWidth: 'auto',
+        fontSize: 12,
+        halign: 'center',
+      },
+      columnStyles: {
+        0: { cellWidth: 'auto' },
+        3: { halign: 'right' },
+      },
+    };
+
+    // Add a header
+    pdf.setFontSize(18);
+    pdf.text('Invoice', 105, 20, null, null, 'center');
+
+    // Load the logo image
+    const logoWidth = 24; // Set the width of the logo
+    const logoHeight = 12; // Set the height of the logo
+    pdf.addImage(logoImageURL, 'PNG', 10, 10, logoWidth, logoHeight); // Adjust the position and size as needed
+    // Add the current date
+    pdf.setFontSize(12);
+    pdf.text(`Date: ${currentDate}`, 10, 30);
+
+    // Add customer details
+    pdf.setFontSize(12);
+    pdf.text(`Customer Name: ${this.selectedOrder.orderId.userId.fullName}`, 10, 40);
+    pdf.text(`Phone Number: ${this.selectedOrder.orderId.phoneNumber}`, 10, 50);
+    pdf.text(`Email: ${this.selectedOrder.orderId.userId.email}`, 10, 60);
+    pdf.text(`Address: ${this.selectedOrder.orderId.address}`, 10, 70);
+    pdf.text(`Payment Method: ${this.mapPaymentMethod(this.selectedOrder.orderId.paymentMethod)}`, 10, 80);
+    pdf.text(`Status: ${this.mapStatus(this.selectedOrder.status)}`, 10, 90);
+
+    // Add Order ID and Invoice ID at the top right
+    pdf.setFontSize(12);
+    pdf.text(`Order ID: ${this.selectedOrder.orderId._id}`, 125, 30); // Further adjusted X-coordinate
+    pdf.text(`Invoice ID: ${this.selectedOrder._id}`, 125, 40); // Further adjusted X-coordinate
+
+    // Add the table to the PDF
+    pdf.autoTable(tableColumns);
+
+    // Add the total amount
+    pdf.setFontSize(14);
+    pdf.text(`Total Amount: ${totalAmount.toFixed(2)} $`, 10, pdf.autoTable.previous.finalY + 20);
+
+    // Add a thank you message
+    pdf.setFontSize(12);
+    pdf.text('Thank you for your purchase!', 10, pdf.autoTable.previous.finalY + 30);
+    
+     // Add your company information in the bottom corner
+     pdf.setFontSize(8);
+pdf.text(`Address: ${this.form.address}`, 10, pdf.internal.pageSize.height - 20);
+pdf.text(`Tel: ${this.form.phoneNumber}`, 10, pdf.internal.pageSize.height - 15);
+pdf.text(`Telegram: ${this.form.telegram}`, 10, pdf.internal.pageSize.height - 10);
+pdf.text(`Email: ${this.form.companyEmail}`, 10, pdf.internal.pageSize.height - 5);
+
+
+    // Save or print the PDF
+    pdf.save('invoice.pdf');
   }
 },
 
@@ -164,11 +425,12 @@ generateAndPrintPDF() {
             modal.show();
         },
         closeViewModal() {
-            // Clear the selected order and close the modal
-            this.selectedOrder = null;
-            const modal = new bootstrap.Modal(document.getElementById('viewModal'));
-            modal.hide();
-        },
+  // Clear the selected order, close the modal, and clear the search input
+  this.selectedOrder = null;
+ 
+  const modal = new bootstrap.Modal(document.getElementById("viewModal"));
+  modal.hide();
+},
         getStatusClass(status) {
             // Define your status classes here as you did in your original code
         },
@@ -204,16 +466,78 @@ generateAndPrintPDF() {
                 case 1:
                     return 'Cash on Delivery';
                 case 2:
-                    return 'Online Payment';
+                    return 'Online Payment (20% OFF)';
                 default:
                     return 'Unknown';
             }
         },
     },
+    async mounted() {
+      await this.getCompanyInfo();
+    const urlParams = new URLSearchParams(window.location.search);
+    const limitParam = urlParams.get('limit');
+    const pageParam = urlParams.get('page');
+
+    // Update limit and page with query parameter values if provided
+    if (limitParam) {
+      this.limit = parseInt(limitParam);
+    }
+    if (pageParam) {
+      this.page = parseInt(pageParam);
+    }
+  
+  },
 };
 </script>
   
 <style lang="scss" scoped>
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.pagination {
+  display: flex;
+  list-style: none;
+  padding: 0;
+}
+
+.page-item {
+  margin: 0;
+}
+
+.page-link {
+  display: inline-block;
+  padding: 4px 8px;
+  font-size: 12px;
+  border: 1px solid #ddd;
+  background-color: #f9f9f9;
+  color: #333;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.page-link.active {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.page-link:hover {
+  background-color: #e9e9e9;
+}
+
+.page-link:disabled {
+  background-color: #ddd;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.page-link:focus {
+  outline: none;
+  box-shadow: none;
+}
+
 span {
     margin-left: 2px;
 }

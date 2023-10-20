@@ -1,8 +1,44 @@
 <template>
   <div class="container-fluid">
-    <h1 class="mt-4">Top Up Management</h1>
+    <h1>Top Up Management</h1>
 
-    <div class="mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3 mt-5">
+  <!-- "Items Per Page" select element on the left -->
+  <div class="items-per-page">
+    <label for="itemsPerPageSelect" class="mr-2">Show:</label>
+    <select
+      id="itemsPerPageSelect"
+      v-model="itemsPerPage"
+      @change="updateItemsPerPage"
+      class="custom-select custom-select-sm"
+    >
+      <option value="10">10</option>
+      <option value="20">20</option>
+      <option value="50">50</option>
+      <!-- Add more options as needed -->
+    </select>
+  </div>
+
+  <!-- Search-related elements on the right -->
+  <div class="d-flex">
+    <div class="input-group input-group-sm" style="max-width: 200px;">
+      <input
+        type="text"
+        class="form-control form-control-sm"
+        placeholder="Search by Email"
+        v-model="searchEmail"
+      />
+    </div>
+    <button class="btn btn-sm btn-primary" @click="searchOrderByEmail">
+      <i class="fas fa-search"></i> <!-- Font Awesome search icon -->
+    </button>
+    <button class="btn btn-sm btn-secondary" @click="resetSearch">Reset</button>
+  </div>
+</div>
+
+
+
+    <div class="">
       <table class="table table-bordered">
         <thead class="thead-dark">
           <tr>
@@ -16,38 +52,64 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(topup, index) in topups" :key="topup._id">
-            <th>{{ index + 1 }}</th>
+          <tr v-for="(topup, index) in paginatedtopups" :key="topup._id" >
+            <th>{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th>
             <td>{{ topup.userId.fullName }}</td>
             <td>{{ topup.userId.email }}</td>
             <td>{{ topup.amount }} $</td>
             <td>{{formatDate(topup.createdAt) }}</td>
             <td>
-              <span :class="getStatusClass(topup.status)" style="font-weight: bold;">
-                <span v-if="!topup.isEditing" @click="startEditingStatus(topup)">
-                  {{ mapStatus(topup.status) }}
-                  <i class="fa fa-pencil ml-2" style="cursor: pointer;"></i> <!-- Edit icon -->
-                </span>
-                <span v-else>
-                  <!-- Use a div with a class for styling instead of the select element -->
-                  <div class="status-dropdown-sm">
-                    <select v-model="topup.newStatus" class="form-select form-select-sm">
-                      <option value="1">Pending</option>
-                      <option value="2">Agreed</option>
-                      <option value="3">Rejected</option>
-                    </select>
-                  </div>
-                  <button class="btn btn-primary btn-sm smaller-btn" @click="updateStatus(topup)">Save</button>
-                  <button class="btn btn-secondary btn-sm smaller-btn" @click="cancelEditingStatus(topup)">Cancel</button>
-                </span>
-              </span>
-            </td>
+  <span :class="getStatusClass(topup.status)" style="font-weight: bold;">
+    <span v-if="!topup.isEditing">
+      {{ mapStatus(topup.status) }}
+    </span>
+    <span v-else>
+      <span v-if="topup.status !== 2 && topup.status !== 3">
+        <!-- Only show if status is not Agreed or Rejected -->
+        <div class="status-dropdown-sm">
+          <select v-model="topup.newStatus" class="form-select form-select-sm">
+            <option value="1">Pending</option>
+            <option value="2">Agreed</option>
+            <option value="3">Rejected</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-sm smaller-btn" @click="updateStatus(topup)">Save</button>
+        <button class="btn btn-secondary btn-sm smaller-btn" @click="cancelEditingStatus(topup)">Cancel</button>
+      </span>
+    </span>
+    <i v-if="!topup.isEditing && topup.status === 1" class="fa fa-pencil ml-2" style="cursor: pointer;"
+       @click="startEditingStatus(topup)"></i> <!-- Edit icon -->
+  </span>
+</td>
+
             <td>
               <button class="btn btn-primary" @click="viewTopUp(topup)">View</button>
             </td>
           </tr>
         </tbody>
       </table>
+    </div>
+    <!-- Only show pagination if there are more than 10 items -->
+    <div class="pagination-container" v-if="topups.length > 10">
+      <ul class="pagination">
+        <li class="page-item">
+  <button class="page-link" @click="currentPage -= 1" :disabled="currentPage === 1">
+    &#8592; Previous
+  </button>
+</li>
+
+        <li v-for="page in visiblePages" :key="page">
+          <button class="page-link" @click="currentPage = page" :class="{ 'active': currentPage === page }">
+            {{ page }}
+          </button>
+        </li>
+        <li class="page-item">
+  <button class="page-link" @click="currentPage += 1" :disabled="currentPage === totalPages">
+    Next &#8594;
+  </button>
+</li>
+
+      </ul>
     </div>
   </div>
 
@@ -56,10 +118,10 @@
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="viewModalLabel">View Top-Up Details</h5>
-          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" @click="closeViewModal">
+          <h5 class="modal-title" id="viewModalLabel">Top-Up Details</h5>
+          <!-- <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" @click="closeViewModal">
             <span aria-hidden="true">&times;</span>
-          </button>
+          </button> -->
         </div>
         <div class="modal-body">
           <!-- Display top-up details here -->
@@ -75,7 +137,7 @@
               <p><strong>Transaction Photo:</strong></p>
               <img
         :src="selectedTopUp.transactionPhoto.url"
-        :class="{ 'subProduct-img': selectedTopUp.hasPadding }" 
+        :class="{ 'topups-img': selectedTopUp.hasPadding }" 
         alt="Transaction Photo"
         class="img-fluid"
       />
@@ -84,7 +146,8 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary bg-danger text-white" data-bs-dismiss="modal" @click="closeViewModal">Close</button>
+          <button type="button" class="btn btn-secondary bg-red-500 hover:bg-red-600 text-white" data-bs-dismiss="modal"
+            @click="closeViewModal">Close</button>
         </div>
       </div>
     </div>
@@ -97,25 +160,129 @@ import axios from 'axios';
 export default {
   data() {
     return {
+      originalTopups: [], // Store the original top-ups data here
       topups: [],
+  
+      searchEmail: "",
+ 
       selectedTopUp: null,
+      currentPage: 1,
+      itemsPerPage: 10,
+      limit: 1000, // Default limit
+      page: 1,   // Default page
     };
+  },
+  computed: {
+    paginatedtopups() {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + parseInt(this.itemsPerPage); // Parse the selected itemsPerPage
+    return this.topups.slice(startIndex, endIndex); // Change this line
+  },
+    totalPages() {
+      return Math.ceil(this.topups.length / this.itemsPerPage);
+    },
+    visiblePages() {
+      const maxVisiblePages = 5; // Adjust this value as needed
+      const pages = [];
+
+      if (this.totalPages <= maxVisiblePages) {
+        for (let i = 1; i <= this.totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        if (this.currentPage <= maxVisiblePages - 2) {
+          for (let i = 1; i <= maxVisiblePages - 2; i++) {
+            pages.push(i);
+          }
+          pages.push("...");
+          pages.push(this.totalPages - 1);
+          pages.push(this.totalPages);
+        } else if (this.currentPage >= this.totalPages - maxVisiblePages + 3) {
+          pages.push(1);
+          pages.push(2);
+          pages.push("...");
+          for (let i = this.totalPages - maxVisiblePages + 3; i <= this.totalPages; i++) {
+            pages.push(i);
+          }
+        } else {
+          pages.push(1);
+          pages.push(2);
+          pages.push("...");
+          for (let i = this.currentPage - 1; i <= this.currentPage + 1; i++) {
+            pages.push(i);
+          }
+          pages.push("...");
+          pages.push(this.totalPages - 1);
+          pages.push(this.totalPages);
+        }
+      }
+
+      return pages;
+    },
   },
   created() {
-    const token = localStorage.getItem('token'); // Get the token from local storage
-    const headers = {
-      Authorization: `Bearer ${token}`,
-    };
+  // Fetch the initial data when the component is created
+  this.fetchInitialData();
+  const token = localStorage.getItem('token');
+  const headers = {
+    Authorization: `Bearer ${token}`,
+  };
 
-    axios.get('/topup', { headers }) // Include the headers in the request
-      .then(response => {
-        this.topups = response.data.data.items; // Assuming 'items' contains the list of "Top Up" records
-      })
-      .catch(error => {
-        console.error('Error fetching data', error);
-      });
-  },
+  axios.get(`/topup?limit=${this.limit}&page=${this.page}`, { headers })
+    .then(response => {
+      this.originalTopups = response.data.data.items; // Populate the original data
+      this.topups = [...this.originalTopups]; // Copy the data to the working array
+      console.log('Fetched top-ups:', this.topups);
+    })
+    .catch(error => {
+      console.error('Error fetching data', error);
+    });
+},
+
   methods: {
+    updateItemsPerPage() {
+    // Reset the current page to 1 when changing the items per page
+    this.currentPage = 1;
+  },
+    resetSearch() {
+  this.searchEmail = ""; // Clear the search input
+
+  this.topups = [...this.originalTopups]; // Reset the topups array to original data
+},
+
+
+    
+    fetchInitialData() {
+      // Fetch data from your API and update the 'users' array
+      axios.get(`/topup?limit=${this.limit}&page=${this.page}`)
+        .then(response => {
+          this.topups = response.data.data.items; // Updated to use 'users' data
+        })
+        .catch(error => {
+          console.error('Error fetching data', error);
+        });
+    },
+    searchOrderByEmail() {
+  const emailToSearch = this.searchEmail.trim();
+
+  if (!emailToSearch) {
+    // Handle empty search input as needed
+    return;
+  }
+
+  // Filter the topups based on email in the originalTopups list
+  this.topups = this.originalTopups.filter(
+    (topup) => topup.userId.email.toLowerCase() === emailToSearch.toLowerCase()
+  );
+
+  // Reset the current page to 1
+  this.currentPage = 1;
+},
+
+
+    setCurrentPage(page) {
+      this.currentPage = page;
+    },
     formatDate(isoDate) {
       const date = new Date(isoDate);
       const options = {
@@ -138,8 +305,11 @@ export default {
       topup.newStatus = topup.status;
     },
     startEditingStatus(topup) {
-      topup.isEditing = true;
-      topup.newStatus = topup.status; // Initialize newStatus with the current status
+      // Allow editing only if the status is "Pending"
+      if (topup.status === 1) {
+        topup.isEditing = true;
+        topup.newStatus = topup.status; // Initialize newStatus with the current status
+      }
     },
     updateStatus(topup) {
   // Store the new status before making the API call
@@ -213,6 +383,25 @@ export default {
       }
     },
   },
+  async mounted() {
+
+       // Fetch the initial user data
+       await this.fetchInitialData();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const limitParam = urlParams.get('limit');
+    const pageParam = urlParams.get('page');
+
+    // Update limit and page with query parameter values if provided
+    if (limitParam) {
+      this.limit = parseInt(limitParam);
+    }
+    if (pageParam) {
+      this.page = parseInt(pageParam);
+    }
+
+
+  },
 };
 </script>
   
@@ -224,6 +413,52 @@ export default {
   /* Adjust the gap as needed */
 }
 
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.pagination {
+  display: flex;
+  list-style: none;
+  padding: 0;
+}
+
+.page-item {
+  margin: 0;
+}
+
+.page-link {
+  display: inline-block;
+  padding: 4px 8px;
+  font-size: 12px;
+  border: 1px solid #ddd;
+  background-color: #f9f9f9;
+  color: #333;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.page-link.active {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.page-link:hover {
+  background-color: #e9e9e9;
+}
+
+.page-link:disabled {
+  background-color: #ddd;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.page-link:focus {
+  outline: none;
+  box-shadow: none;
+}
 
 /* Adjust the font size and padding for the smaller buttons */
 .smaller-btn {
@@ -288,10 +523,11 @@ export default {
 }
 
 h1 {
-        font-size: 24px;
-        font-weight: bold;
-        text-transform: uppercase;
-    }
+    font-size: 24px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 90px;
+  }
   .order-page {
     h1 {
       font-size: 24px;
@@ -318,11 +554,11 @@ h1 {
    
   }
   
-  .subProduct-img {
+  .topups-img {
   margin-left: 2px;
   padding: 10px; /* Adjust the padding to your preferred size */
-  max-width: 400px; /* Limit the maximum width */
-  max-height: 400px; /* Limit the maximum height */
+  max-width: 500px; /* Limit the maximum width */
+  max-height: 500px; /* Limit the maximum height */
   object-fit: contain;
 }
 

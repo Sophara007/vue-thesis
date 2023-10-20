@@ -18,8 +18,8 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(product, index) in products" :key="product._id" style="text-align: center;">
-            <th>{{ index + 1 }}</th>
+          <tr v-for="(product, index) in paginatedproducts" :key="product._id" style="text-align: center;">
+            <th>{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th>
             <td><span class="description">{{ product.title }}</span></td>
             <td><span class="description">{{ product.description }}</span></td>
             <td>
@@ -38,6 +38,27 @@
           </tr>
         </tbody>
       </table>
+    </div>
+    <!-- Only show pagination if there are more than 10 items -->
+    <div class="pagination-container" v-if="products.length > 10">
+      <ul class="pagination">
+        <li class="page-item">
+          <button class="page-link" @click="currentPage -= 1" :disabled="currentPage === 1">
+            &#8592; Previous
+          </button>
+        </li>
+        <li v-for="page in visiblePages" :key="page">
+          <button class="page-link" @click="currentPage = page" :class="{ 'active': currentPage === page }">
+            {{ page }}
+          </button>
+        </li>
+        <li class="page-item">
+          <button class="page-link" @click="currentPage += 1" :disabled="currentPage === totalPages">
+            Next &#8594;
+          </button>
+        </li>
+
+      </ul>
     </div>
   </div>
 
@@ -105,6 +126,10 @@ export default {
   data() {
     return {
       products: [],
+      currentPage: 1,
+      itemsPerPage: 10,
+      limit: 1000, // Default limit
+      page: 1,   // Default page
       form: {
         title: "",
         description: "",
@@ -117,10 +142,63 @@ export default {
       },
     };
   },
+  computed: {
+    paginatedproducts() {
+      const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+      const endIndex = startIndex + this.itemsPerPage;
+      return this.products.slice(startIndex, endIndex);
+
+    },
+    totalPages() {
+      return Math.ceil(this.products.length / this.itemsPerPage);
+    },
+
+    visiblePages() {
+      const maxVisiblePages = 5; // Adjust this value as needed
+      const pages = [];
+
+      if (this.totalPages <= maxVisiblePages) {
+        for (let i = 1; i <= this.totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        if (this.currentPage <= maxVisiblePages - 2) {
+          for (let i = 1; i <= maxVisiblePages - 2; i++) {
+            pages.push(i);
+          }
+          pages.push("...");
+          pages.push(this.totalPages - 1);
+          pages.push(this.totalPages);
+        } else if (this.currentPage >= this.totalPages - maxVisiblePages + 3) {
+          pages.push(1);
+          pages.push(2);
+          pages.push("...");
+          for (let i = this.totalPages - maxVisiblePages + 3; i <= this.totalPages; i++) {
+            pages.push(i);
+          }
+        } else {
+          pages.push(1);
+          pages.push(2);
+          pages.push("...");
+          for (let i = this.currentPage - 1; i <= this.currentPage + 1; i++) {
+            pages.push(i);
+          }
+          pages.push("...");
+          pages.push(this.totalPages - 1);
+          pages.push(this.totalPages);
+        }
+      }
+
+      return pages;
+    },
+  },
   methods: {
+    setCurrentPage(page) {
+      this.currentPage = page;
+    },
     async getProducts() {
       try {
-        const response = await axios.get("/product");
+        const response = await axios.get(`/product?limit=${this.limit}&page=${this.page}`);
         if (response.data && response.data.data && Array.isArray(response.data.data.items)) {
           this.products = response.data.data.items;
         } else {
@@ -269,12 +347,72 @@ export default {
   },
 
   async mounted() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const limitParam = urlParams.get('limit');
+    const pageParam = urlParams.get('page');
+
+    // Update limit and page with query parameter values if provided
+    if (limitParam) {
+      this.limit = parseInt(limitParam);
+    }
+    if (pageParam) {
+      this.page = parseInt(pageParam);
+    }
     await this.getProducts();
   },
 };
 </script>
 
 <style lang="scss" scoped>
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.pagination {
+  display: flex;
+  list-style: none;
+  padding: 0;
+}
+
+.page-item {
+  margin: 0;
+}
+
+.page-link {
+  display: inline-block;
+  padding: 4px 8px;
+  font-size: 12px;
+  border: 1px solid #ddd;
+  background-color: #f9f9f9;
+  color: #333;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.page-link.active {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.page-link:hover {
+  background-color: #e9e9e9;
+}
+
+.page-link:disabled {
+  background-color: #ddd;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.page-link:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+
 .description {
   display: -webkit-box;
   -webkit-line-clamp: 2;

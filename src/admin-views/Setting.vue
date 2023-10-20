@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper-setting-page container-fluid">
-    <h1>Setting Information</h1>
+    <h1>Information Setting</h1>
     <div class="wrapper-form mt-5">
       <div class="wrapper-form-input">
         <input
@@ -67,6 +67,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+ h1 {
+    font-size: 24px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
     .btn {
       color: green;
 

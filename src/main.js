@@ -1,6 +1,6 @@
 import { createApp } from 'vue';
 import App from './App.vue';
-import router from './router/index.js';
+import router from './router/index'; // Assuming you have a router setup file
 import store from './store/index.js';
 import '@fortawesome/fontawesome-free/css/all.css';
 import axios from 'axios';
@@ -20,6 +20,18 @@ if (token) {
 }
 
 app.config.globalProperties.$axios = axios;
+
+// Add a navigation guard to update the title
+router.beforeEach((to, from, next) => {
+  // Check if the route has a meta field for the title
+  if (to.meta.title) {
+    document.title = to.meta.title;
+  } else {
+    // If no title is specified, you can set a default title
+    document.title = 'BlueTech-Panel';
+  }
+  next();
+});
 
 app.use(router);
 app.use(store);

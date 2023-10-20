@@ -16,8 +16,8 @@
       </div>
     </div>
 
-   <!-- Sales Report -->
-   <div class="card shadow-lg mt-4">
+    <!-- Sales Report -->
+    <div class="card shadow-lg mt-4">
       <div class="card-body text-center">
         <h3 class="card-title fs-2">Sales Report</h3>
         <div class="chart-container">
@@ -33,88 +33,19 @@ import axios from 'axios';
 import Chart from 'chart.js/auto';
 import 'chartjs-adapter-date-fns';
 
+
 export default {
   data() {
     return {
       dashboardItems: [],
       salesData: {
-        labels: [
-       
-          '2023-01-08', // Weekly point
-          '2023-01-15', // Weekly point
-          '2023-01-22', // Weekly point
-          '2023-01-29', // Weekly point
-        
-          '2023-02-08', // Weekly point
-          '2023-02-15', // Weekly point
-          '2023-02-22', // Weekly point
-          '2023-02-28', // Weekly point
-        
-          '2023-03-08', // Weekly point
-          '2023-03-15', // Weekly point
-          '2023-03-22', // Weekly point
-          '2023-03-29', // Weekly point
-       
-          '2023-04-08', // Weekly point
-          '2023-04-15', // Weekly point
-          '2023-04-22', // Weekly point
-          '2023-04-29', // Weekly point
-        
-          '2023-05-08', // Weekly point
-          '2023-05-15', // Weekly point
-          '2023-05-22', // Weekly point
-          '2023-05-29', // Weekly point
-        
-          '2023-06-08', // Weekly point
-          '2023-06-15', // Weekly point
-          '2023-06-22', // Weekly point
-          '2023-06-29', // Weekly point
-         
-          '2023-07-08', // Weekly point
-          '2023-07-15', // Weekly point
-          '2023-07-22', // Weekly point
-          '2023-07-29', // Weekly point
-        
-          '2023-08-08', // Weekly point
-          '2023-08-15', // Weekly point
-          '2023-08-22', // Weekly point
-          '2023-08-29', // Weekly point
-       
-          '2023-09-08', // Weekly point
-          '2023-09-15', // Weekly point
-          '2023-09-22', // Weekly point
-          '2023-09-29', // Weekly point
-          
-          '2023-10-08', // Weekly point
-          '2023-10-15', // Weekly point
-          '2023-10-22', // Weekly point
-          '2023-10-29', // Weekly point
-        
-          '2023-11-08', // Weekly point
-          '2023-11-15', // Weekly point
-          '2023-11-22', // Weekly point
-          '2023-11-29', // Weekly point
-         
-          '2023-12-08', // Weekly point
-          '2023-12-15', // Weekly point
-          '2023-12-22', // Weekly point
-          '2023-12-29', // Weekly point
-        ],
+        labels: [],
         datasets: [
           {
-            label: 'Sales',
-            data: [
-  0, 1300, 1400, 1500, 1600,
-  1700, 1900, 1800, 1700, 1600,
-  1500, 1400, 1300, 1200, 1100,
-  1000, 950, 900, 850, 800,
-  750, 700, 650, 600, 550,
-  500, 450, 400, 350, 300,
-  
-
-],
-
+            label: 'Sales', // Change label to 'Number of Sales'
+            data: [], // Initialize data as an empty array
             borderColor: 'rgba(0, 123, 255, 1)',
+             backgroundColor: 'rgba(0, 123, 255, 0.3)', // Add a background color
             borderWidth: 2,
             fill: {
               target: 'origin',
@@ -127,45 +58,92 @@ export default {
   },
   methods: {
     async getDashboard() {
-      // Simulate fetching dashboard data from an API (replace with actual API call)
-      const dashboardData = await this.fetchDashboardData();
+      try {
+        const dashboardResponse = await axios.get('/dashboard');
+        const dashboardData = dashboardResponse.data.data;
 
-      // Map fetched data to dashboardItems
-      this.dashboardItems = [
-        { title: 'Products', count: dashboardData.count_product, iconClasses: 'fas fa-box' },
-        { title: 'Services', count: dashboardData.count_service, iconClasses: 'fas fa-handshake' },
-        { title: 'Users', count: dashboardData.count_user, iconClasses: 'fas fa-users' },
-        { title: 'Inquiries', count: dashboardData.count_inquiry, iconClasses: 'fa fa-commenting' },
-        { title: 'Partners', count: dashboardData.count_partner, iconClasses: 'fa-regular fa-window-restore' },
-        { title: 'Industries', count: dashboardData.count_industry, iconClasses: 'fas fa-industry' },
-      ];
+        this.dashboardItems = [
+          { title: 'Products', count: dashboardData.count_product, iconClasses: 'fas fa-box' },
+          { title: 'Services', count: dashboardData.count_service, iconClasses: 'fas fa-handshake' },
+          { title: 'Users', count: dashboardData.count_user, iconClasses: 'fas fa-users' },
+          { title: 'Inquiries', count: dashboardData.count_inquiry, iconClasses: 'fa fa-commenting' },
+          { title: 'Partners', count: dashboardData.count_partner, iconClasses: 'fa-regular fa-window-restore' },
+          { title: 'Industries', count: dashboardData.count_industry, iconClasses: 'fas fa-industry' },
+        ];
 
-      // After fetching dashboard data, create the chart
-      this.createSalesChart();
+        // After fetching dashboard data, create the chart
+        this.createSalesChart();
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      }
     },
-    async fetchDashboardData() {
-      // Simulate fetching data from an API (replace with your actual API endpoint)
-      const response = await axios.get('/dashboard');
-      return response.data.data;
-    },
+    async fetchSalesData() {
+  try {
+    const today = new Date(); // Get the current date
+    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    const salesResponse = await axios.get('/reports?limit=1000');
+    const salesData = salesResponse.data.data;
+
+    // Filter sales data where isPaid is true and createdAt is within the current month
+    const filteredSalesData = salesData.items.filter((item) => {
+      const saleDate = new Date(item.createdAt);
+      return item.isPaid && saleDate >= firstDayOfMonth && saleDate <= today;
+    });
+
+    // Create an object to store sales counts by date
+    const salesCountsByDate = {};
+
+    // Process each sale to aggregate sales counts by date
+    filteredSalesData.forEach((item) => {
+      const saleDate = new Date(item.createdAt).toLocaleDateString();
+
+      if (salesCountsByDate[saleDate]) {
+        salesCountsByDate[saleDate]++;
+      } else {
+        salesCountsByDate[saleDate] = 1;
+      }
+    });
+
+    // Extract date labels and sales counts from the aggregated data
+    const saleDates = Object.keys(salesCountsByDate);
+    const saleCounts = Object.values(salesCountsByDate);
+
+    // Update the salesData object
+    this.salesData.labels = saleDates; // Use saleDates as the X-axis labels
+    this.salesData.datasets[0].data = saleCounts; // Use saleCounts as the Y-axis data
+
+    // After fetching data and updating the salesData object, create the chart
+    this.createSalesChart();
+  } catch (error) {
+    console.error('Error fetching sales data:', error);
+  }
+},
+
+
     createSalesChart() {
       const ctx = document.getElementById('salesChart').getContext('2d');
-      const chart = new Chart(ctx, {
-        type: 'line',
+
+      // Destroy the existing chart if it exists
+      if (this.salesChart) {
+        this.salesChart.destroy();
+      }
+
+      this.salesChart = new Chart(ctx, {
+        type: 'bar',
         data: this.salesData,
         options: {
           responsive: true,
           maintainAspectRatio: false,
           scales: {
             x: {
-              type: 'time',
-              time: {
-                unit: 'month',
-                tooltipFormat: 'yyyy-MM-dd',
-              },
+              beginAtZero: true,
+              suggestedMin: 0,
             },
             y: {
               beginAtZero: true,
+              suggestedMin: 0,
+              suggestedMax: Math.max(...this.salesData.datasets[0].data) + 1,
               title: {
                 display: true,
                 text: 'Sales',
@@ -187,13 +165,18 @@ export default {
               },
             },
           },
+          legend: {
+            display: false,
+          },
         },
       });
-      chart.update();
     },
+
   },
   async mounted() {
     await this.getDashboard();
+    await this.fetchSalesData();
+    this.createSalesChart(); // Call createSalesChart after fetching data
   },
 };
 </script>
@@ -201,7 +184,7 @@ export default {
 <style scoped>
 .chart-container {
   width: 100%;
-  max-width: 1000px; /* Adjust the size as needed */
+  max-width: 1000px;
   margin: 0 auto;
   height: 400px;
 }

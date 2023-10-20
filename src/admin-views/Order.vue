@@ -2,6 +2,41 @@
   <div class="order-page container-fluid">
     <h1>Order Management</h1>
 
+    <div class="d-flex justify-content-between align-items-center mb-3 mt-5">
+  <!-- "Items Per Page" select element on the left -->
+  <div class="items-per-page">
+    <label for="itemsPerPageSelect" class="mr-2">Show:</label>
+    <select
+      id="itemsPerPageSelect"
+      v-model="itemsPerPage"
+      @change="updateItemsPerPage"
+      class="custom-select custom-select-sm"
+    >
+      <option value="10">10</option>
+      <option value="20">20</option>
+      <option value="50">50</option>
+      <!-- Add more options as needed -->
+    </select>
+  </div>
+
+  <!-- Search-related elements on the right -->
+  <div class="d-flex">
+    <div class="input-group input-group-sm" style="max-width: 200px;">
+      <input
+        type="text"
+        class="form-control form-control-sm"
+        placeholder="Search by Email"
+        v-model="searchEmail"
+      />
+    </div>
+    <button class="btn btn-sm btn-primary" @click="searchOrderByEmail">
+      <i class="fas fa-search"></i> <!-- Font Awesome search icon -->
+    </button>
+    <button class="btn btn-sm btn-secondary" @click="resetSearch">Reset</button>
+  </div>
+</div>
+
+
     <div class="wrapper-table">
       <table class="table">
         <thead>
@@ -10,37 +45,45 @@
             <th scope="col">Customer Name</th>
             <th scope="col">Item</th>
             <th scope="col">Payment Method</th>
+            <th scope="col">Created At</th>
             <th scope="col">Status</th>
             <th scope="col">Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(order, index) in orders" :key="order._id" :class="getStatusClass(order.status)"
+          <tr v-for="(order, index) in paginatedorders" :key="order._id" :class="getStatusClass(order.status)"
             style="text-align: center;">
-            <th>{{ index + 1 }}</th>
-            <td>{{ order.fullName }}</td>
+            <th>{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th>
+            <td>{{ order.userId.fullName }}</td>
             <td>{{ order.subProductId.title }}</td>
             <td>{{ mapPaymentMethod(order.paymentMethod) }}</td>
+            <td>{{ formatDate(order.createdAt) }}</td>
             <td :class="getStatusClass(order.status)">
-              <span :class="getStatusTextClass(order.status)" style="font-weight: bold;">
-                <span v-if="!order.isEditing" @click="startEditingStatus(order)">
-                  {{ mapStatus(order.status) }}
-                  <i class="fa fa-pencil ml-2" style="cursor: pointer;"></i> <!-- Edit icon -->
-                </span>
-                <span v-else>
-                  <!-- Use a div with a class for styling instead of the select element -->
-                  <div class="status-dropdown-sm">
-                    <select v-model="order.newStatus" class="form-select form-select-sm">
-                      <option value="1">Pending</option>
-                      <option value="2">Agreed</option>
-                      <option value="3">Rejected</option>
-                    </select>
-                  </div>
-                  <button class="btn btn-primary btn-sm smaller-btn" @click="updateStatus(order)">Save</button>
-                  <button class="btn btn-secondary btn-sm smaller-btn" @click="cancelEditingStatus(order)">Cancel</button>
-                </span>
-              </span>
-            </td>
+  <span :class="getStatusTextClass(order.status)" style="font-weight: bold;">
+    <span v-if="!order.isEditing">
+      {{ mapStatus(order.status) }}
+    </span>
+    <span v-else>
+      <span v-if="order.status !== 2 && order.status !== 3">
+        <!-- Only show if status is not Agreed or Rejected -->
+        <div class="status-dropdown-sm">
+          <select v-model="order.newStatus" class="form-select form-select-sm">
+            <option value="1">Pending</option>
+            <option value="2">Agreed</option>
+            <option value="3">Rejected</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-sm smaller-btn" @click="updateStatus(order)">Save</button>
+        <button class="btn btn-secondary btn-sm smaller-btn" @click="cancelEditingStatus(order)">Cancel</button>
+      </span>
+    </span>
+    <i v-if="!order.isEditing && order.status === 1" class="fa fa-pencil ml-2" style="cursor: pointer;"
+       @click="startEditingStatus(order)"></i> <!-- Edit icon -->
+  </span>
+</td>
+
+
+
 
             <td>
               <button class="btn btn-primary" @click="viewOrder(order)">
@@ -50,6 +93,27 @@
           </tr>
         </tbody>
       </table>
+    </div>
+    <!-- Only show pagination if there are more than 10 items -->
+    <div class="pagination-container" v-if="orders.length > 10">
+      <ul class="pagination">
+        <li class="page-item">
+          <button class="page-link" @click="currentPage -= 1" :disabled="currentPage === 1">
+            &#8592; Previous
+          </button>
+        </li>
+        <li v-for="page in visiblePages" :key="page">
+          <button class="page-link" @click="currentPage = page" :class="{ 'active': currentPage === page }">
+            {{ page }}
+          </button>
+        </li>
+        <li class="page-item">
+          <button class="page-link" @click="currentPage += 1" :disabled="currentPage === totalPages">
+            Next &#8594;
+          </button>
+        </li>
+
+      </ul>
     </div>
   </div>
 
@@ -68,15 +132,15 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="viewModalLabel">View Order Details</h5>
-          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" @click="closeViewModal">
+          <!-- <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" @click="closeViewModal">
             <span aria-hidden="true">&times;</span>
-          </button>
+          </button> -->
         </div>
         <div class="modal-body">
           <!-- Display order details here -->
           <div v-if="selectedOrder">
             <p><strong>Order ID:</strong> {{ selectedOrder._id }}</p>
-            <p><strong>Customer Name:</strong> {{ selectedOrder.fullName }}</p>
+            <p><strong>Customer Name:</strong> {{ selectedOrder.userId.fullName }}</p>
             <p><strong>Payment Method:</strong> {{ mapPaymentMethod(selectedOrder.paymentMethod) }}</p>
             <p><strong>Status:</strong> <span :class="getStatusTextClass(selectedOrder.status)"
                 style="font-weight: bold;">{{ mapStatus(selectedOrder.status) }}</span></p>
@@ -109,21 +173,147 @@ export default {
   data() {
     return {
       orders: [],
+   
       selectedOrder: null,
+      searchEmail: "",
+      originalOrders: [], // Initialize the originalOrders array
+   
+      currentPage: 1,
+      itemsPerPage: 10,
+      limit: 1000, // Default limit
+      page: 1,   // Default page
     };
+  },
+  computed: {
+    paginatedorders() {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + parseInt(this.itemsPerPage); // Parse the selected itemsPerPage
+    return this.orders.slice(startIndex, endIndex);
+  },
+    totalPages() {
+      return Math.ceil(this.orders.length / this.itemsPerPage);
+    },
+
+    visiblePages() {
+      const maxVisiblePages = 5; // Adjust this value as needed
+      const pages = [];
+
+      if (this.totalPages <= maxVisiblePages) {
+        for (let i = 1; i <= this.totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        if (this.currentPage <= maxVisiblePages - 2) {
+          for (let i = 1; i <= maxVisiblePages - 2; i++) {
+            pages.push(i);
+          }
+          pages.push("...");
+          pages.push(this.totalPages - 1);
+          pages.push(this.totalPages);
+        } else if (this.currentPage >= this.totalPages - maxVisiblePages + 3) {
+          pages.push(1);
+          pages.push(2);
+          pages.push("...");
+          for (let i = this.totalPages - maxVisiblePages + 3; i <= this.totalPages; i++) {
+            pages.push(i);
+          }
+        } else {
+          pages.push(1);
+          pages.push(2);
+          pages.push("...");
+          for (let i = this.currentPage - 1; i <= this.currentPage + 1; i++) {
+            pages.push(i);
+          }
+          pages.push("...");
+          pages.push(this.totalPages - 1);
+          pages.push(this.totalPages);
+        }
+      }
+
+      return pages;
+    },
   },
   created() {
     // Fetch data from your API and update the orders array
-    axios.get('/order') // Replace with your API endpoint
-      .then(response => {
-        this.orders = response.data.data.items; // Assuming 'items' contains the list of orders
-      })
-      .catch(error => {
-        console.error('Error fetching data', error);
-      });
+    axios.get(`/order?limit=${this.limit}&page=${this.page}`)
+    .then(response => {
+      this.originalOrders = response.data.data.items;
+      this.orders = [...this.originalOrders]; // Copy the data to orders
+    })
+    .catch(error => {
+      console.error('Error fetching data', error);
+    });
+
+       // Fetch the initial data when the component is created
+    this.fetchInitialData();
+
   },
   methods: {
+    updateItemsPerPage() {
+    // Reset the current page to 1 when changing the items per page
+    this.currentPage = 1;
+  },
+      formatDate(isoDate) {
+      const date = new Date(isoDate);
+      const options = {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false, // 24-hour format
+      };
+      return date.toLocaleDateString('en-US', options);
+    },
+    resetSearch() {
+  // Clear the search input
+  this.searchEmail = "";
 
+  // Reset the searchedOrderIndex to remove styling
+  this.searchedOrderIndex = -1;
+
+  // Fetch the initial data again to reset the list
+  this.fetchInitialData();
+},
+
+
+    fetchInitialData() {
+      // Fetch data from your API and update the orders array
+      axios.get(`/order?limit=${this.limit}&page=${this.page}`)
+        .then(response => {
+          this.orders = response.data.data.items;
+        })
+        .catch(error => {
+          console.error('Error fetching data', error);
+        });
+    },
+    searchOrderByEmail() {
+  const emailToSearch = this.searchEmail.trim();
+
+  if (!emailToSearch) {
+    // Handle empty search input as needed
+    return;
+  }
+
+  // Filter the originalOrders array based on email
+  this.orders = this.originalOrders.filter((order) => {
+    if (order.userId && order.userId.email) {
+      return order.userId.email.toLowerCase().includes(emailToSearch.toLowerCase());
+    }
+    return false;
+  });
+
+  // Reset the current page to 1
+  this.currentPage = 1;
+},
+
+
+
+
+    setCurrentPage(page) {
+      this.currentPage = page;
+    },
     cancelEditingStatus(order) {
       // Reset the isEditing property to false
       order.isEditing = false;
@@ -133,28 +323,31 @@ export default {
       order.newStatus = order.status;
     },
     startEditingStatus(order) {
-      order.isEditing = true;
-      order.newStatus = order.status; // Initialize newStatus with the current status
+      // Allow editing only if the status is "Pending"
+      if (order.status === 1) {
+        order.isEditing = true;
+        order.newStatus = order.status; // Initialize newStatus with the current status
+      }
     },
     updateStatus(order) {
-  const newStatus = parseInt(order.newStatus);
+      const newStatus = parseInt(order.newStatus);
 
-  axios
-    .put(`/order/${order._id}`, { status: newStatus }) // Replace with your endpoint and data structure
-    .then(response => {
-      if (response.status === 200) {
-        // The server has successfully updated the order status
-        order.status = newStatus; // Update the status locally
-        order.isEditing = false; // Exit edit mode
-        console.log('Order status updated successfully:', response.data);
-      } else {
-        console.error('Failed to update order status. Server returned:', response.status);
-      }
-    })
-    .catch(error => {
-      console.error('Error updating order status', error);
-    });
-},
+      axios
+        .put(`/order/${order._id}`, { status: newStatus }) // Replace with your endpoint and data structure
+        .then(response => {
+          if (response.status === 200) {
+            // The server has successfully updated the order status
+            order.status = newStatus; // Update the status locally
+            order.isEditing = false; // Exit edit mode
+            console.log('Order status updated successfully:', response.data);
+          } else {
+            console.error('Failed to update order status. Server returned:', response.status);
+          }
+        })
+        .catch(error => {
+          console.error('Error updating order status', error);
+        });
+    },
     viewOrder(order) {
       // Set the selectedOrder and open the modal
       this.selectedOrder = order;
@@ -162,11 +355,13 @@ export default {
       modal.show();
     },
     closeViewModal() {
-      // Clear the selected order and close the modal
-      this.selectedOrder = null;
-      const modal = new bootstrap.Modal(document.getElementById('viewModal'));
-      modal.hide();
-    },
+  // Clear the selected order, close the modal, and clear the search input
+  this.selectedOrder = null;
+ 
+  const modal = new bootstrap.Modal(document.getElementById("viewModal"));
+  modal.hide();
+},
+
     getStatusClass(status) {
       // Define your status classes here as you did in your original code
     },
@@ -208,10 +403,72 @@ export default {
       }
     },
   },
+  async mounted() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const limitParam = urlParams.get('limit');
+    const pageParam = urlParams.get('page');
+
+    // Update limit and page with query parameter values if provided
+    if (limitParam) {
+      this.limit = parseInt(limitParam);
+    }
+    if (pageParam) {
+      this.page = parseInt(pageParam);
+    }
+
+  },
 };
 </script>
 
 <style lang="scss" scoped>
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.pagination {
+  display: flex;
+  list-style: none;
+  padding: 0;
+}
+
+.page-item {
+  margin: 0;
+}
+
+.page-link {
+  display: inline-block;
+  padding: 4px 8px;
+  font-size: 12px;
+  border: 1px solid #ddd;
+  background-color: #f9f9f9;
+  color: #333;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.page-link.active {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.page-link:hover {
+  background-color: #e9e9e9;
+}
+
+.page-link:disabled {
+  background-color: #ddd;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.page-link:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+
 span {
   margin-left: 2px;
 }

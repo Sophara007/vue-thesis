@@ -202,8 +202,8 @@
             </div>
             <!-- Notification dropdown -->
             <div v-show="showNotify" id="notification"
-              class="w-[550px] max-h-[550px] overflow-y-auto border rounded-lg border-gray-300 shadow-md"
-              style="overflow-x: hidden;">
+  class="w-[550px] max-h-[550px] overflow-y-auto border rounded-lg border-gray-300 shadow-md"
+  style="overflow-x: hidden; z-index: 1000;">
               <ul>
                 <!-- Close button -->
                 <button @click="toggleDropNotify"
@@ -223,43 +223,46 @@
                 <li v-for="notification in notifications" :key="notification._id">
 
                   <div @click="handleNotificationClick(notification)"
-                    class="wrapper-message flex flex-row justify-between">
+                    class="wrapper-message flex flex-row justify-between"
+                    :style="{ 'background-color': notification.isRead ? '' : '#F3F8FE' }">
+                    <!-- Use #F3F8FE for unread notifications -->
+
                     <div class="flex">
+                      <!-- Profile Image for 'register' type -->
                       <div class="img flex flex-column justify-between" style="overflow: hidden;">
                         <div>
                           <img class="rounded-full border-5"
                             :class="{ 'border-gray-500': notification.isRead, 'border-green-500': !notification.isRead }"
-                            v-if="notification.type == 'register'" 
-                            src="https://clipart-library.com/images/yckroAaoi.png"
+                            v-if="notification.type == 'register'" src="../assets/man.png"
                             style="cursor: pointer; width: 70%;" />
                           <img class="rounded-full border-5"
                             :class="{ 'border-gray-500': notification.isRead, 'border-green-500': !notification.isRead }"
-                            v-if="notification.type == 'order'"
-                            src="https://st4.depositphotos.com/11953928/25118/v/450/depositphotos_251186360-stock-illustration-colorful-shopping-cart-sale-with.jpg"
+                            v-if="notification.type == 'order'" src="../assets/shopping_10092603.png"
                             style="cursor: pointer; width: 70%;" />
                           <img class="rounded-full border-5"
                             :class="{ 'border-gray-500': notification.isRead, 'border-green-500': !notification.isRead }"
                             v-if="notification.type == 'inquiry'"
-                            src="https://www.3dprinting.com.au/wp-content/uploads/2021/03/Email-icon.png"
+                            src="https://thumbs.dreamstime.com/b/white-background-colorful-silhouette-envelope-mail-opened-letter-thick-contour-vector-illustration-142460488.jpg"
                             style="cursor: pointer; width: 70%;" />
                           <img class="rounded-full border-5"
                             :class="{ 'border-gray-500': notification.isRead, 'border-green-500': !notification.isRead }"
                             v-if="notification.type == 'top-up'"
-                            src="https://cdn3.iconfinder.com/data/icons/bank-and-money-vol-2/512/Money_icon-07-1024.png"
+                            src="https://cdn0.iconfinder.com/data/icons/cash-card-add-on-colored/48/JD-11-1024.png"
                             style="cursor: pointer; width: 70%;" />
                         </div>
-                        <!-- <div class="wrapper-read flex justify-between align-between">
-                                      <i
-                                        class="fa-solid"
-                                         :class="{ 'fa-circle': notification.isRead, 'text-orange-500': notification.isRead }"
-                                          style="font-size: 8px;"
-                                        ></i>
-                                   </div> -->
+                        <div class="inline-block wrapper-read justify-between align-between">
+                          <i class="fa-solid"
+                            :class="{ 'fa-circle': true, 'text-gray-500': notification.isRead, 'text-green-500': !notification.isRead }"
+                            style="font-size: 8px;"></i>
+                        </div>
+
+
                       </div>
 
                       <div class="flex flex-column w-[350px]">
                         <div>
-                          <p style="font-weight: bold; padding-bottom: 10px; font-size: 14px;">{{ notification.title }}
+                          <p style="font-weight: bold; padding-bottom: 5px; font-size: 14px;">{{ notification && notification.data && notification.data.email ? notification.data.email : 'No email available' }}</p>
+                          <p style="font-weight: bold; padding-bottom: 5px; font-size: 14px;">{{ notification.title }}
                           </p>
                         </div>
                         <div>
@@ -279,6 +282,7 @@
                       </button>
                     </div>
                   </div>
+
                 </li>
                 <!-- Message when there are no notifications -->
                 <p v-if="notifications.length === 0" class="text-gray-600 text-center py-4">No new notifications.</p>
@@ -475,7 +479,7 @@ export default {
     },
     // Method to fetch notifications (using Long Polling)
     fetchNotification() {
-      const notificationEndpoint = '/notifications'; // Replace with your endpoint
+      const notificationEndpoint = '/notifications?limit=100&sortField=_id'; // Replace with your endpoint
 
       // Make a request to the server
       axios.get(notificationEndpoint, {

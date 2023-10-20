@@ -15,14 +15,15 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 /* Scoped styles specific to the Navbar.vue component */
 nav {
   background-color: #007bff;
   padding: 10px;
   color: white;
-  position: sticky;
+  position: fixed;
   top: 0;
+  width: 100%;
   z-index: 1;
 }
 
@@ -30,7 +31,7 @@ nav {
   display: inline-block;
   justify-content: space-between;
   align-items: center;
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto;
 }
 
