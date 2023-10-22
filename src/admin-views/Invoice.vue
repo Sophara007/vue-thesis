@@ -144,13 +144,12 @@
                         <p><strong>Invoice ID:</strong> {{ selectedOrder._id }}</p>
                         <hr>
                         <p><strong>Item:</strong> {{ selectedOrder.orderId.subProductId.title }}</p>
-                        <p v-if="selectedOrder.orderId.paymentMethod === 2">
-    <strong>Price(Discount 20%):</strong>
-    {{ (selectedOrder.price * 0.8).toFixed(2) }} <span> $</span>
-  </p>
-  <p v-else>
-    <strong>Price:</strong> {{ selectedOrder.price }} <span> $</span>
-  </p>
+                        <p>
+  <strong>Price:</strong>
+  <span v-if="selectedOrder.orderId.paymentMethod === 2" style="text-decoration: line-through;">{{ selectedOrder.price.toFixed(2) }} $</span>
+  {{ selectedOrder.orderId.paymentMethod === 2 ? (selectedOrder.price * 0.8).toFixed(2) + ' $ ' : selectedOrder.price + ' $ ' }}
+</p>
+
                     </div>
                 </div>
                 <div class="modal-footer">

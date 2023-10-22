@@ -149,7 +149,15 @@
             <p><strong>Address:</strong> {{ selectedOrder.address }}</p>
             <hr>
             <p><strong>Item:</strong> {{ selectedOrder.subProductId.title }}</p>
-            <p><strong>Price:</strong> {{ selectedOrder.subProductId.price }}<span> $</span></p>
+            <p v-if="selectedOrder.paymentMethod === 2">
+  <strong>Price:</strong>
+  <span style="text-decoration: line-through;">{{ selectedOrder.subProductId.price.toFixed(2) }} $</span>
+  {{ (selectedOrder.subProductId.price * 0.8).toFixed(2) }} $
+</p>
+<p v-else>
+  <strong>Price:</strong> {{ selectedOrder.subProductId.price }} <span> $</span>
+</p>
+
             <img
               v-if="selectedOrder.subProductId && selectedOrder.subProductId.image && selectedOrder.subProductId.image.url"
               :src="selectedOrder.subProductId.image.url" class="subProduct-img img-fluid"
