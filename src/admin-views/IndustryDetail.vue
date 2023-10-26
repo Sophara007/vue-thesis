@@ -1,6 +1,6 @@
 <template>
   <div class="industry-page container-fluid">
-    <h1>Industry Detail Page</h1>
+    <h1>Client Detail Page</h1>
     <div class="wrapper-create m-5">
       <button class="btn btn-success custom-btn" data-bs-toggle="modal" data-bs-target="#createModal">
         Create
@@ -11,7 +11,7 @@
         <thead>
           <tr style="text-align: center;">
             <th scope="col" style="width: 5%;">No</th>
-            <th scope="col" style="width: 20%;">Industry Detail of</th>
+            <th scope="col" style="width: 20%;">Client</th>
             <th scope="col" style="width: 20%;">Title</th>
             <th scope="col" style="width: 20%;">Description</th>
             <th scope="col" style="width: 20%;">Image</th>

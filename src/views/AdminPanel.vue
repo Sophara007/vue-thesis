@@ -80,7 +80,7 @@
                 ">
                 <div>
                   <i class="fas fa-industry mr-5"></i>
-                  Industries
+                  Clients
                 </div>
                 <div>
                   <i v-if="showIndustryDetail" class="ml-2 fas fa-angle-up text-gray-500"></i>
@@ -91,11 +91,11 @@
               <div v-if="showIndustryDetail" class="ml-6 text-sm text-gray-500 space-y-2 cursor-pointer">
                 <router-link :class="$route.name == 'Industry' ? 'custom-active' : ''" to="/industry"
                   class="block py-1 transition duration-300 white-text pl-5 rounded pt-2 pb-2 cursor-pointer">
-                  Industry
+                  Client
                 </router-link>
                 <router-link :class="$route.name == 'IndustryDetail' ? 'custom-active' : ''
                   " to="/industrydetail" class="block py-1 transition duration-300 white-text pl-5 rounded pt-2 pb-2">
-                  Industry Detail
+                  Client Details
                 </router-link>
                 <!-- Add more sub-links as needed -->
               </div>

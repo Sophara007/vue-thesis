@@ -68,7 +68,7 @@ export default {
           { title: 'Users', count: dashboardData.count_user, iconClasses: 'fas fa-users' },
           { title: 'Inquiries', count: dashboardData.count_inquiry, iconClasses: 'fa fa-commenting' },
           { title: 'Partners', count: dashboardData.count_partner, iconClasses: 'fa-regular fa-window-restore' },
-          { title: 'Industries', count: dashboardData.count_industry, iconClasses: 'fas fa-industry' },
+          { title: 'Clients', count: dashboardData.count_industry, iconClasses: 'fas fa-industry' },
         ];
 
         // After fetching dashboard data, create the chart

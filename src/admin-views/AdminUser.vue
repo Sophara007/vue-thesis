@@ -14,7 +14,7 @@
             <th scope="col">Admin Name</th>
             <th scope="col">Email</th>
             <!-- <th scope="col">Password</th> -->
-            <th scope="col" style="text-align: center;">Actions</th>
+            <th scope="col" style="text-align: center; width: 25%;">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -25,6 +25,8 @@
             <!-- <td>{{ admin.password }}</td> -->
             <td>
       <div class="wrapper-action" style="text-align: center;">
+        <button class="btn btn-primary custom-btn" data-bs-toggle="modal" data-bs-target="#viewModal" @click="openViewModal(admin)">View</button>
+        <button class="btn btn-warning custom-btn  mx-2" data-bs-toggle="modal" data-bs-target="#editModal" @click="openEditModal(admin)">Edit</button>
         <button class="btn btn-danger" @click="confirmDeleteAdmin(admin.id)">Delete</button>
       </div>
     </td>
@@ -56,7 +58,7 @@
   </div>
 
   <!-- Modal -->
-  <div class="modal fade wrapper-modal" id="createModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+<div class="modal fade wrapper-modal" id="createModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" @hidden.bs.modal="resetCreateAdminForm">
     aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -65,16 +67,57 @@
         </div>
         <div class="modal-body">
           <div class="wrapper-form-input">
-            <input type="text" class="form-control mb-3" placeholder="Full Name" v-model="form.fullname" />
-            <input type="email" class="form-control mb-3" placeholder="Email" v-model="form.email" />
-            <input type="password" class="form-control mb-3" placeholder="Password" v-model="form.password" />
-            <div v-if="form.password.length > 0 && form.password.length < 8" class="text-danger">
-             Password must be longer than or equal to 8 characters.
-           </div>
-          </div>
+  <input type="text" class="form-control mb-3" placeholder="Full Name" v-model="form.fullname" />
+  <input type="email" class="form-control mb-3" placeholder="Email" v-model="form.email" />
+  <input type="password" class="form-control mb-3" placeholder="Password" v-model="form.password" />
+  <input type="password" class="form-control mb-3" placeholder="Confirm Password" v-model="form.confirmPassword" />
+  <div v-if="form.password.length > 0 && form.password.length < 8" class="text-danger">
+    Password must be longer than or equal to 8 characters.
+  </div>
+</div>
+
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-success" data-bs-dismiss="modal" @click="createAdmin">Create</button>
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- View Modal -->
+<div class="modal fade wrapper-modal" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="viewModalLabel">View Admin Details</h1>
+      </div>
+      <div class="modal-body">
+        <p><strong>Admin Name:</strong> {{ selectedAdmin.fullname }}</p>
+        <p><strong>Email:</strong> {{ selectedAdmin.email }}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Edit Modal -->
+  <div class="modal fade wrapper-modal" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="editModalLabel">Edit Admin Details</h1>
+        </div>
+        <div class="modal-body">
+          <div class="wrapper-form-input">
+            <input type="text" class="form-control mb-3" placeholder="Full Name" v-model="selectedAdmin.fullname" />
+            <input type="email" class="form-control mb-3" placeholder="Email" v-model="selectedAdmin.email" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" @click="saveEditedAdmin">Save Changes</button>
         </div>
       </div>
     </div>
@@ -97,7 +140,16 @@ export default {
         fullname: "",
         email: "",
         password: "",
+         confirmPassword: "", // Add confirmPassword field
       },
+      editedAdmin: {
+      id: null,
+      changes: {},
+    },
+      selectedAdmin: {  // Initialize selectedAdmin with default values
+      fullname: "",  // You should use 'fullName' instead of 'fullname'
+      email: "",
+    },
     };
   },
   computed: {
@@ -151,36 +203,114 @@ export default {
     },
   },
   methods: {
+     resetCreateAdminForm() {
+    this.form.fullname = "";
+    this.form.email = "";
+    this.form.password = "";
+    this.form.confirmPassword = ""; // Clear the confirmPassword field
+  },
+   openEditModal(admin) {
+  // Create a copy of the admin object
+  this.selectedAdmin = { ...admin };
+  // Set the editedAdmin to the original admin data
+  this.editedAdmin.id = admin.id;
+  this.editedAdmin.changes = {};
+},
+
+    openViewModal(admin) {
+    this.selectedAdmin = admin; // Update the selectedAdmin data
+    console.log("Selected Admin:", this.selectedAdmin); // Add this debug statement
+  },
     setCurrentPage(page) {
       this.currentPage = page;
     },
-    async createAdmin() {
-      try {
-        const createResponse = await axios.post("/admin/create", this.form);
-        if (createResponse.status === 201) {
-          this.form.fullname = "";
-          this.form.email = "";
-          this.form.password = "";
+    async saveEditedAdmin() {
+  try {
+    const { id, fullname, email } = this.selectedAdmin; // Destructure admin data
+    const updateData = {}; // Create an empty object for updated data
 
-          await this.fetchAdminList();
+    // Check if email and fullname have been modified
+    const originalAdmin = this.adminList.find(admin => admin.id === id);
+    if (email !== originalAdmin.email && fullname !== originalAdmin.fullname) {
+      // Both email and fullname have been modified, choose one to update
+      // In this example, we choose to update email, but you can choose fullname instead
+      updateData.email = email;
+    } else if (email !== originalAdmin.email) {
+      // Only email has been modified
+      updateData.email = email;
+    } else if (fullname !== originalAdmin.fullname) {
+      // Only fullname has been modified
+      updateData.fullname = fullname;
+    }
 
-          // Show SweetAlert success message
-          Swal.fire({
-            icon: 'success',
-            title: 'Admin Created',
-            text: 'New admin has been created successfully!',
-          });
-        }
-      } catch (error) {
-        console.error("Error creating admin:", error);
-        // Show SweetAlert error message
+    // Check if any fields were modified
+    if (Object.keys(updateData).length > 0) {
+      const updateResponse = await axios.put(`/admin/update/${id}`, updateData);
+      if (updateResponse.status === 200) {
+        await this.fetchAdminList();
+
+      
+
+        // Show SweetAlert success message
         Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'An error occurred while creating admin.',
+          icon: 'success',
+          title: 'Admin Updated',
+          text: 'Admin details have been updated successfully!',
         });
       }
-    },
+    } else {
+      // No fields were modified
+      Swal.fire({
+        icon: 'info',
+        title: 'No Changes',
+        text: 'No changes were made to the admin details.',
+      });
+    }
+  } catch (error) {
+    console.error("Error updating admin:", error);
+    // Show SweetAlert error message
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'An error occurred while updating admin details.',
+    });
+  }
+},
+   async createAdmin() {
+  try {
+    // Check if the password and confirmation password match
+    if (this.form.password !== this.form.confirmPassword) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Password and Confirm Password do not match.',
+      });
+      return; // Exit the method
+    }
+
+    // Proceed with creating the admin if the passwords match
+    const createResponse = await axios.post("/admin/create", this.form);
+    if (createResponse.status === 201) {
+      this.resetCreateAdminForm(); // Reset the form fields
+      await this.fetchAdminList();
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Admin Created',
+        text: 'New admin has been created successfully!',
+      });
+    }
+  } catch (error) {
+    console.error("Error creating admin:", error);
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'An error occurred while creating admin.',
+    });
+  }
+},
+
+
     async confirmDeleteAdmin(adminId) {
       try {
         const confirmResult = await Swal.fire({
