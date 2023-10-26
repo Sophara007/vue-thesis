@@ -25,7 +25,7 @@
       <input
         type="text"
         class="form-control form-control-sm"
-        placeholder="Search by Email"
+        placeholder="Search"
         v-model="searchEmail"
       />
     </div>
@@ -285,24 +285,28 @@ export default {
     });
 },
 searchOrderByEmail() {
-      const emailToSearch = this.searchEmail.trim();
+  const keywordToSearch = this.searchEmail.trim().toLowerCase();
 
-      if (!emailToSearch) {
-        // Handle empty search input as needed
-        return;
-      }
+  if (!keywordToSearch) {
+    // Handle empty search input as needed
+    this.orders = this.originalOrders; // Reset to the original list
+    this.currentPage = 1; // Reset the current page to 1
+    return;
+  }
 
-      // Filter the orders based on email in the originalOrders list
-      this.orders = this.originalOrders.filter((order) => {
-        if (order.orderId && order.orderId.userId && order.orderId.userId.email) {
-          return order.orderId.userId.email.toLowerCase() === emailToSearch.toLowerCase();
-        }
-        return false;
-      });
+  // Filter the orders based on email and customer name in the originalOrders list
+  this.orders = this.originalOrders.filter((order) => {
+    const orderEmail = order.orderId && order.orderId.userId && order.orderId.userId.email ? order.orderId.userId.email.toLowerCase() : "";
+    const customerName = order.orderId.userId && order.orderId.userId.fullName ? order.orderId.userId.fullName.toLowerCase() : "";
 
-      // Reset the current page to 1
-      this.currentPage = 1;
-    },
+    return orderEmail.includes(keywordToSearch) || customerName.includes(keywordToSearch);
+  });
+
+  // Reset the current page to 1
+  this.currentPage = 1;
+},
+
+
 
         formatDate(isoDate) {
       const date = new Date(isoDate);

@@ -25,7 +25,7 @@
       <input
         type="text"
         class="form-control form-control-sm"
-        placeholder="Search by Email"
+        placeholder="Search"
         v-model="searchEmail"
       />
     </div>
@@ -297,24 +297,29 @@ export default {
         });
     },
     searchOrderByEmail() {
-  const emailToSearch = this.searchEmail.trim();
+  const keywordToSearch = this.searchEmail.trim().toLowerCase();
 
-  if (!emailToSearch) {
+  if (!keywordToSearch) {
     // Handle empty search input as needed
+    this.orders = this.originalOrders; // Reset to the original list
+    this.currentPage = 1; // Reset the current page to 1
     return;
   }
 
-  // Filter the originalOrders array based on email
+  // Filter the originalOrders array based on email, customer name, and item titles
   this.orders = this.originalOrders.filter((order) => {
-    if (order.userId && order.userId.email) {
-      return order.userId.email.toLowerCase().includes(emailToSearch.toLowerCase());
-    }
-    return false;
+    const email = order.userId && order.userId.email ? order.userId.email.toLowerCase() : "";
+    const customerName = order.userId && order.userId.fullName ? order.userId.fullName.toLowerCase() : "";
+    const title = order.subProductId && order.subProductId.title ? order.subProductId.title.toLowerCase() : "";
+
+    // Check if the keyword is found in email, customer name, or item titles
+    return email.includes(keywordToSearch) || customerName.includes(keywordToSearch) || title.includes(keywordToSearch);
   });
 
   // Reset the current page to 1
   this.currentPage = 1;
 },
+
 
 
 

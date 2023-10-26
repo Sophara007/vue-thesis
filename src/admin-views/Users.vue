@@ -25,7 +25,7 @@
       <input
         type="text"
         class="form-control form-control-sm"
-        placeholder="Search by Email"
+        placeholder="Search"
         v-model="searchEmail"
       />
     </div>
@@ -227,22 +227,28 @@ export default {
       console.error('Error fetching data', error);
     });
 },
-    searchOrderByEmail() {
-    const emailToSearch = this.searchEmail.trim();
+searchOrderByEmail() {
+  const keywordToSearch = this.searchEmail.trim().toLowerCase();
 
-    if (!emailToSearch) {
-      // Handle empty search input as needed
-      return;
-    }
+  if (!keywordToSearch) {
+    // Handle empty search input as needed
+    this.users = this.originalUsers; // Reset to the original list
+    this.currentPage = 1; // Reset the current page to 1
+    return;
+  }
 
-    // Filter the users based on email in the originalUsers list
-    this.users = this.originalUsers.filter(
-      (user) => user.email.toLowerCase() === emailToSearch.toLowerCase()
-    );
+  // Filter the users based on email and full name in the originalUsers list
+  this.users = this.originalUsers.filter((user) => {
+    const userMail = user.email ? user.email.toLowerCase() : "";
+    const fullName = user.fullName ? user.fullName.toLowerCase() : "";
 
-    // Reset the current page to 1
-    this.currentPage = 1;
-  },
+    return userMail.includes(keywordToSearch) || fullName.includes(keywordToSearch);
+  });
+
+  // Reset the current page to 1
+  this.currentPage = 1;
+},
+
     setCurrentPage(page) {
       this.currentPage = page;
     },

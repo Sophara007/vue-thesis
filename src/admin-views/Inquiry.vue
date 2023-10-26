@@ -21,19 +21,20 @@
 
   <!-- Search-related elements on the right -->
   <div class="d-flex">
-    <div class="input-group input-group-sm" style="max-width: 200px;">
-      <input
-        type="text"
-        class="form-control form-control-sm"
-        placeholder="Search by Email"
-        v-model="searchEmail"
-      />
-    </div>
-    <button class="btn btn-sm btn-primary" @click="searchOrderByEmail">
-      <i class="fas fa-search"></i> <!-- Font Awesome search icon -->
-    </button>
-    <button class="btn btn-sm btn-secondary" @click="resetSearch">Reset</button>
+  <div class="input-group input-group-sm" style="max-width: 200px;">
+    <input
+      type="text"
+      class="form-control form-control-sm"
+      placeholder="Search"
+      v-model="searchQuery"
+    />
   </div>
+  <button class="btn btn-sm btn-primary" @click="searchOrders">
+    <i class="fas fa-search"></i> <!-- Font Awesome search icon -->
+  </button>
+  <button class="btn btn-sm btn-secondary" @click="resetSearch">Reset</button>
+</div>
+
 </div>
 
 
@@ -132,8 +133,8 @@ import axios from "axios";
 export default {
     data() {
         return {
-            currentPage: 1,
-          
+            currentPage: 1,       
+            searchFullName: "", // Initialize with an empty string
             searchEmail: "",
             originalOrders: [], // Initialize the originalOrders array
      
@@ -205,37 +206,46 @@ this.fetchInitialData();
     // Reset the current page to 1 when changing the items per page
     this.currentPage = 1;
   },
-      resetSearch() {
-  // Clear the search input
-  this.searchEmail = "";
+  resetSearch() {
+   // Clear the search inputs
+   this.searchEmail = "";
+  this.searchFullName = "";
+  
+  // Clear the search query (if it exists)
+  this.searchQuery = "";
 
-  // Fetch the initial data again to reset the list
+  // Fetch the initial data to reset the list
   this.fetchInitialData();
 },
 
-    
-    fetchInitialData() {
-      // Fetch data from your API and update the 'users' array
-      axios.get(`/messages?limit=${this.limit}&page=${this.page}`)
-        .then(response => {
-          this.inquiries = response.data.data.items; // Updated to use 'users' data
-        })
-        .catch(error => {
-          console.error('Error fetching data', error);
-        });
-    },
-    searchOrderByEmail() {
-  const emailToSearch = this.searchEmail.trim();
 
-  if (!emailToSearch) {
+    
+fetchInitialData() {
+  // Fetch data from your API and update the 'inquiries' array
+  axios.get(`/messages?limit=${this.limit}&page=${this.page}`)
+    .then(response => {
+      this.inquiries = response.data.data.items;
+      // Set the 'originalInquiries' to the same data
+      this.originalInquiries = response.data.data.items;
+    })
+    .catch(error => {
+      console.error('Error fetching data', error);
+    });
+},
+searchOrders() {
+  const query = this.searchQuery.trim().toLowerCase();
+
+  if (!query) {
     // Handle empty search input as needed
     return;
   }
 
-  // Filter the inquiries based on the email field
-  this.inquiries = this.inquiries.filter((inquiry) => {
-    // Check if the email field in lowercase contains the searched email in lowercase
-    return inquiry.email.toLowerCase().includes(emailToSearch.toLowerCase());
+  // Filter the inquiries based on email or full name fields
+  this.inquiries = this.originalInquiries.filter((inquiry) => {
+    const inquiryEmail = inquiry.email.toLowerCase();
+    const inquiryFullName = inquiry.fullName.toLowerCase();
+
+    return inquiryEmail.includes(query) || inquiryFullName.includes(query);
   });
 
   // Reset the current page to 1

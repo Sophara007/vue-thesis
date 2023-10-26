@@ -25,7 +25,7 @@
       <input
         type="text"
         class="form-control form-control-sm"
-        placeholder="Search by Email"
+        placeholder="Search"
         v-model="searchEmail"
       />
     </div>
@@ -263,21 +263,28 @@ export default {
         });
     },
     searchOrderByEmail() {
-  const emailToSearch = this.searchEmail.trim();
+  const keywordToSearch = this.searchEmail.trim().toLowerCase();
 
-  if (!emailToSearch) {
+  if (!keywordToSearch) {
     // Handle empty search input as needed
+    this.topups = this.originalTopups; // Reset to the original list
+    this.currentPage = 1; // Reset the current page to 1
     return;
   }
 
-  // Filter the topups based on email in the originalTopups list
-  this.topups = this.originalTopups.filter(
-    (topup) => topup.userId.email.toLowerCase() === emailToSearch.toLowerCase()
-  );
+  // Filter the topups based on email and full name in the originalTopups list
+  this.topups = this.originalTopups.filter((topup) => {
+    const topupEmail = topup.userId && topup.userId.email ? topup.userId.email.toLowerCase() : "";
+    const fullName = topup.userId && topup.userId.fullName ? topup.userId.fullName.toLowerCase() : "";
+
+    return topupEmail.includes(keywordToSearch) || fullName.includes(keywordToSearch);
+  });
 
   // Reset the current page to 1
   this.currentPage = 1;
 },
+
+
 
 
     setCurrentPage(page) {
