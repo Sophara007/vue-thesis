@@ -89,12 +89,12 @@
               </div>
               <!-- Sub-link content under Industry -->
               <div v-if="showIndustryDetail" class="ml-6 text-sm text-gray-500 space-y-2 cursor-pointer">
-                <router-link :class="$route.name == 'Industry' ? 'custom-active' : ''" to="/industry"
+                <router-link :class="$route.name == 'Industry' ? 'custom-active' : ''" to="/client"
                   class="block py-1 transition duration-300 white-text pl-5 rounded pt-2 pb-2 cursor-pointer">
                   Client
                 </router-link>
                 <router-link :class="$route.name == 'IndustryDetail' ? 'custom-active' : ''
-                  " to="/industrydetail" class="block py-1 transition duration-300 white-text pl-5 rounded pt-2 pb-2">
+                  " to="/clientdetail" class="block py-1 transition duration-300 white-text pl-5 rounded pt-2 pb-2">
                   Client Details
                 </router-link>
                 <!-- Add more sub-links as needed -->
@@ -152,7 +152,7 @@
             <router-link :class="$route.name == 'CompanyInfo' ? 'custom-active' : ''" to="/setting"
               class="inline-flex relative items-center py-[10px] px-[10px] w-full text-sm font-medium rounded-md rounded-b-lg hover:bg-gray-300 hover:text-gray-800 transition duration-400 ease-in-out">
               <i class="fa-solid fa-gear mr-5"></i>
-              Company Info
+              Company Information
             </router-link>
           </div>
         </div>

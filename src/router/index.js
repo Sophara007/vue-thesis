@@ -78,18 +78,18 @@ const routes = [
       },
       {
         name: 'Industry',
-        path: '/industry',
+        path: '/client',
         component: Industry,
         meta: {
-          title: 'Industry | BlueTech' // Specify the title for the Product page
+          title: 'Client | BlueTech' // Specify the title for the Product page
         }
       },
       {
         name: 'IndustryDetail',
-        path: '/industrydetail',
+        path: '/clientdetail',
         component: IndustryDetail,
         meta: {
-          title: 'Industry-Detail | BlueTech' // Specify the title for the Product page
+          title: 'Client-Detail | BlueTech' // Specify the title for the Product page
         }
       },
       {
