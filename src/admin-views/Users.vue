@@ -97,7 +97,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="userDetailsModalLabel">
-              {{ selectedUser ? selectedUser.fullName + " Details" : "" }}
+              {{ selectedUser ? selectedUser.fullName + " Informations" : "" }}
             </h5>
           </div>
           <div class="modal-body">
