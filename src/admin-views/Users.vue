@@ -3,39 +3,41 @@
     <h1>Customer Page</h1>
 
     <div class="d-flex justify-content-between align-items-center mb-3 mt-5">
-  <!-- "Items Per Page" select element on the left -->
-  <div class="items-per-page">
-    <label for="itemsPerPageSelect" class="mr-2">Show:</label>
-    <select
-      id="itemsPerPageSelect"
-      v-model="itemsPerPage"
-      @change="updateItemsPerPage"
-      class="custom-select custom-select-sm"
-    >
-      <option value="10">10</option>
-      <option value="20">20</option>
-      <option value="50">50</option>
-      <!-- Add more options as needed -->
-    </select>
-  </div>
+      <!-- "Items Per Page" select element on the left -->
+      <div class="items-per-page">
+        <label for="itemsPerPageSelect" class="mr-2">Show:</label>
+        <select
+          id="itemsPerPageSelect"
+          v-model="itemsPerPage"
+          @change="updateItemsPerPage"
+          class="custom-select custom-select-sm"
+        >
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="50">50</option>
+          <!-- Add more options as needed -->
+        </select>
+      </div>
 
-  <!-- Search-related elements on the right -->
-  <div class="d-flex">
-    <div class="input-group input-group-sm" style="max-width: 200px;">
-      <input
-        type="text"
-        class="form-control form-control-sm"
-        placeholder="Search"
-        v-model="searchEmail"
-      />
+      <!-- Search-related elements on the right -->
+      <div class="d-flex">
+        <div class="input-group input-group-sm" style="max-width: 200px">
+          <input
+            type="text"
+            class="form-control form-control-sm"
+            placeholder="Search"
+            v-model="searchEmail"
+          />
+        </div>
+        <button class="btn btn-sm btn-primary" @click="searchOrderByEmail">
+          <i class="fas fa-search"></i>
+          <!-- Font Awesome search icon -->
+        </button>
+        <button class="btn btn-sm btn-secondary" @click="resetSearch">
+          Reset
+        </button>
+      </div>
     </div>
-    <button class="btn btn-sm btn-primary" @click="searchOrderByEmail">
-      <i class="fas fa-search"></i> <!-- Font Awesome search icon -->
-    </button>
-    <button class="btn btn-sm btn-secondary" @click="resetSearch">Reset</button>
-  </div>
-</div>
-
 
     <div class="wrapper-table">
       <table class="table">
@@ -50,7 +52,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(user, index) in paginatedusers" :key="user.id" >
+          <tr v-for="(user, index) in paginatedusers" :key="user.id">
             <th>{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th>
             <td>{{ user.fullName }}</td>
             <td>{{ user.email }}</td>
@@ -58,7 +60,10 @@
             <td>{{ formatDate(user.createdAt) }}</td>
             <td>
               <div class="wrapper-action">
-                <button class="btn btn-info" @click="viewUserDetails(user)">
+                <!-- <button class="btn btn-info" @click="viewUserDetails(user)">
+                  View
+                </button> -->
+                <button class="btn btn-info" @click="getUserById(user._id)">
                   View
                 </button>
               </div>
@@ -71,28 +76,45 @@
     <div class="pagination-container" v-if="users.length > 10">
       <ul class="pagination">
         <li class="page-item">
-          <button class="page-link" @click="currentPage -= 1" :disabled="currentPage === 1">
+          <button
+            class="page-link"
+            @click="currentPage -= 1"
+            :disabled="currentPage === 1"
+          >
             &#8592; Previous
           </button>
         </li>
 
         <li v-for="page in visiblePages" :key="page">
-          <button class="page-link" @click="currentPage = page" :class="{ 'active': currentPage === page }">
+          <button
+            class="page-link"
+            @click="currentPage = page"
+            :class="{ active: currentPage === page }"
+          >
             {{ page }}
           </button>
         </li>
         <li class="page-item">
-          <button class="page-link" @click="currentPage += 1" :disabled="currentPage === totalPages">
+          <button
+            class="page-link"
+            @click="currentPage += 1"
+            :disabled="currentPage === totalPages"
+          >
             Next &#8594;
           </button>
         </li>
-
       </ul>
     </div>
 
     <!-- User Details Modal -->
-    <div class="modal fade" id="userDetailsModal" tabindex="-1" role="dialog" aria-labelledby="userDetailsModalLabel"
-      aria-hidden="true">
+    <div
+      class="modal fade"
+      id="userDetailsModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="userDetailsModalLabel"
+      aria-hidden="true"
+    >
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -102,17 +124,23 @@
           </div>
           <div class="modal-body">
             <div v-if="selectedUser">
-              <strong>Full Name:</strong> {{ selectedUser.fullName }} <br>
-              <strong>Email:</strong> {{ selectedUser.email }} <br>
+              <strong>Full Name:</strong> {{ selectedUser.fullName }} <br />
+              <strong>Email:</strong> {{ selectedUser.email }} <br />
               <strong>Ballance:</strong> {{ selectedUser.ballance }} $
             </div>
+            {{orders}}
             <!-- Add more user details here -->
           </div>
           <div class="modal-footer">
-          <button type="button" class="btn btn-secondary bg-red-500 hover:bg-red-600 text-white" data-bs-dismiss="modal"
-            @click="closeViewModal">Close</button>
-        </div>
-
+            <button
+              type="button"
+              class="btn btn-secondary bg-red-500 hover:bg-red-600 text-white"
+              data-bs-dismiss="modal"
+              @click="closeViewModal"
+            >
+              Close
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -127,11 +155,12 @@ export default {
     return {
       users: [], // Changed to 'users'
       selectedUser: null,
+      orders:[],
       currentPage: 1,
       itemsPerPage: 10,
       searchEmail: "",
       limit: 1000, // Default limit
-      page: 1,   // Default page
+      page: 1, // Default page
     };
   },
   computed: {
@@ -163,7 +192,11 @@ export default {
           pages.push(1);
           pages.push(2);
           pages.push("...");
-          for (let i = this.totalPages - maxVisiblePages + 3; i <= this.totalPages; i++) {
+          for (
+            let i = this.totalPages - maxVisiblePages + 3;
+            i <= this.totalPages;
+            i++
+          ) {
             pages.push(i);
           }
         } else {
@@ -183,71 +216,71 @@ export default {
     },
   },
   created() {
-
-           // Fetch the initial data when the component is created
-           this.fetchInitialData();
-
-    },
+    // Fetch the initial data when the component is created
+    this.fetchInitialData();
+  },
   methods: {
     updateItemsPerPage() {
-    // Reset the current page to 1 when changing the items per page
-    this.currentPage = 1;
-  },
+      // Reset the current page to 1 when changing the items per page
+      this.currentPage = 1;
+    },
     formatDate(isoDate) {
       const date = new Date(isoDate);
       const options = {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
         hour12: false, // 24-hour format
       };
-      return date.toLocaleDateString('en-US', options);
+      return date.toLocaleDateString("en-US", options);
     },
     resetSearch() {
-  // Clear the search input
-  this.searchEmail = "";
+      // Clear the search input
+      this.searchEmail = "";
 
+      // Fetch the initial data again to reset the list
+      this.fetchInitialData();
+    },
 
-  // Fetch the initial data again to reset the list
-  this.fetchInitialData();
-},
-
-    
     fetchInitialData() {
-  // Fetch data from your API and update the 'users' and 'originalUsers' arrays
-  axios.get(`/users?limit=${this.limit}&page=${this.page}`)
-    .then(response => {
-      this.users = response.data.data.items;
-      this.originalUsers = response.data.data.items; // Initialize originalUsers
-    })
-    .catch(error => {
-      console.error('Error fetching data', error);
-    });
-},
-searchOrderByEmail() {
-  const keywordToSearch = this.searchEmail.trim().toLowerCase();
+      // Fetch data from your API and update the 'users' and 'originalUsers' arrays
+      axios
+        .get(`/users?limit=${this.limit}&page=${this.page}`)
+        .then((response) => {
+          this.users = response.data.data.items;
+          this.originalUsers = response.data.data.items; // Initialize originalUsers
+        })
+        .catch((error) => {
+          console.error("Error fetching data", error);
+        });
+    },
+    searchOrderByEmail() {
+      const keywordToSearch = this.searchEmail.trim().toLowerCase();
 
-  if (!keywordToSearch) {
-    // Handle empty search input as needed
-    this.users = this.originalUsers; // Reset to the original list
-    this.currentPage = 1; // Reset the current page to 1
-    return;
-  }
+      if (!keywordToSearch) {
+        // Handle empty search input as needed
+        this.users = this.originalUsers; // Reset to the original list
+        this.currentPage = 1; // Reset the current page to 1
+        return;
+      }
 
-  // Filter the users based on email and full name in the originalUsers list
-  this.users = this.originalUsers.filter((user) => {
-    const userMail = user.email ? user.email.toLowerCase() : "";
-    const fullName = user.fullName ? user.fullName.toLowerCase() : "";
+      // Filter the users based on email and full name in the originalUsers list
+      this.users = this.originalUsers.filter((user) => {
+        const userMail = user.email ? user.email.toLowerCase() : "";
+        const fullName = user.fullName ? user.fullName.toLowerCase() : "";
 
-    return userMail.includes(keywordToSearch) || fullName.includes(keywordToSearch);
-  });
+        return (
+          userMail.includes(keywordToSearch) ||
+          fullName.includes(keywordToSearch)
+        );
+      });
 
-  // Reset the current page to 1
-  this.currentPage = 1;
-},
+      // Reset the current page to 1
+      this.currentPage = 1;
+    },
 
     setCurrentPage(page) {
       this.currentPage = page;
@@ -263,11 +296,25 @@ searchOrderByEmail() {
       // Trigger the Bootstrap modal to show
       $("#userDetailsModal").modal("show");
     },
+    // get user by Id
+    async getUserById(userId) {
+      const users = await axios
+        .get(`/users/${userId}`) // Updated URL
+        .then((res) => this.selectedUser =res.data.data);
+
+        // get order
+         await axios
+        .get(`/order/getOrder/${userId}`) // Updated URL
+        .then((res) => this.orders =res.data.data);
+
+      $("#userDetailsModal").modal("show");
+
+    },
   },
   async mounted() {
     const urlParams = new URLSearchParams(window.location.search);
-    const limitParam = urlParams.get('limit');
-    const pageParam = urlParams.get('page');
+    const limitParam = urlParams.get("limit");
+    const pageParam = urlParams.get("page");
 
     // Update limit and page with query parameter values if provided
     if (limitParam) {
