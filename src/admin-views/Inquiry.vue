@@ -137,6 +137,9 @@ export default {
             searchFullName: "", // Initialize with an empty string
             searchEmail: "",
             originalOrders: [], // Initialize the originalOrders array
+            searchQuery: "", // Define searchQuery
+            inquiries: [],
+    originalInquiries: [], // Define originalInquiries
      
       itemsPerPage: 10,
       limit: 1000, // Default limit
