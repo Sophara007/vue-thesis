@@ -147,7 +147,7 @@
                                 <strong>Email:</strong> {{ selectedUser.email }}
                                 <br /> <br/>
                                 <strong>Balance:</strong>
-                                {{ selectedUser.balance }} $
+                                {{ selectedUser.ballance }} $
                                 <br/>
                             </div>
                             <hr />
