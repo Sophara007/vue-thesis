@@ -146,7 +146,7 @@
                                 {{ selectedUser.fullName }} <br /><br/>
                                 <strong>Email:</strong> {{ selectedUser.email }}
                                 <br /> <br/>
-                                <strong>Balance:</strong>
+                                <strong>Ballance:</strong>
                                 {{ selectedUser.ballance }} $
                                 <br/>
                             </div>
