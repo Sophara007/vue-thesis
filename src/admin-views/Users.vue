@@ -129,29 +129,27 @@
           <strong>Balance:</strong> {{ selectedUser.balance }} $
           <hr>
          <!-- Order History -->
-        
+       
 <h4><strong>Order History</strong></h4>
 <br>
 <table class="table">
   <thead>
     <tr>
       <th>Title</th>
-      <th>Created At</th>
-      <th>Price</th>
-      <th>Payment Method</th>
+      
       <th>Status</th>
+      <th>Image</th>
     </tr>
   </thead>
   <tbody>
     <tr v-for="order in orders" :key="order._id">
       <td>{{ order.subProductId.title }}</td>
-      <td>{{ formatDate(order.createdAt) }}</td>
-      <td>{{ order.subProductId.price }} $</td>
+      
       <td>
-        {{ order.paymentMethod === 2 ? "Online Payment" : order.paymentMethod === 1 ? "Cash on Delivery" : "Unknown" }}
-      </td>
-       <td>
         {{ order.status === 1 ? "Pending" : order.status === 2 ? "Agreed" : order.status === 3 ? "Rejected" : "Unknown" }}
+      </td>
+      <td>
+        <img :src="order.subProductId.image.url" alt="Product Image" style="max-width: 100px; max-height: 100px;">
       </td>
     </tr>
   </tbody>
