@@ -107,43 +107,72 @@
     </div>
 
     <!-- User Details Modal -->
-    <div
-      class="modal fade"
-      id="userDetailsModal"
-      tabindex="-1"
-      role="dialog"
-      aria-labelledby="userDetailsModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="userDetailsModalLabel">
-              {{ selectedUser ? selectedUser.fullName + " Informations" : "" }}
-            </h5>
-          </div>
-          <div class="modal-body">
-            <div v-if="selectedUser">
-              <strong>Full Name:</strong> {{ selectedUser.fullName }} <br />
-              <strong>Email:</strong> {{ selectedUser.email }} <br />
-              <strong>Ballance:</strong> {{ selectedUser.ballance }} $
-            </div>
-            {{orders}}
-            <!-- Add more user details here -->
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary bg-red-500 hover:bg-red-600 text-white"
-              data-bs-dismiss="modal"
-              @click="closeViewModal"
-            >
-              Close
-            </button>
-          </div>
+<div
+  class="modal fade"
+  id="userDetailsModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="userDetailsModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="userDetailsModalLabel">
+          {{ selectedUser ? selectedUser.fullName + " Information" : "" }}
+        </h5>
+      </div>
+      <div class="modal-body">
+        <div v-if="selectedUser">
+          <strong>Full Name:</strong> {{ selectedUser.fullName }} <br />
+          <strong>Email:</strong> {{ selectedUser.email }} <br />
+          <strong>Balance:</strong> {{ selectedUser.balance }} $
+          <hr>
+         <!-- Order History -->
+        
+<h4><strong>Order History</strong></h4>
+<br>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Created At</th>
+      <th>Price</th>
+      <th>Payment Method</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr v-for="order in orders" :key="order._id">
+      <td>{{ order.subProductId.title }}</td>
+      <td>{{ formatDate(order.createdAt) }}</td>
+      <td>{{ order.subProductId.price }} $</td>
+      <td>
+        {{ order.paymentMethod === 2 ? "Online Payment" : order.paymentMethod === 1 ? "Cash on Delivery" : "Unknown" }}
+      </td>
+       <td>
+        {{ order.status === 1 ? "Pending" : order.status === 2 ? "Agreed" : order.status === 3 ? "Rejected" : "Unknown" }}
+      </td>
+    </tr>
+  </tbody>
+</table>
+
         </div>
       </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary bg-red-500 hover-bg-red-600 text-white"
+          data-bs-dismiss="modal"
+          @click="closeViewModal"
+        >
+          Close
+        </button>
+      </div>
     </div>
+  </div>
+</div>
+
   </div>
 </template>
 
