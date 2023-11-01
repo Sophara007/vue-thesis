@@ -63,12 +63,15 @@
                         </td>
                         <td>{{formatDate(inquiry.createdAt) }}</td>
                         <td>
-                            <div class="wrapper-action">
-                                <button class="btn btn-info" data-bs-toggle="modal" @click="getOne(inquiry)"
-                                    data-bs-target="#viewInquiry">
-                                    View
-                                </button>
-                            </div>
+                          <div class="wrapper-action">
+  <button class="btn btn-info mx-2" data-bs-toggle="modal" @click="getOne(inquiry)" data-bs-target="#viewInquiry">
+    View
+  </button>
+  <button class="btn btn-primary" @click="prepareSendEmail(inquiry)" data-bs-toggle="modal" data-bs-target="#sendEmailModal">
+    Send Email
+  </button>
+</div>
+
                         </td>
                     </tr>
                 </tbody>
@@ -113,23 +116,54 @@
                     <div class="wrapper-inquiry">
                         <h6><strong>From</strong> : {{ inquiry.fullName }}</h6>
                         <h6><strong>Email</strong> : {{ inquiry.email }}</h6>
+                        <h6><strong>Phone Number</strong> : {{ inquiry.phoneNumber }}</h6>
                         <h6><strong>Promotion Code</strong> : {{ inquiry.promotionCode }}</h6>
                         <br>
                         <h6><strong>Subject</strong> : {{ inquiry.subject }}</h6>
                         <p>{{ inquiry.message }}</p>
                     </div>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer d-flex justify-content-between">
           <button type="button" class="btn btn-secondary bg-red-500 hover:bg-red-600 text-white" data-bs-dismiss="modal"
             @click="closeViewModal">Close</button>
+            
         </div>
 
             </div>
         </div>
     </div>
+ <!-- Send Email Modal -->
+<div class="modal fade" id="sendEmailModal" tabindex="-1" aria-labelledby="sendEmailModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="sendEmailModalLabel">Send Email To : {{ inquiry.email }}</h5>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="emailSubject">Subject :</label>
+          <input type="text" class="form-control" id="emailSubject" v-model="emailSubject">
+        </div>
+        <div class="form-group">
+          <label for="emailMessage">Email Message:</label>
+          <textarea class="form-control" id="emailMessage" v-model="emailMessage"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary bg-red-500 hover-bg-red-600 text-white" @click="closeModals" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary bg-blue-500 hover-bg-blue-600 text-white" @click="sendEmail">Send</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
 </template>
 <script>
 import axios from "axios";
+import Swal from 'sweetalert2';
+
 export default {
     data() {
         return {
@@ -140,6 +174,8 @@ export default {
             searchQuery: "", // Define searchQuery
             inquiries: [],
     originalInquiries: [], // Define originalInquiries
+    emailSubject: "",
+    emailMessage: "",
      
       itemsPerPage: 10,
       limit: 1000, // Default limit
@@ -205,6 +241,46 @@ this.fetchInitialData();
     },
   },
     methods: {
+      closeModals() {
+    $('#viewInquiry').modal('hide'); // Close the 'viewInquiry' modal
+    $('#sendEmailModal').modal('hide'); // Close the 'sendEmailModal' modal
+  },
+      prepareSendEmail(inquiry) {
+    this.inquiry = inquiry;
+    // Clear the email subject and message fields
+    this.emailSubject = "";
+    this.emailMessage = "";
+  },
+  sendEmail() {
+  const emailData = {
+    to: this.inquiry.email,
+    subject: this.emailSubject,
+    text: this.emailMessage,
+  };
+
+  axios
+    .post("/messages/send-email", emailData) // Replace with your actual email sending endpoint
+    .then(() => {
+      Swal.fire({
+        icon: "success",
+        title: "Email Sent",
+        text: "Email sent successfully.",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    })
+    .catch(() => {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Failed to send the email. Please try again.",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    });
+},
+
+
       updateItemsPerPage() {
     // Reset the current page to 1 when changing the items per page
     this.currentPage = 1;
@@ -236,23 +312,28 @@ fetchInitialData() {
     });
 },
 searchOrders() {
-  const query = this.searchQuery.trim().toLowerCase();
+    const query = this.searchQuery.trim().toLowerCase();
 
-  if (!query) {
-    // Handle empty search input as needed
-    return;
-  }
+    if (!query) {
+        // Handle empty search input as needed
+        return;
+    }
 
-  // Filter the inquiries based on email or full name fields
-  this.inquiries = this.originalInquiries.filter((inquiry) => {
-    const inquiryEmail = inquiry.email.toLowerCase();
-    const inquiryFullName = inquiry.fullName.toLowerCase();
+    // Filter the inquiries based on email, full name, and phone number fields
+    this.inquiries = this.originalInquiries.filter((inquiry) => {
+        const inquiryEmail = inquiry.email.toLowerCase();
+        const inquiryFullName = inquiry.fullName.toLowerCase();
+        const phoneNumber = inquiry.phoneNumber.toLowerCase();
 
-    return inquiryEmail.includes(query) || inquiryFullName.includes(query);
-  });
+        return (
+            inquiryEmail.includes(query) ||
+            inquiryFullName.includes(query) ||
+            phoneNumber.includes(query)
+        );
+    });
 
-  // Reset the current page to 1
-  this.currentPage = 1;
+    // Reset the current page to 1
+    this.currentPage = 1;
 },
 
 

@@ -263,26 +263,28 @@ export default {
         });
     },
     searchOrderByEmail() {
-  const keywordToSearch = this.searchEmail.trim().toLowerCase();
+    const keywordToSearch = this.searchEmail.trim().toLowerCase();
 
-  if (!keywordToSearch) {
-    // Handle empty search input as needed
-    this.topups = this.originalTopups; // Reset to the original list
-    this.currentPage = 1; // Reset the current page to 1
-    return;
-  }
+    if (!keywordToSearch) {
+        // Handle empty search input as needed
+        this.topups = this.originalTopups; // Reset to the original list
+        this.currentPage = 1; // Reset the current page to 1
+        return;
+    }
 
-  // Filter the topups based on email and full name in the originalTopups list
-  this.topups = this.originalTopups.filter((topup) => {
-    const topupEmail = topup.userId && topup.userId.email ? topup.userId.email.toLowerCase() : "";
-    const fullName = topup.userId && topup.userId.fullName ? topup.userId.fullName.toLowerCase() : "";
+    // Filter the topups based on email, full name, and phone number in the originalTopups list
+    this.topups = this.originalTopups.filter((topup) => {
+        const topupEmail = topup.userId && topup.userId.email ? topup.userId.email.toLowerCase() : "";
+        const fullName = topup.userId && topup.userId.fullName ? topup.userId.fullName.toLowerCase() : "";
+        const phoneNumber = topup.userId && topup.userId.phoneNumber ? topup.userId.phoneNumber.toLowerCase() : "";
 
-    return topupEmail.includes(keywordToSearch) || fullName.includes(keywordToSearch);
-  });
+        return topupEmail.includes(keywordToSearch) || fullName.includes(keywordToSearch) || phoneNumber.includes(keywordToSearch);
+    });
 
-  // Reset the current page to 1
-  this.currentPage = 1;
+    // Reset the current page to 1
+    this.currentPage = 1;
 },
+
 
 
 

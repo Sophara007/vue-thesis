@@ -285,25 +285,36 @@ export default {
     });
 },
 searchOrderByEmail() {
-  const keywordToSearch = this.searchEmail.trim().toLowerCase();
+    const keywordToSearch = this.searchEmail.trim().toLowerCase();
 
-  if (!keywordToSearch) {
-    // Handle empty search input as needed
-    this.orders = this.originalOrders; // Reset to the original list
-    this.currentPage = 1; // Reset the current page to 1
-    return;
-  }
+    if (!keywordToSearch) {
+        // Handle empty search input as needed
+        this.orders = this.originalOrders; // Reset to the original list
+        this.currentPage = 1; // Reset the current page to 1
+        return;
+    }
 
-  // Filter the orders based on email and customer name in the originalOrders list
-  this.orders = this.originalOrders.filter((order) => {
-    const orderEmail = order.orderId && order.orderId.userId && order.orderId.userId.email ? order.orderId.userId.email.toLowerCase() : "";
-    const customerName = order.orderId.userId && order.orderId.userId.fullName ? order.orderId.userId.fullName.toLowerCase() : "";
+    // Filter the orders based on email, customer name, and phone number in the originalOrders list
+    this.orders = this.originalOrders.filter((order) => {
+        const orderEmail = order.orderId && order.orderId.userId && order.orderId.userId.email
+            ? order.orderId.userId.email.toLowerCase()
+            : "";
+        const customerName = order.orderId.userId && order.orderId.userId.fullName
+            ? order.orderId.userId.fullName.toLowerCase()
+            : "";
+        const phoneNumber = order.orderId && order.orderId && order.orderId.phoneNumber
+            ? order.orderId.phoneNumber.toLowerCase()
+            : "";
 
-    return orderEmail.includes(keywordToSearch) || customerName.includes(keywordToSearch);
-  });
+        return (
+            orderEmail.includes(keywordToSearch) ||
+            customerName.includes(keywordToSearch) ||
+            phoneNumber.includes(keywordToSearch)
+        );
+    });
 
-  // Reset the current page to 1
-  this.currentPage = 1;
+    // Reset the current page to 1
+    this.currentPage = 1;
 },
 
 

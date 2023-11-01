@@ -306,19 +306,21 @@ export default {
     return;
   }
 
-  // Filter the originalOrders array based on email, customer name, and item titles
+  // Filter the originalOrders array based on email, customer name, item titles, and phone number
   this.orders = this.originalOrders.filter((order) => {
     const email = order.userId && order.userId.email ? order.userId.email.toLowerCase() : "";
     const customerName = order.userId && order.userId.fullName ? order.userId.fullName.toLowerCase() : "";
     const title = order.subProductId && order.subProductId.title ? order.subProductId.title.toLowerCase() : "";
+    const phoneNumber = order && order.phoneNumber ? order.phoneNumber.toLowerCase() : "";
 
-    // Check if the keyword is found in email, customer name, or item titles
-    return email.includes(keywordToSearch) || customerName.includes(keywordToSearch) || title.includes(keywordToSearch);
+    // Check if the keyword is found in email, customer name, item titles, or phone number
+    return email.includes(keywordToSearch) || customerName.includes(keywordToSearch) || title.includes(keywordToSearch) || phoneNumber.includes(keywordToSearch);
   });
 
   // Reset the current page to 1
   this.currentPage = 1;
 },
+
 
 
 

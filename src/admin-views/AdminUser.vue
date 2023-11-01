@@ -111,13 +111,14 @@
       </div>
       <div class="modal-body">
         <div class="wrapper-form-input">
-          <input type="text" class="form-control mb-3" placeholder="Full Name" v-model="selectedAdmin.fullname" />
-          <input type="email" class="form-control mb-3" placeholder="Email" v-model="selectedAdmin.email" />
+          <label for="">Username</label>
+          <input type="text" class="form-control mb-3 mt-2" placeholder="Full Name" v-model="selectedAdmin.fullname" />
+          <!-- <input type="email" class="form-control mb-3" placeholder="Email" v-model="selectedAdmin.email" />
           <input type="password" class="form-control mb-3" placeholder="New Password" v-model="selectedAdmin.newPassword" />
           <input type="password" class="form-control mb-3" placeholder="Confirm New Password" v-model="selectedAdmin.confirmNewPassword" />
           <div v-if="selectedAdmin.newPassword && selectedAdmin.newPassword.length > 0 && selectedAdmin.newPassword.length < 8" class="text-danger">
             New Password must be longer than or equal to 8 characters.
-          </div>
+          </div> -->
         </div>
       </div>
       <div class="modal-footer">

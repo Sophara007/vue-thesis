@@ -146,6 +146,10 @@
                                 {{ selectedUser.fullName }} <br /><br/>
                                 <strong>Email:</strong> {{ selectedUser.email }}
                                 <br /> <br/>
+                                <strong>Phone Number:</strong>
+                                {{ selectedUser.phoneNumber }} <br /><br/>
+                                <strong>Address:</strong>
+                                {{ selectedUser.address }} <br /><br/>
                                 <strong>Ballance:</strong>
                                 {{ selectedUser.ballance }} $
                                 <br/>
@@ -335,31 +339,34 @@ export default {
                 });
         },
         searchOrderByEmail() {
-            const keywordToSearch = this.searchEmail.trim().toLowerCase();
+    const keywordToSearch = this.searchEmail.trim().toLowerCase();
 
-            if (!keywordToSearch) {
-                // Handle empty search input as needed
-                this.users = this.originalUsers; // Reset to the original list
-                this.currentPage = 1; // Reset the current page to 1
-                return;
-            }
+    if (!keywordToSearch) {
+        // Handle empty search input as needed
+        this.users = this.originalUsers; // Reset to the original list
+        this.currentPage = 1; // Reset the current page to 1
+        return;
+    }
 
-            // Filter the users based on email and full name in the originalUsers list
-            this.users = this.originalUsers.filter((user) => {
-                const userMail = user.email ? user.email.toLowerCase() : "";
-                const fullName = user.fullName
-                    ? user.fullName.toLowerCase()
-                    : "";
+    // Filter the users based on email, full name, and phone number in the originalUsers list
+    this.users = this.originalUsers.filter((user) => {
+        const userMail = user.email ? user.email.toLowerCase() : "";
+        const fullName = user.fullName ? user.fullName.toLowerCase() : "";
+        const phoneNumber = user.phoneNumber ? user.phoneNumber.toLowerCase() : "";
 
-                return (
-                    userMail.includes(keywordToSearch) ||
-                    fullName.includes(keywordToSearch)
-                );
-            });
+        // Check if any part of the user's information includes the search keyword
+        return (
+            userMail.includes(keywordToSearch) ||
+            fullName.includes(keywordToSearch) ||
+            phoneNumber.includes(keywordToSearch)
+        );
+    });
 
-            // Reset the current page to 1
-            this.currentPage = 1;
-        },
+    // Reset the current page to 1
+    this.currentPage = 1;
+},
+
+
 
         setCurrentPage(page) {
             this.currentPage = page;
