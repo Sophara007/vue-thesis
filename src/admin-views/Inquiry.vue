@@ -252,6 +252,18 @@ this.fetchInitialData();
     this.emailMessage = "";
   },
   sendEmail() {
+  if (!this.emailSubject.trim() || !this.emailMessage.trim()) {
+    // Show an error message to the admin
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: "Please fill in both subject and message fields before sending the email.",
+      timer: 1500,
+      showConfirmButton: false,
+    });
+    return; // Don't proceed if fields are empty
+  }
+
   const emailData = {
     to: this.inquiry.email,
     subject: this.emailSubject,
@@ -279,6 +291,7 @@ this.fetchInitialData();
       });
     });
 },
+
 
 
       updateItemsPerPage() {
