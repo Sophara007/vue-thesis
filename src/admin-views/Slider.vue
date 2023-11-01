@@ -222,6 +222,8 @@ export default {
               icon: "success",
               title: "Slider Deleted!",
               text: "The slider has been successfully deleted.",
+              timer: 1500,
+  showConfirmButton: false
             });
           }
         }
@@ -275,6 +277,8 @@ export default {
           icon: "success",
           title: "Slider Created!",
           text: "The slider has been successfully created.",
+          timer: 1500,
+  showConfirmButton: false
         });
       } catch (error) {
         console.error("Error creating slider:", error);
@@ -282,6 +286,8 @@ export default {
           icon: "error",
           title: "Create Failed",
           text: "Failed to create the slider. Please try again.",
+          timer: 1500,
+  showConfirmButton: false
         });
       }
     },
@@ -317,6 +323,8 @@ export default {
             icon: "success",
             title: "Slider Updated!",
             text: "The slider has been successfully updated.",
+            timer: 1500,
+  showConfirmButton: false
           });
         }
       } catch (error) {
@@ -325,6 +333,8 @@ export default {
           icon: "error",
           title: "Update Failed",
           text: "Failed to update the slider. Please try again.",
+          timer: 1500,
+  showConfirmButton: false
         });
       }
     },

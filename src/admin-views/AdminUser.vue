@@ -265,6 +265,8 @@ export default {
           icon: 'success',
           title: 'Admin Updated',
           text: 'Admin details have been updated successfully!',
+          timer: 1500, // The dialog will automatically close after 1.5 seconds
+  showConfirmButton: false // Hide the "OK" button
         });
       }
     } else {
@@ -273,6 +275,8 @@ export default {
         icon: 'info',
         title: 'No Changes',
         text: 'No changes were made to the admin details.',
+        timer: 1500, // The dialog will automatically close after 1.5 seconds
+  showConfirmButton: false // Hide the "OK" button
       });
     }
   } catch (error) {
@@ -282,6 +286,8 @@ export default {
       icon: 'error',
       title: 'Error',
       text: 'An error occurred while updating admin details.',
+      timer: 1500, // The dialog will automatically close after 1.5 seconds
+  showConfirmButton: false // Hide the "OK" button
     });
   }
 },
@@ -293,6 +299,8 @@ export default {
         icon: 'error',
         title: 'Error',
         text: 'Password and Confirm Password do not match.',
+        timer: 1500, // The dialog will automatically close after 1.5 seconds
+  showConfirmButton: false // Hide the "OK" button
       });
       return; // Exit the method
     }
@@ -304,10 +312,15 @@ export default {
       await this.fetchAdminList();
 
       Swal.fire({
-        icon: 'success',
-        title: 'Admin Created',
-        text: 'New admin has been created successfully!',
-      });
+  icon: 'success',
+  title: 'Admin Created',
+  text: 'New admin has been created successfully!',
+  timer: 1500, // The dialog will automatically close after 1.5 seconds
+  showConfirmButton: false // Hide the "OK" button
+});
+
+
+
     }
   } catch (error) {
     console.error("Error creating admin:", error);
@@ -315,6 +328,8 @@ export default {
       icon: 'error',
       title: 'Error',
       text: 'An error occurred while creating admin.',
+      timer: 1500, // The dialog will automatically close after 1.5 seconds
+  showConfirmButton: false // Hide the "OK" button
     });
   }
 },
@@ -340,6 +355,8 @@ export default {
               icon: 'success',
               title: 'Admin Deleted',
               text: 'Admin has been deleted successfully!',
+              timer: 1500, // The dialog will automatically close after 2 seconds
+  showConfirmButton: false // Hide the "OK" button
             });
           }
         }
@@ -349,6 +366,8 @@ export default {
           icon: 'error',
           title: 'Error',
           text: 'An error occurred while deleting admin.',
+          timer: 1500, // The dialog will automatically close after 2 seconds
+  showConfirmButton: false // Hide the "OK" button
         });
       }
     },

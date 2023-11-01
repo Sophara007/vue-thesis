@@ -274,6 +274,8 @@ export default {
             icon: "success",
             title: "SubProduct Updated!",
             text: "The SubProduct has been successfully updated.",
+            timer: 1500,
+  showConfirmButton: false
           });
         }
       } catch (error) {
@@ -282,6 +284,8 @@ export default {
           icon: "error",
           title: "Update Failed",
           text: "Failed to update the SubProduct. Please try again.",
+          timer: 1500,
+  showConfirmButton: false
         });
       }
     },
@@ -316,6 +320,8 @@ export default {
               icon: "success",
               title: "SubProduct Deleted!",
               text: "The SubProduct has been successfully deleted.",
+              timer: 1500,
+  showConfirmButton: false
             });
           }
         }
@@ -325,6 +331,8 @@ export default {
           icon: "error",
           title: "Delete Failed",
           text: "Failed to delete the SubProduct. Please try again.",
+          timer: 1500,
+  showConfirmButton: false
         });
       }
     },
@@ -359,6 +367,8 @@ export default {
             icon: "success",
             title: "SubProduct Created!",
             text: "The SubProduct has been successfully created.",
+            timer: 1500,
+  showConfirmButton: false
           });
         }
       } catch (error) {
@@ -367,6 +377,8 @@ export default {
           icon: "error",
           title: "Create Failed",
           text: "Failed to create the SubProduct. Please try again.",
+          timer: 1500,
+  showConfirmButton: false
         });
       }
     },
@@ -392,6 +404,8 @@ export default {
           icon: "error",
           title: "Create Failed",
           text: "Failed to create the SubProduct. Please try again.",
+          timer: 1500,
+  showConfirmButton: false
         });
       }
     },

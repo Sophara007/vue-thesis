@@ -109,7 +109,9 @@ export default {
           Swal.fire({
             icon: 'success',
             title: 'Success',
-            text: 'Password updated successfully.'
+            text: 'Password updated successfully.',
+            timer: 1500,
+  showConfirmButton: false
           });
           // Clear input fields
           this.currentPassword = '';
@@ -121,7 +123,9 @@ export default {
           Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: 'An error occurred. Please check your input and try again.'
+            text: 'An error occurred. Please check your input and try again.',
+            timer: 1500,
+  showConfirmButton: false
           });
         });
     },

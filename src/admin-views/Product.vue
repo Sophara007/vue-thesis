@@ -228,6 +228,8 @@ export default {
               icon: "success",
               title: "Product Deleted!",
               text: "The product has been successfully deleted.",
+              timer: 1500,
+  showConfirmButton: false
             });
           }
         }
@@ -237,6 +239,8 @@ export default {
           icon: "error",
           title: "Delete Failed",
           text: "Failed to delete the product. Please try again.",
+          timer: 1500,
+  showConfirmButton: false
         });
       }
     },
@@ -279,6 +283,8 @@ export default {
           icon: "success",
           title: "Product Created!",
           text: "The product has been successfully created.",
+          timer: 1500,
+  showConfirmButton: false
         });
       } catch (error) {
         console.error("Error creating product:", error);
@@ -286,6 +292,8 @@ export default {
           icon: "error",
           title: "Create Failed",
           text: "Failed to create the product. Please try again.",
+          timer: 1500,
+  showConfirmButton: false
         });
       }
     },
@@ -321,6 +329,8 @@ export default {
             icon: "success",
             title: "Product Updated!",
             text: "The product has been successfully updated.",
+            timer: 1500,
+  showConfirmButton: false
           });
         }
       } catch (error) {
@@ -329,6 +339,8 @@ export default {
           icon: "error",
           title: "Update Failed",
           text: "Failed to update the product. Please try again.",
+          timer: 1500,
+  showConfirmButton: false
         });
       }
     },

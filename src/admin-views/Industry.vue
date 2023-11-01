@@ -238,6 +238,8 @@ export default {
             icon: "success",
             title: "Industry Updated!",
             text: "The industry has been successfully updated.",
+            timer: 1500,
+  showConfirmButton: false
           });
         }
       } catch (error) {
@@ -246,6 +248,8 @@ export default {
           icon: "error",
           title: "Update Failed",
           text: "Failed to update the industry. Please try again.",
+          timer: 1500,
+  showConfirmButton: false
         });
       }
     },
@@ -287,6 +291,8 @@ export default {
               icon: "success",
               title: "Industry Deleted!",
               text: "The industry has been successfully deleted.",
+              timer: 1500,
+  showConfirmButton: false
             });
           }
         }
@@ -296,6 +302,8 @@ export default {
           icon: "error",
           title: "Delete Failed",
           text: "Failed to delete the industry. Please try again.",
+          timer: 1500,
+  showConfirmButton: false
         });
       }
     },
@@ -341,6 +349,8 @@ export default {
           icon: "success",
           title: "Industry Created!",
           text: "The industry has been successfully created.",
+          timer: 1500,
+  showConfirmButton: false
         });
       } catch (error) {
         console.error("Error creating industry:", error);
@@ -348,6 +358,8 @@ export default {
           icon: "error",
           title: "Create Failed",
           text: "Failed to create the industry. Please try again.",
+          timer: 1500,
+  showConfirmButton: false
         });
       }
     },

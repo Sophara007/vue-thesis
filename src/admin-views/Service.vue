@@ -239,6 +239,8 @@ export default {
               icon: "success",
               title: "Service Deleted!",
               text: "The service has been successfully deleted.",
+              timer: 1500,
+  showConfirmButton: false
             });
           }
         }
@@ -249,6 +251,8 @@ export default {
           icon: "error",
           title: "Delete Failed",
           text: "Failed to delete the service. Please try again.",
+          timer: 1500,
+  showConfirmButton: false
         });
       }
     },
@@ -293,6 +297,8 @@ export default {
           icon: "success",
           title: "Service Created!",
           text: "The service has been successfully created.",
+          timer: 1500,
+  showConfirmButton: false
         });
       } catch (error) {
         console.error("Error creating service:", error);
@@ -301,6 +307,8 @@ export default {
           icon: "error",
           title: "Create Failed",
           text: "Failed to create the service. Please try again.",
+          timer: 1500,
+  showConfirmButton: false
         });
       }
     },
@@ -338,6 +346,8 @@ export default {
             icon: "success",
             title: "Service Updated!",
             text: "The service has been successfully updated.",
+            timer: 1500,
+  showConfirmButton: false
           });
         }
       } catch (error) {
@@ -347,6 +357,8 @@ export default {
           icon: "error",
           title: "Update Failed",
           text: "Failed to update the service. Please try again.",
+          timer: 1500,
+  showConfirmButton: false
         });
       }
     },

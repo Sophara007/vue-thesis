@@ -225,6 +225,8 @@ export default {
               icon: "success",
               title: "Partner Deleted!",
               text: "The partner has been successfully deleted.",
+              timer: 1500,
+  showConfirmButton: false
             });
           }
         }
@@ -234,6 +236,8 @@ export default {
           icon: "error",
           title: "Delete Failed",
           text: "Failed to delete the partner. Please try again.",
+          timer: 1500,
+  showConfirmButton: false
         });
       }
     },
@@ -278,6 +282,8 @@ export default {
           icon: "success",
           title: "Partner Created!",
           text: "The partner has been successfully created.",
+          timer: 1500,
+  showConfirmButton: false
         });
       } catch (error) {
         console.error("Error creating partner:", error);
@@ -285,6 +291,8 @@ export default {
           icon: "error",
           title: "Create Failed",
           text: "Failed to create the partner. Please try again.",
+          timer: 1500,
+  showConfirmButton: false
         });
       }
     },
@@ -320,6 +328,8 @@ export default {
             icon: "success",
             title: "Partner Updated!",
             text: "The partner has been successfully updated.",
+            timer: 1500,
+  showConfirmButton: false
           });
         }
       } catch (error) {
@@ -328,6 +338,8 @@ export default {
           icon: "error",
           title: "Update Failed",
           text: "Failed to update the partner. Please try again.",
+          timer: 1500,
+  showConfirmButton: false
         });
       }
     },
