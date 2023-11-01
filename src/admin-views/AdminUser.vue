@@ -102,26 +102,33 @@
 </div>
 
 
-  <!-- Edit Modal -->
-  <div class="modal fade wrapper-modal" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="editModalLabel">Edit Admin Details</h1>
-        </div>
-        <div class="modal-body">
-          <div class="wrapper-form-input">
-            <input type="text" class="form-control mb-3" placeholder="Full Name" v-model="selectedAdmin.fullname" />
-            <input type="email" class="form-control mb-3" placeholder="Email" v-model="selectedAdmin.email" />
+<!-- Edit Modal -->
+<div class="modal fade wrapper-modal" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="editModalLabel">Edit Admin Details</h1>
+      </div>
+      <div class="modal-body">
+        <div class="wrapper-form-input">
+          <input type="text" class="form-control mb-3" placeholder="Full Name" v-model="selectedAdmin.fullname" />
+          <input type="email" class="form-control mb-3" placeholder="Email" v-model="selectedAdmin.email" />
+          <input type="password" class="form-control mb-3" placeholder="New Password" v-model="selectedAdmin.newPassword" />
+          <input type="password" class="form-control mb-3" placeholder="Confirm New Password" v-model="selectedAdmin.confirmNewPassword" />
+          <div v-if="selectedAdmin.newPassword && selectedAdmin.newPassword.length > 0 && selectedAdmin.newPassword.length < 8" class="text-danger">
+            New Password must be longer than or equal to 8 characters.
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" @click="saveEditedAdmin">Save Changes</button>
-        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" @click="saveEditedAdmin">Save Changes</button>
       </div>
     </div>
   </div>
+</div>
+
+
 </template>
 
 <script>
@@ -146,10 +153,13 @@ export default {
       id: null,
       changes: {},
     },
-      selectedAdmin: {  // Initialize selectedAdmin with default values
-      fullname: "",  // You should use 'fullName' instead of 'fullname'
-      email: "",
-    },
+    selectedAdmin: {
+  fullname: "",
+  email: "",
+  newPassword: "", // Add newPassword field
+  confirmNewPassword: "", // Add confirmNewPassword field
+},
+
     };
   },
   computed: {
@@ -226,21 +236,22 @@ export default {
     },
     async saveEditedAdmin() {
   try {
-    const { id, fullname, email } = this.selectedAdmin; // Destructure admin data
+    const { id, fullname, email, newPassword, confirmNewPassword } = this.selectedAdmin; // Destructure admin data
     const updateData = {}; // Create an empty object for updated data
 
     // Check if email and fullname have been modified
-    const originalAdmin = this.adminList.find(admin => admin.id === id);
-    if (email !== originalAdmin.email && fullname !== originalAdmin.fullname) {
-      // Both email and fullname have been modified, choose one to update
-      // In this example, we choose to update email, but you can choose fullname instead
-      updateData.email = email;
-    } else if (email !== originalAdmin.email) {
+    const originalAdmin = this.adminList.find((admin) => admin.id === id);
+    if (email !== originalAdmin.email) {
       // Only email has been modified
       updateData.email = email;
-    } else if (fullname !== originalAdmin.fullname) {
+    }
+    if (fullname !== originalAdmin.fullname) {
       // Only fullname has been modified
       updateData.fullname = fullname;
+    }
+    if (newPassword && newPassword === confirmNewPassword) {
+      // New password is provided and matches the confirmation
+      updateData.password = newPassword;
     }
 
     // Check if any fields were modified
@@ -248,8 +259,6 @@ export default {
       const updateResponse = await axios.put(`/admin/update/${id}`, updateData);
       if (updateResponse.status === 200) {
         await this.fetchAdminList();
-
-      
 
         // Show SweetAlert success message
         Swal.fire({
