@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
-
 import AdminPanel from '@/views/AdminPanel.vue';
 
 import User from '@/admin-views/Users.vue';
@@ -14,7 +13,6 @@ import Product from '../admin-views/Product.vue';
 import Setting from '../admin-views/Setting.vue';
 import HomePage from '../admin-views/Home.vue';
 import Admin from '../admin-views/Admin.vue';
-import store from '../store';
 import Inquiry from '../admin-views/Inquiry.vue'
 import AdminUser from '../admin-views/AdminUser.vue'
 import IndustryDetail from '../admin-views/IndustryDetail.vue'
@@ -22,25 +20,23 @@ import SubProduct from '../admin-views/SubProduct.vue'
 import Order from '../admin-views/Order.vue'
 import Topup from '../admin-views/Topup.vue'
 import Invoice from '../admin-views/Invoice.vue'
+
 const routes = [
   {
     path: '/',
     component: Home,
     meta: {
-      title: 'Welcome To BlueTech' // Specify the title for the Product page
+      title: 'Welcome To BlueTech'
     }
   },
   {
     path: '/logout',
     component: Logout,
   },
-
-
   {
     path: '/admin',
     component: AdminPanel,
-    meta: { 
-      requiresAuth: true,
+    meta: {
       hideNavbar: true, 
     },
     children: [
@@ -49,7 +45,7 @@ const routes = [
         path: '/home',
         component: HomePage,
         meta: {
-          title: 'Home-Dashboard | BlueTech' // Specify the title for the Product page
+          title: 'Home-Dashboard | BlueTech'
         }
       },
       {
@@ -57,7 +53,7 @@ const routes = [
         path: '/slider',
         component: Slider,
         meta: {
-          title: 'Homepage-Slider | BlueTech' // Specify the title for the Product page
+          title: 'Homepage-Slider | BlueTech'
         }
       },
       {
@@ -65,7 +61,7 @@ const routes = [
         path: '/invoice',
         component: Invoice,
         meta: {
-          title: 'Invoice | BlueTech' // Specify the title for the Product page
+          title: 'Invoice | BlueTech'
         }
       },
       {
@@ -73,7 +69,7 @@ const routes = [
         path: '/service',
         component: Service,
         meta: {
-          title: 'Service | BlueTech' // Specify the title for the Product page
+          title: 'Service | BlueTech'
         }
       },
       {
@@ -81,7 +77,7 @@ const routes = [
         path: '/client',
         component: Industry,
         meta: {
-          title: 'Client | BlueTech' // Specify the title for the Product page
+          title: 'Client | BlueTech'
         }
       },
       {
@@ -89,7 +85,7 @@ const routes = [
         path: '/clientdetail',
         component: IndustryDetail,
         meta: {
-          title: 'Client-Detail | BlueTech' // Specify the title for the Product page
+          title: 'Client-Detail | BlueTech'
         }
       },
       {
@@ -97,7 +93,7 @@ const routes = [
         path: '/partner',
         component: Partner,
         meta: {
-          title: 'Partner | BlueTech' // Specify the title for the Product page
+          title: 'Partner | BlueTech'
         }
       },
       {
@@ -105,7 +101,7 @@ const routes = [
         path: '/order',
         component: Order,
         meta: {
-          title: 'Order | BlueTech' // Specify the title for the Product page
+          title: 'Order | BlueTech'
         }
       },
       {
@@ -113,7 +109,7 @@ const routes = [
         path: '/topup',
         component: Topup,
         meta: {
-          title: 'Top up | BlueTech' // Specify the title for the Product page
+          title: 'Top up | BlueTech'
         }
       },
       {
@@ -121,7 +117,7 @@ const routes = [
         path: '/product',
         component: Product,
         meta: {
-          title: 'Product | BlueTech' // Specify the title for the Product page
+          title: 'Product | BlueTech'
         }
       },
       {
@@ -129,7 +125,7 @@ const routes = [
         path: '/subproduct',
         component: SubProduct,
         meta: {
-          title: 'Sub-Product | BlueTech' // Specify the title for the Product page
+          title: 'Sub-Product | BlueTech'
         }
       },
       {
@@ -137,7 +133,7 @@ const routes = [
         path: '/setting',
         component: Setting,
         meta: {
-          title: 'Info-Setting | BlueTech' // Specify the title for the Product page
+          title: 'Info-Setting | BlueTech'
         }
       },
       {
@@ -145,8 +141,7 @@ const routes = [
         path: '/admin/users',
         component: User,
         meta: {
-          title: 'User | BlueTech', // Specify the title for the User Management page
-          requiresAuth: true
+          title: 'User | BlueTech',
         },
       },      
       {
@@ -155,7 +150,7 @@ const routes = [
         component: Inquiry,
         meta: { 
           title: 'Inquiry | BlueTech',
-          requiresAuth: true },
+        },
       },
       {
         name: "AdminUser",
@@ -163,7 +158,7 @@ const routes = [
         component: AdminUser,
         meta: { 
           title: 'Admin-User | BlueTech',
-          requiresAuth: true },
+        },
       },
       {
         name: 'AdminSetting',
@@ -171,18 +166,13 @@ const routes = [
         component: Admin,
         meta: {
           title: 'Admin Setting | BlueTech',
-          requiresAuth: true, // Require authentication for this route
         },
       },
     ],
   },
-
   {
     path: '/:catchAll(.*)',
     redirect: '/home',
-    meta: {
-      requiresAuth: true, // Require authentication for the Catch-All Route
-    },
   },
 ];
 
@@ -192,16 +182,7 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
-  const requiresGuest = to.matched.some((record) => record.meta.requiresGuest);
-
-  if (requiresAuth && !store.getters.isAuthenticated) {
-    next('/');
-  } else if (requiresGuest && store.getters.isAuthenticated) {
-    next('/admin');
-  } else {
-    next();
-  }
+  next(); // Allow all routes without authentication check
 });
 
 export default router;
